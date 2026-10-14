@@ -160,6 +160,11 @@ label.hard input{accent-color:var(--brass-text);width:16px;height:16px;margin:0}
 #veil{position:absolute;inset:0;display:grid;place-items:center;background:rgba(241,242,244,.9);z-index:3}
 #veil p{font-family:var(--display);font-size:22px;margin:0}
 #win{position:absolute;inset:0;display:grid;place-items:center;z-index:4;background:rgba(35,38,43,.35);padding:16px}
+#paused{position:absolute;inset:0;display:grid;place-items:center;z-index:5;background:var(--table);padding:16px}
+#paused .card{background:var(--card);border-radius:8px;padding:26px 28px;max-width:380px;width:100%;text-align:center;box-shadow:0 30px 60px rgba(35,38,43,.35)}
+#paused h2{font-family:var(--display);font-weight:400;font-size:30px;margin:0 0 6px;color:var(--brass-text)}
+#paused .row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:12px}
+#pauseBtn[aria-pressed="true"]{color:var(--brass-text)}
 #unlock{position:fixed;inset:0;display:grid;place-items:center;z-index:40;background:rgba(35,38,43,.45);padding:16px}
 #unlock .card{background:var(--card);border-radius:8px;padding:26px 28px;max-width:460px;width:100%;box-shadow:0 30px 60px rgba(35,38,43,.35)}
 #unlock h2{font-family:var(--display);font-weight:400;font-size:28px;margin:0 0 8px;color:var(--brass-text)}
@@ -236,14 +241,14 @@ label.hard input{accent-color:var(--brass-text);width:16px;height:16px;margin:0}
 </main>
 <div id="unlock" hidden role="dialog" aria-modal="true" aria-labelledby="unlockTitle"><div class="card">
   <h2 id="unlockTitle">Unlock every puzzle</h2>
-  <p id="unlockLead"><span id="freeCount"></span> puzzles are free to try. An unlock code opens all of them, at every piece count, on up to 5 of your devices.</p>
+  <p id="unlockLead">The free version includes a selection of puzzles at every piece count. An unlock code opens every picture on up to 3 of your devices.</p>
   <div id="unlockForm">
     <label for="unlockInput">Unlock code</label>
     <input id="unlockInput" placeholder="PP-XXXX-XXXX-XXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="24">
     <div class="row"><button class="btn" id="unlockGo">Unlock</button><a class="btn ghost" id="unlockBuy" href="buy.html" target="_blank" rel="noopener">Get a code</a><button class="btn ghost" id="unlockClose">Not now</button></div>
   </div>
   <div id="unlockDone" hidden>
-    <p>This device is unlocked with code <b id="unlockCode" style="font-family:var(--mono)"></b>. Enter the same code on your other devices (up to 5).</p>
+    <p>This device is unlocked with code <b id="unlockCode" style="font-family:var(--mono)"></b>. Enter the same code on your other devices (up to 3).</p>
     <div class="row"><button class="btn ghost" id="unlockRemove">Remove this device from the code</button><button class="btn" id="unlockClose2">Close</button></div>
   </div>
   <p id="unlockMsg" aria-live="polite"></p>
@@ -257,6 +262,7 @@ label.hard input{accent-color:var(--brass-text);width:16px;height:16px;margin:0}
     <div class="stat" id="pProg" title="Pieces joined"><em>0%</em></div>
     <div class="stat" id="pMoves" title="Moves (pieces placed)">0 moves</div>
     <div class="stat" id="pTime" title="Time spent">0:00</div>
+    <button class="tb icon" id="pauseBtn" aria-pressed="false" aria-label="Pause the timer" title="Pause the timer"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path id="pauseIco" d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg></button>
   </div>
   <div id="table">
     <canvas id="cv" aria-label="Puzzle table. Drag pieces to move them; double-tap a piece to bring it to the centre of the board; drag the empty table to pan; scroll or pinch to zoom."></canvas>
@@ -264,6 +270,7 @@ label.hard input{accent-color:var(--brass-text);width:16px;height:16px;margin:0}
     <div id="big" hidden><img id="bigImg" alt="Finished picture, full screen"><span>Tap anywhere to close</span></div>
     <div id="veil"><p id="veilMsg">Cutting pieces…</p></div>
     <canvas id="confetti" hidden></canvas>
+    <div id="paused" hidden><div class="card"><h2>Paused</h2><p>The timer is stopped and the pieces are hidden until you resume.</p><div class="row"><button class="btn" id="resumeBtn">Resume</button><button class="btn ghost" id="pausedBack">Back to puzzles</button></div></div></div>
     <div id="win" hidden><div class="card">
       <h2>Finished!</h2>
       <p id="winMsg"></p>
@@ -340,7 +347,6 @@ async function licCall(action,body){
 }
 function lockUI(){
   const b=$('unlockBtn'); b.hidden=!LOCKING; b.classList.toggle('on',unlocked()); b.querySelector('span').textContent=unlocked()?'Unlocked':'Unlock all puzzles';
-  $('freeCount').textContent=FREE.size;
 }
 function openUnlock(img){
   const d=$('unlock'), on=unlocked(); d.hidden=false; const m=$('unlockMsg'); m.textContent=''; m.className='';
@@ -555,7 +561,7 @@ function addEdge(path,pts,rev,ox,oy){
 
 async function openPuzzle(img,n){
   if(!canPlay(img)){openUnlock(img);return}
-  $('gallery').hidden=true; $('play').hidden=false; $('veil').hidden=false; $('win').hidden=true; $('veilMsg').textContent='Opening the box…';
+  $('gallery').hidden=true; $('play').hidden=false; $('veil').hidden=false; $('win').hidden=true; $('paused').hidden=true; $('pauseBtn').setAttribute('aria-pressed','false'); $('pauseIco').setAttribute('d','M7 5h4v14H7zM13 5h4v14h-4z'); $('veilMsg').textContent='Opening the box…';
   $('pTitle').textContent=img.title; $('peekImg').src='img/'+img.slug+'.jpg';
   resize();
   let im;
@@ -978,7 +984,9 @@ document.addEventListener('keydown',e=>{
 });
 
 /* ---------- timer & saving ---------- */
-function tick(){if(!P||P.won)return;const now=performance.now();if(document.visibilityState==='visible')P.elapsed+=now-P.started;P.started=now;$('pTime').textContent=fmtTime(P.elapsed)}
+function tick(){if(!P||P.won)return;const now=performance.now();if(document.visibilityState==='visible'&&!P.paused)P.elapsed+=now-P.started;P.started=now;$('pTime').textContent=fmtTime(P.elapsed)}
+function setPaused(on){ if(!P||P.won)return; tick(); P.paused=!!on; P.started=performance.now(); $('paused').hidden=!on; const b=$('pauseBtn'); b.setAttribute('aria-pressed',String(!!on)); b.setAttribute('aria-label',on?'Resume the timer':'Pause the timer'); b.title=b.getAttribute('aria-label'); $('pauseIco').setAttribute('d',on?'M8 5l11 7-11 7z':'M7 5h4v14H7zM13 5h4v14h-4z'); if(!on) draw(); }
+$('pauseBtn').onclick=()=>setPaused(!(P&&P.paused)); $('resumeBtn').onclick=()=>setPaused(false); $('pausedBack').onclick=()=>{setPaused(false);leave()};
 setInterval(tick,1000);
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){if(P){tick();save()}syncPush(true)}else if(P)P.started=performance.now()});
 function save(){

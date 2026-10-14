@@ -7,7 +7,7 @@ The web app at https://puzzle-parlor-app.pages.dev is free to try (the first two
 - `public/admin.html` — make, list and revoke codes. Needs the admin key.
 - `functions/api/license/[action].js` — `activate`, `deactivate` (public); `mint`, `list`, `revoke`, `unrevoke` (admin, header `x-admin-key`).
 - `functions/api/square/webhook.js` — Square calls this after a payment; it mints a code and emails it.
-- Codes look like `PP-XXXX-XXXX-XXXX`, work on up to 5 devices, and live in the PUZZLE_PROGRESS KV namespace under `lic:` keys.
+- Codes look like `PP-XXXX-XXXX-XXXX`, work on up to 3 devices, and live in the PUZZLE_PROGRESS KV namespace under `lic:` keys.
 
 ## One-time setup
 Add these as **GitHub repository secrets** (puzzle-parlor → Settings → Secrets and variables → Actions). Every deploy copies the ones that are set to the Cloudflare Pages project, so you never touch the Cloudflare dashboard. (Setting them directly in Cloudflare → Pages → Settings → Variables and Secrets also works.)
