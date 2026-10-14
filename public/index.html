@@ -573,8 +573,9 @@ function tidy(){
 function collectToTray(){
   const back=[];
   for(const g of P.groups.values()){if(g.locked||g.members.length!==1)continue;const i=g.members[0];if(!P.pieces[i].inTray){back.push(i);P.pieces[i].inTray=true}}
-  back.sort((a,b)=>P.pieces[b].edge-P.pieces[a].edge);
-  P.tray=back.concat(P.tray); buildTray(); save(); fit();
+  // shuffle everything going into the tray (Edges only still filters the tray when switched on)
+  P.tray=back.concat(P.tray); for(let i=P.tray.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[P.tray[i],P.tray[j]]=[P.tray[j],P.tray[i]]}
+  buildTray(); save(); fit();
 }
 
 /* ---------- piece tray ---------- */
