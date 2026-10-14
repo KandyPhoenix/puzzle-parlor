@@ -162,11 +162,12 @@ label.hard input{accent-color:var(--brass-text);width:16px;height:16px;margin:0}
 .tb.icon{padding:8px}
 .sep{width:1px;background:var(--faint);margin-inline:4px}
 @media (max-width:720px){ .tb .lbl{display:none} .tb{padding:8px} .tools{gap:4px;padding-inline:6px} .sep{display:none} }
-#loupeWrap{position:absolute;top:12px;left:12px;width:min(210px,42vw);aspect-ratio:1;border-radius:10px;background:var(--card);box-shadow:0 12px 30px rgba(35,38,43,.3);border:3px solid #fff;z-index:3;overflow:hidden;display:grid;place-items:center}
+#loupeWrap{position:absolute;top:12px;left:12px;touch-action:none;cursor:grab;user-select:none;width:min(210px,42vw);aspect-ratio:1;border-radius:10px;background:var(--card);box-shadow:0 12px 30px rgba(35,38,43,.3);border:3px solid #fff;z-index:3;overflow:hidden;display:grid;place-items:center}
 #loupeWrap canvas{width:100%;height:100%;display:block;grid-area:1/1}
 #loupeWrap .lhint{grid-area:1/1;font-size:12px;color:var(--muted);text-align:center;padding:0 16px;display:none}
 #loupeWrap.empty .lhint{display:block}
 #loupeWrap .lbtns{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:center;gap:6px;padding:6px;background:linear-gradient(transparent,rgba(241,242,244,.95) 40%)}
+#loupeWrap.dragging{cursor:grabbing;box-shadow:0 20px 40px rgba(35,38,43,.4)}
 #loupeWrap .lbtns button{width:40px;height:34px;border-radius:7px;border:1px solid var(--faint);background:var(--card);color:var(--ink);cursor:pointer;display:grid;place-items:center;font-weight:700}
 #loupeWrap .lbtns button svg{width:20px;height:20px}
 #loupeWrap .lbtns button:hover{border-color:var(--brass)}
@@ -823,6 +824,17 @@ function drawLoupe(){
   const z=S*0.9/(ext*2); lctx.setTransform(z,0,0,z,S/2-cx*z,S/2-cy*z); lctx.imageSmoothingQuality='high';
   for(const p of ps) drawPiece(lctx,p,hiCanvas(p));
 }
+/* the magnifier can be dragged anywhere on the table; its spot is remembered */
+(function(){
+  const w=$('loupeWrap'), tbl=$('table'); let dg=null;
+  function place(x,y){ const r=tbl.getBoundingClientRect(); x=Math.max(4,Math.min(r.width-w.offsetWidth-4,x)); y=Math.max(4,Math.min(r.height-w.offsetHeight-4,y)); w.style.left=x+'px'; w.style.top=y+'px'; return [x,y]; }
+  const saved=store.get('jig-loupe-pos'); if(saved) requestAnimationFrame(()=>place(saved.x,saved.y));
+  w.addEventListener('pointerdown',e=>{ if(e.target.closest('button')) return; dg={id:e.pointerId,dx:e.clientX-w.offsetLeft,dy:e.clientY-w.offsetTop}; w.setPointerCapture(e.pointerId); w.classList.add('dragging'); e.preventDefault(); e.stopPropagation(); });
+  w.addEventListener('pointermove',e=>{ if(!dg||e.pointerId!==dg.id) return; place(e.clientX-dg.dx,e.clientY-dg.dy); e.preventDefault(); });
+  const end=e=>{ if(!dg||e.pointerId!==dg.id) return; const [x,y]=place(e.clientX-dg.dx,e.clientY-dg.dy); store.set('jig-loupe-pos',{x,y}); dg=null; w.classList.remove('dragging'); };
+  w.addEventListener('pointerup',end); w.addEventListener('pointercancel',end);
+  window.addEventListener('resize',()=>{ const sv=store.get('jig-loupe-pos'); if(sv&&!w.hidden) place(sv.x,sv.y); });
+})();
 function setLoupe(on){ loupeOn=!!on; store.set('jig-loupe',loupeOn); $('loupeBtn').setAttribute('aria-pressed',String(loupeOn)); draw(); }
 $('loupeBtn').onclick=()=>setLoupe(!loupeOn); $('loupeHide').onclick=()=>setLoupe(false);
 $('loupeCW').onclick=()=>{ if(P&&P.lastId!=null&&P.groups.has(P.lastId)) rotateGroup(P.lastId) };
