@@ -28,7 +28,9 @@
   --mono:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
   color-scheme:light;
 }
-html,body{height:100%}
+html,body{height:100%;overscroll-behavior:none}
+button,label,.tab{touch-action:manipulation}
+#play{touch-action:none;overscroll-behavior:none}
 [hidden]{display:none!important}
 body{background:var(--wood);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5}
 button{font:inherit;color:inherit}
@@ -243,6 +245,7 @@ label.hard input{accent-color:var(--brass-text);width:16px;height:16px;margin:0}
     <div class="tray-side"><b id="trayCount">0</b><span>in tray</span></div>
   </div>
   <div class="tools" role="toolbar" aria-label="Puzzle tools">
+    <button class="tb" id="lock" aria-pressed="true" title="Lock: one finger only moves pieces; use two fingers (or a mouse) to move the table (L)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg><span class="lbl">Lock</span></button>
     <button class="tb icon" id="zOut" aria-label="Zoom out" title="Zoom out (−)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M8 11h6M20 20l-4-4"/></svg></button>
     <button class="tb" id="zFit" title="Fit everything (0)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span class="lbl">Fit</span></button>
     <button class="tb icon" id="zIn" aria-label="Zoom in" title="Zoom in (+)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M8 11h6M11 8v6M20 20l-4-4"/></svg></button>
@@ -449,7 +452,7 @@ let tableId=store.get('jig-table')||'gray'; if(!TABLES.some(t=>t.id===tableId)) 
 const curTable=()=>TABLES.find(t=>t.id===tableId);
 function applyTable(){document.documentElement.style.setProperty('--table',curTable().c);$('swatches').innerHTML=TABLES.map(t=>`<button class="sw${t.clear?' clear':''}" style="background:${t.c}" aria-label="${t.name} table" title="${t.name} table" aria-pressed="${t.id===tableId}" data-t="${t.id}"></button>`).join('');draw()}
 $('swatches').addEventListener('click',e=>{const b=e.target.closest('.sw');if(!b)return;tableId=b.dataset.t;store.set('jig-table',tableId);applyTable()});
-let P=null, cam={x:0,y:0,z:1}, needDraw=false, flags={edges:false,ghost:false,peek:false,sound:store.get('jig-sound')!==false};
+let P=null, cam={x:0,y:0,z:1}, needDraw=false, flags={edges:false,ghost:false,peek:false,sound:store.get('jig-sound')!==false,lock:store.get('jig-lock')!==false};
 
 const T=0.1, J=0.045;
 function edgeParams(rng){const r=()=>(rng()*2-1)*J;return{f:rng()<.5?1:-1,a:r(),b:r(),c:r(),d:r(),e:r()}}
@@ -529,7 +532,7 @@ async function openPuzzle(img,n){
     if(hard) for(const p of pieces) p.rot=1+Math.floor(Math.random()*3); // every piece starts turned
   }
   buildTray();
-  setFlag('edges',false); strip.classList.remove('edges'); setFlag('ghost',false); setFlag('peek',false); setFlag('sound',flags.sound);
+  setFlag('edges',false); strip.classList.remove('edges'); setFlag('ghost',false); setFlag('peek',false); setFlag('sound',flags.sound); setFlag('lock',flags.lock);
   $('restart').classList.remove('armed'); $('restart').querySelector('.lbl').textContent='Restart';
   $('veil').hidden=true;
   applyTable(); updateProgress(); fit(); draw();
@@ -821,12 +824,13 @@ cv.addEventListener('pointerdown',e=>{
   const[sx,sy]=local(e); ptrs.set(e.pointerId,{x:sx,y:sy});
   if(ptrs.size===2){ if(drag) endDrag(); pan=null; pinch=startPinch(); return; }
   if(ptrs.size>2) return;
-  const[wx,wy]=world(sx,sy), id=hitTest(wx,wy,e.pointerType==='touch'?14/cam.z:0);
+  const touch=e.pointerType==='touch';
+  const[wx,wy]=world(sx,sy), id=hitTest(wx,wy,touch?24/cam.z:0);
   const now=performance.now(), dbl=id!=null&&id===lastTap.id&&now-lastTap.t<400&&Math.hypot(sx-lastTap.x,sy-lastTap.y)<24;
   lastTap={t:now,x:sx,y:sy,id};
   if(dbl){lastTap.id=null;if(P.hard)rotateGroup(id);else centreGroup(id);return}
   if(id!=null){P.lastId=id;drag={id,x:wx,y:wy,pid:e.pointerId};toTop(id);cv.classList.add('grabbing');draw()}
-  else pan={x:sx,y:sy,cx:cam.x,cy:cam.y,pid:e.pointerId};
+  else if(!(touch&&flags.lock)) pan={x:sx,y:sy,cx:cam.x,cy:cam.y,pid:e.pointerId};
 });
 cv.addEventListener('pointermove',e=>{
   if(!P||!ptrs.has(e.pointerId)) return;
@@ -842,13 +846,13 @@ function up(e){
   if(!ptrs.has(e.pointerId)) return; ptrs.delete(e.pointerId);
   if(drag&&drag.pid===e.pointerId) endDrag(e.clientX,e.clientY);
   if(pan&&pan.pid===e.pointerId) pan=null;
-  if(pinch&&ptrs.size<2){pinch=null; if(ptrs.size===1){const[[pid,p]]=[...ptrs.entries()];pan={x:p.x,y:p.y,cx:cam.x,cy:cam.y,pid}}}
+  if(pinch&&ptrs.size<2){pinch=null; if(ptrs.size===1&&!flags.lock){const[[pid,p]]=[...ptrs.entries()];pan={x:p.x,y:p.y,cx:cam.x,cy:cam.y,pid}}}
 }
 cv.addEventListener('pointerup',up); cv.addEventListener('pointercancel',up); cv.addEventListener('lostpointercapture',up);
 cv.addEventListener('wheel',e=>{e.preventDefault();const[sx,sy]=local(e);const dy=e.deltaMode===1?e.deltaY*16:e.deltaY;zoomAt(sx,sy,Math.exp(-dy*.0016))},{passive:false});
 
 /* ---------- toolbar ---------- */
-function setFlag(name,v){flags[name]=v;const b=$(name==='peek'?'peekBtn':name);if(b)b.setAttribute('aria-pressed',String(v));if(name==='peek')$('peek').hidden=!v;if(name==='sound')store.set('jig-sound',v);draw()}
+function setFlag(name,v){flags[name]=v;const b=$(name==='peek'?'peekBtn':name);if(b)b.setAttribute('aria-pressed',String(v));if(name==='peek')$('peek').hidden=!v;if(name==='sound')store.set('jig-sound',v);if(name==='lock')store.set('jig-lock',v);draw()}
 $('edges').onclick=()=>{setFlag('edges',!flags.edges);strip.classList.toggle('edges',flags.edges)};
 $('toTray').onclick=()=>{if(P)collectToTray()};
 $('tidy').onclick=()=>{if(P)tidy()};
@@ -858,6 +862,7 @@ $('peekBtn').onclick=()=>setFlag('peek',!flags.peek);
 $('peek').onclick=()=>{$('bigImg').src=$('peekImg').src;$('big').hidden=false};
 $('big').onclick=()=>{$('big').hidden=true};
 $('sound').onclick=()=>{setFlag('sound',!flags.sound);if(flags.sound){ensureAudio();clack()}};
+$('lock').onclick=()=>setFlag('lock',!flags.lock);
 $('sort').onclick=()=>{if(P)spreadOut()};
 $('zFit').onclick=fit;
 $('zIn').onclick=()=>zoomAt(cv.clientWidth/2,cv.clientHeight/2,1.35);
@@ -875,7 +880,7 @@ document.addEventListener('keydown',e=>{
   if($('play').hidden||!P||e.target.closest('input,textarea')) return;
   const k=e.key.toLowerCase();
   if(k==='+'||k==='=') $('zIn').click(); else if(k==='-') $('zOut').click(); else if(k==='0') fit();
-  else if(k==='e') $('edges').click(); else if(k==='g') $('ghost').click(); else if(k==='p') $('peekBtn').click(); else if(k==='s') $('sort').click(); else if(k==='t') $('toTray').click(); else if(k==='y') $('tidy').click(); else if(k==='r'&&P.hard) $('rotate').click();
+  else if(k==='e') $('edges').click(); else if(k==='g') $('ghost').click(); else if(k==='p') $('peekBtn').click(); else if(k==='s') $('sort').click(); else if(k==='t') $('toTray').click(); else if(k==='y') $('tidy').click(); else if(k==='l') $('lock').click(); else if(k==='r'&&P.hard) $('rotate').click();
   else if(k==='f'){ if($('big').hidden){$('bigImg').src=$('peekImg').src;$('big').hidden=false} else $('big').hidden=true; }
   else if(k==='escape'){ if(!$('big').hidden) $('big').hidden=true; else if(!$('win').hidden) $('winStay').click(); else if(flags.peek) setFlag('peek',false); }
 });
