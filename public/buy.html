@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Puzzle Parlor Jigsaw Puzzle App for iPad, Phone and PC</title>
-<meta name="description" content="Jigsaw puzzle app for iPad, Android, phone and computer. 100 to 1,000 pieces, razor-sharp zoom, no ads, plays offline. Free version, or unlock every puzzle for $2.99.">
+<meta name="description" content="Jigsaw puzzle app for iPad, Android, phone and PC. 100 to 1,000 pieces, razor-sharp zoom, no ads, plays offline. Free version, or unlock every puzzle for $2.99.">
 <link rel="canonical" href="https://puzzles.kandyphoenix.com/buy">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://puzzles.kandyphoenix.com/buy">
@@ -93,6 +93,12 @@ h2{font-family:var(--display);font-weight:400;font-size:clamp(28px,4.2vw,40px);l
 .pcard li.no::before{content:"–";background:rgba(255,255,255,.18);color:#fff}
 .pcard h3{margin:0 0 10px;font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.6)}
 .pcard .note{font-size:13px;color:rgba(255,255,255,.6);margin-top:10px}
+.cmp{width:100%;border-collapse:collapse;font-size:15px;margin-bottom:8px}
+.cmp th{text-align:center;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.6);padding:0 6px 8px}
+.cmp th:first-child{text-align:left}
+.cmp td{padding:9px 6px;border-top:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.9);text-align:center}
+.cmp td:first-child{text-align:left;color:rgba(255,255,255,.75)}
+.cmp td:last-child{color:var(--gold);font-weight:700}
 /* steps + faq */
 .how{padding:30px 0 60px}
 .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:26px;counter-reset:s}
@@ -199,16 +205,16 @@ footer a{color:#fff}
       </div>
       <div>
         <h3>Free vs full</h3>
-        <ul>
-          <li>Free version: a selection of puzzles, every piece count, no time limit</li>
-          <li>Full version: every picture in all seven themes</li>
-          <li>All sizes from 100 to 1,000 pieces</li>
-          <li>Works on iPad, iPhone, Android, Windows and Mac</li>
-          <li>Up to 3 devices on one code</li>
-          <li>Offline play, progress sync, hard mode</li>
-          <li class="no">No ads, no account, no tracking, in both versions</li>
-          <li class="no">Plays without internet after a one-tap "Save for offline"</li>
-        </ul>
+        <table class="cmp">
+          <tr><th></th><th>Free</th><th>Full</th></tr>
+          <tr><td>Puzzles</td><td>Two per theme</td><td>Every picture</td></tr>
+          <tr><td>Piece counts 100 to 1,000</td><td>✓</td><td>✓</td></tr>
+          <tr><td>Sharp zoom, piece tray, hard mode</td><td>✓</td><td>✓</td></tr>
+          <tr><td>Offline play and progress sync</td><td>✓</td><td>✓</td></tr>
+          <tr><td>No ads, no account, no tracking</td><td>✓</td><td>✓</td></tr>
+          <tr><td>Devices</td><td>Any</td><td>3 per code</td></tr>
+          <tr><td>Price</td><td>$0</td><td>$2.99 once</td></tr>
+        </table>
         <p class="note">All sales are final. Try the free version on your device first to be sure it suits you.</p>
       </div>
     </div>
