@@ -95,9 +95,10 @@ button{font:inherit;color:inherit}
 .size.done .s{color:var(--brass-text)}
 label.hard{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--ink);cursor:pointer;padding:9px 14px;border-radius:6px;border:1px solid var(--faint);background:var(--card)}
 label.hard input{accent-color:var(--brass-text);width:16px;height:16px;margin:0}
-#syncBtn,#unlockBtn{display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border-radius:6px;border:1px solid var(--faint);background:var(--card);cursor:pointer;font-weight:600;font-size:13px;color:var(--ink)}
-#syncBtn i,#unlockBtn i{width:9px;height:9px;border-radius:50%;background:#b9ab9a}
-#syncBtn.on i,#unlockBtn.on i{background:#4f9d6b}
+#syncBtn,#unlockBtn,#offlineBtn{display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border-radius:6px;border:1px solid var(--faint);background:var(--card);cursor:pointer;font-weight:600;font-size:13px;color:var(--ink)}
+#syncBtn i,#unlockBtn i,#offlineBtn i{width:9px;height:9px;border-radius:50%;background:#b9ab9a}
+#syncBtn.on i,#unlockBtn.on i,#offlineBtn.on i{background:#4f9d6b}
+#offlineBtn i{background:#b9ab9a}#offlineBtn.busy i{background:var(--brass)}
 #unlockBtn i{background:var(--brass)}
 #unlockBtn.on{color:var(--muted)}
 #syncBtn.err i{background:#c8452f}
@@ -225,7 +226,7 @@ label.hard input{accent-color:var(--brass-text);width:16px;height:16px;margin:0}
         <ul class="menu" id="themeMenu" role="listbox" hidden></ul>
       </div>
       <div class="pins" id="pins"></div>
-      <div class="tools-right"><button id="unlockBtn" hidden><i></i><span>Unlock all puzzles</span></button><label class="hard" title="Pieces come out rotated; double-tap or Rotate to turn them"><input type="checkbox" id="hardMode"> Hard mode</label><button id="syncBtn" aria-expanded="false" aria-controls="syncPanel"><i></i><span id="syncLbl">Sync</span></button></div>
+      <div class="tools-right"><button id="unlockBtn" hidden><i></i><span>Unlock all puzzles</span></button><button id="offlineBtn" hidden title="Save every picture on this device so puzzles open without internet"><i></i><span>Save for offline</span></button><label class="hard" title="Pieces come out rotated; double-tap or Rotate to turn them"><input type="checkbox" id="hardMode"> Hard mode</label><button id="syncBtn" aria-expanded="false" aria-controls="syncPanel"><i></i><span id="syncLbl">Sync</span></button></div>
     </nav>
     <section id="syncPanel" hidden>
       <h3>Sync progress across devices</h3>
@@ -1018,6 +1019,20 @@ function confetti(){
   const bits=Array.from({length:160},()=>({x:Math.random()*w,y:-20-Math.random()*h*.5,vx:(Math.random()-.5)*2,vy:2+Math.random()*3,r:Math.random()*6.28,vr:(Math.random()-.5)*.3,s:5+Math.random()*7,c:cols[Math.random()*cols.length|0]}));
   let t=0;(function f(){t++;g.clearRect(0,0,w,h);for(const b of bits){b.x+=b.vx;b.y+=b.vy;b.r+=b.vr;g.save();g.translate(b.x,b.y);g.rotate(b.r);g.fillStyle=b.c;g.fillRect(-b.s/2,-b.s/4,b.s,b.s/2);g.restore()}if(t<260&&!c.hidden)requestAnimationFrame(f);else{g.clearRect(0,0,w,h);c.hidden=true}})();
 }
+
+/* ---------- offline: cache every picture on demand ---------- */
+const OFFLINE_OK=('caches' in window)&&('serviceWorker' in navigator)&&!window.Capacitor&&location.protocol==='https:';
+function offlineUI(state){ const b=$('offlineBtn'); b.hidden=!OFFLINE_OK; const done=store.get('jig-offline')===IMAGES.length; b.classList.toggle('on',done&&!state); b.classList.toggle('busy',!!state); b.querySelector('span').textContent=state||(done?'Saved for offline':'Save for offline'); }
+async function saveOffline(){
+  if(!OFFLINE_OK) return; const b=$('offlineBtn'); if(b.classList.contains('busy')) return;
+  const urls=[]; for(const i of IMAGES){ urls.push('img/'+i.slug+'.jpg','thumbs/'+i.slug+'.jpg'); }
+  try{
+    const c=await caches.open('puzzle-parlor-media'); let n=0;
+    for(let k=0;k<urls.length;k+=6){ await Promise.all(urls.slice(k,k+6).map(async u=>{ if(!(await c.match(u))){ const r=await fetch(u,{cache:'no-store'}); if(r.ok) await c.put(u,r); } })); n=Math.min(urls.length,k+6); offlineUI(`Saving… ${Math.round(n/urls.length*100)}%`); }
+    store.set('jig-offline',IMAGES.length); offlineUI('');
+  }catch(e){ offlineUI(''); alert('Could not save everything for offline use. Check your connection and try again.'); }
+}
+$('offlineBtn').onclick=saveOffline; offlineUI('');
 
 /* ---------- unlock UI wiring ---------- */
 $('unlockBtn').onclick=()=>openUnlock(null);

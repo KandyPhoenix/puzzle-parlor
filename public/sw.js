@@ -1,6 +1,6 @@
-const C='puzzle-parlor-95302818a4';
+const C='puzzle-parlor-c12b680ac4';
 self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(['./index.html','./manifest.webmanifest','./icon-192.png'])));self.skipWaiting()});
-self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))));self.clients.claim()});
+self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C&&k!=='puzzle-parlor-media').map(k=>caches.delete(k)))));self.clients.claim()});
 self.addEventListener('fetch',e=>{
   const u=new URL(e.request.url);
   if(e.request.method!=='GET'||u.origin!==location.origin||u.pathname.includes('/api/')) return;
