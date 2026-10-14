@@ -372,7 +372,8 @@ renderTabs();renderGrid();
 const SYNC_WORDS=['apple','brook','candle','dragon','ember','forest','garden','harbor','island','jasper','kettle','lantern','meadow','nectar','orchid','pepper','quartz','river','saddle','timber','velvet','willow','maple','copper','silver','marble','pebble','sunny','frost','clover'];
 const sync={code:store.get('jig-sync')||'',dirty:new Set(),timer:null,last:store.get('jig-sync-last')||0,err:'',busy:false};
 const syncOn=()=>!!sync.code;
-const apiUrl=p=>`api/p/${encodeURIComponent(sync.code)}/${encodeURIComponent(p)}`;
+const API_ROOT=(window.Capacitor||location.protocol==='file:')?'https://puzzle-parlor-app.pages.dev/':'';
+const apiUrl=p=>`${API_ROOT}api/p/${encodeURIComponent(sync.code)}/${encodeURIComponent(p)}`;
 async function apiCall(p,opt){
   const r=await fetch(apiUrl(p),Object.assign({cache:'no-store'},opt||{}));
   if(r.status===404) return null;
@@ -925,6 +926,6 @@ function confetti(){
 }
 </script>
 
-<script>if('serviceWorker' in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('sw.js').catch(()=>{});</script>
+<script>if('serviceWorker' in navigator&&location.protocol!=='file:'&&!window.Capacitor)navigator.serviceWorker.register('sw.js').catch(()=>{});</script>
 </body>
 </html>
