@@ -23,6 +23,8 @@ code{font-family:"IBM Plex Mono",Consolas,monospace;font-size:14px}
 <h1>Puzzle Parlor unlock codes</h1>
 <p class="muted">Admin page. Needs the LICENSE_ADMIN_KEY secret set on the Cloudflare Pages project. The key is kept in this browser tab only.</p>
 <div class="card"><label for="key">Admin key</label><div class="row"><input id="key" type="password" placeholder="paste admin key"><button id="load">Load codes</button></div><p id="msg" class="muted"></p></div>
+<div class="card"><h2 style="margin:0 0 6px;font-size:18px">Settings</h2><p class="muted" style="margin:0 0 8px">Keys for automatic codes and emails. Saved on the server; leave a box blank to keep the current value, type <code>-</code> to clear it.</p>
+<div id="settings"></div><div class="row" style="margin-top:10px"><button id="saveSettings">Save settings</button><span id="setMsg" class="muted"></span></div></div>
 <div class="card"><h2 style="margin:0 0 6px;font-size:18px">Make codes</h2><p class="muted" style="margin:0 0 8px">For a manual sale (Square invoice, gift, giveaway). Email the code to the buyer yourself.</p>
 <div class="row"><div><label for="n">How many</label><input id="n" type="number" value="1" min="1" max="100" style="min-width:90px"></div><div><label for="note">Note</label><input id="note" placeholder="e.g. Etsy order 123 / gift for Mom"></div><div><label for="email">Buyer email (optional)</label><input id="email" placeholder="buyer@example.com"></div><button id="mint">Make</button></div>
 <div id="out" hidden></div></div>
@@ -38,9 +40,12 @@ const fmt=t=>t?new Date(t).toLocaleString():'';
 async function load(){ $('msg').textContent='Loading…'; try{ const j=await api('list'); $('count').textContent='('+j.count+')'; $('msg').textContent='';
   $('rows').innerHTML=j.licenses.map(l=>`<tr><td><code>${l.code}</code>${l.revoked?' <span class="rev">revoked</span>':''}</td><td>${fmt(l.c)}</td><td>${l.src||''}${l.emailed?' · emailed':''}</td><td>${l.email||''}</td><td>${l.note||''}${l.order?' · '+l.order:''}</td><td>${l.devices.length}/${l.max}${l.devices.length?'<br><small class="muted">'+l.devices.map(d=>(d.name||'device')+' '+fmt(d.at).split(',')[0]).join('<br>')+'</small>':''}</td><td><button class="ghost" data-act="${l.revoked?'unrevoke':'revoke'}" data-code="${l.code}">${l.revoked?'Restore':'Revoke'}</button></td></tr>`).join('')||'<tr><td colspan="7" class="muted">No codes yet.</td></tr>';
  }catch(e){ $('msg').textContent='Error: '+e.message; } }
-$('load').onclick=load;
+const SETTINGS=[['SQUARE_WEBHOOK_SIGNATURE_KEY','Square webhook signature key'],['PUZZLE_PRICE_CENTS','Puzzle price in cents (e.g. 299)'],['RESEND_API_KEY','Resend API key (for emailing codes)'],['LICENSE_FROM_EMAIL','From address, e.g. Puzzle Parlor <puzzles@phoenixmethodseo.com>'],['LICENSE_REPLY_TO','Reply-to address'],['APP_URL','App address used in the email'],['SQUARE_NOTIFICATION_URL','Webhook URL override (normally blank)']];
+async function loadSettings(){ try{ const j=await api('settings',{}); $('settings').innerHTML=SETTINGS.map(([k,l])=>{const s=j.settings[k]||{}; return `<label for="s_${k}">${l} <span class="muted" style="font-weight:400;text-transform:none;letter-spacing:0">${s.set?'· currently '+s.preview+(s.source==='env'?' (from GitHub secret)':''):'· not set'}</span></label><input id="s_${k}" data-k="${k}" style="width:100%" autocomplete="off">`}).join(''); }catch(e){ $('settings').textContent='Error: '+e.message; } }
+$('saveSettings').onclick=async()=>{ const set={}; document.querySelectorAll('#settings input').forEach(i=>{const v=i.value.trim(); if(v==='-') set[i.dataset.k]=''; else if(v) set[i.dataset.k]=v;}); $('setMsg').textContent='Saving…'; try{ await api('settings',{set}); $('setMsg').textContent='Saved.'; loadSettings(); }catch(e){ $('setMsg').textContent='Error: '+e.message; } };
+$('load').onclick=()=>{load();loadSettings()};
 $('mint').onclick=async()=>{ $('out').hidden=false; $('out').textContent='Making…'; try{ const j=await api('mint',{count:+$('n').value||1,note:$('note').value,email:$('email').value}); $('out').textContent=j.codes.join('\n'); load(); }catch(e){ $('out').textContent='Error: '+e.message; } };
 $('rows').addEventListener('click',async e=>{ const b=e.target.closest('button[data-act]'); if(!b) return; if(b.dataset.act==='revoke'&&!confirm('Revoke '+b.dataset.code+'? Devices using it will lock on their next check.')) return; try{ await api(b.dataset.act,{code:b.dataset.code}); load(); }catch(err){ alert(err.message); } });
-if(key()) load();
+if(key()){load();loadSettings()}
 </script>
 </body></html>

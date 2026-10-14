@@ -2,6 +2,9 @@
 export const CORS={'access-control-allow-origin':'*','access-control-allow-methods':'GET,POST,OPTIONS','access-control-allow-headers':'content-type,x-admin-key','access-control-max-age':'86400'};
 export const json=(obj,status=200)=>new Response(JSON.stringify(obj),{status,headers:Object.assign({'content-type':'application/json','cache-control':'no-store'},CORS)});
 export const MAX_DEVICES=5;
+// Settings: stored in KV under cfg:<NAME> (set from admin.html) with the Pages env var of the same name as fallback.
+export const SETTING_NAMES=['SQUARE_WEBHOOK_SIGNATURE_KEY','SQUARE_NOTIFICATION_URL','PUZZLE_PRICE_CENTS','RESEND_API_KEY','LICENSE_FROM_EMAIL','LICENSE_REPLY_TO','APP_URL'];
+export async function cfg(env,name){ const v=await env.PROGRESS.get('cfg:'+name); return (v!=null&&v!=='')?v:(env[name]||''); }
 const ALPHABET='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // no 0/O/1/I
 export function makeCode(){
   const b=new Uint8Array(12); crypto.getRandomValues(b);
@@ -49,9 +52,10 @@ export function adminOk(request,env){
   let diff=0; for(let i=0;i<want.length;i++) diff|=want.charCodeAt(i)^got.charCodeAt(i); return diff===0;
 }
 export async function sendCodeEmail(env,{to,code}){
-  if(!env.RESEND_API_KEY||!env.LICENSE_FROM_EMAIL||!to) return false;
-  const appUrl=env.APP_URL||'https://puzzle-parlor-app.pages.dev/';
+  const key=await cfg(env,'RESEND_API_KEY'), from=await cfg(env,'LICENSE_FROM_EMAIL'), replyTo=await cfg(env,'LICENSE_REPLY_TO');
+  if(!key||!from||!to) return false;
+  const appUrl=(await cfg(env,'APP_URL'))||'https://puzzle-parlor-app.pages.dev/';
   const text=`Thank you for buying Puzzle Parlor!\n\nYour unlock code: ${code}\n\nHow to use it:\n1. Open ${appUrl} on your tablet, phone or computer (on iPad, use Safari and choose Share > Add to Home Screen to install it).\n2. Tap "Unlock" at the top of the puzzle gallery.\n3. Enter the code. Every puzzle opens on up to ${MAX_DEVICES} devices.\n\nKeep this email; the code is your proof of purchase.\n\nQuestions? Reply to this email.`;
-  const r=await fetch('https://api.resend.com/emails',{method:'POST',headers:{authorization:'Bearer '+env.RESEND_API_KEY,'content-type':'application/json'},body:JSON.stringify({from:env.LICENSE_FROM_EMAIL,to:[to],reply_to:env.LICENSE_REPLY_TO||undefined,subject:'Your Puzzle Parlor unlock code',text})});
+  const r=await fetch('https://api.resend.com/emails',{method:'POST',headers:{authorization:'Bearer '+key,'content-type':'application/json'},body:JSON.stringify({from,to:[to],reply_to:replyTo||undefined,subject:'Your Puzzle Parlor unlock code',text})});
   return r.ok;
 }
