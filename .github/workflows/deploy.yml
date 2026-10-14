@@ -20,11 +20,11 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: d3aefe8ad2b7a8399b3f47238cde9599
-          command: pages project create puzzle-parlor --production-branch=main
+          command: pages project create puzzle-parlor-app --production-branch=main
         continue-on-error: true
       - name: Deploy
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: d3aefe8ad2b7a8399b3f47238cde9599
-          command: pages deploy --project-name=puzzle-parlor --branch=main --commit-dirty=true
+          command: pages deploy --project-name=puzzle-parlor-app --branch=main --commit-dirty=true
