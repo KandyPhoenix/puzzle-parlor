@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Puzzle Parlor</string>
+    <string name="title_activity_main">Puzzle Parlor</string>
+    <string name="package_name">com.kandyphoenix.puzzleparlor</string>
+    <string name="custom_url_scheme">com.kandyphoenix.puzzleparlor</string>
+</resources>
