@@ -58,6 +58,8 @@ button{font:inherit;color:inherit}
 .menu .pinb:hover{background:var(--chip-hi)}
 .menu .hint{padding:6px 10px 4px;font-size:11px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
 .pins{display:flex;flex-wrap:wrap;gap:8px}
+.tools-right{display:flex;flex-wrap:wrap;gap:8px;margin-left:auto}
+@media (max-width:720px){.tools-right{margin-left:0}}
 .pins .tab{padding-left:12px}
 .pins .tab svg{width:13px;height:13px;opacity:.55}
 .tab{display:inline-flex;align-items:center;gap:9px;padding:9px 16px;border-radius:999px;border:1px solid var(--faint);background:transparent;cursor:pointer;font-weight:600;font-size:14px;color:var(--muted)}
@@ -83,13 +85,13 @@ button{font:inherit;color:inherit}
 .size .bar{position:absolute;left:0;bottom:0;height:3px;background:var(--brass)}
 .size.done{border-color:var(--brass)}
 .size.done .s{color:var(--brass-text)}
-label.hard{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--ink);cursor:pointer;padding:8px 12px;border-radius:999px;border:1px solid var(--faint);background:var(--card)}
+label.hard{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--ink);cursor:pointer;padding:8px 14px;border-radius:999px;border:1px solid var(--faint);background:var(--card)}
 label.hard input{accent-color:var(--brass-text);width:16px;height:16px;margin:0}
 #syncBtn{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;border:1px solid var(--faint);background:var(--card);cursor:pointer;font-weight:600;font-size:13px;color:var(--ink)}
 #syncBtn i{width:9px;height:9px;border-radius:50%;background:#b9ab9a}
 #syncBtn.on i{background:#4f9d6b}
 #syncBtn.err i{background:#c8452f}
-#syncPanel{margin-block:18px 0;padding:18px 20px;border-radius:8px;background:var(--card);box-shadow:0 1px 2px rgba(35,38,43,.06),0 12px 26px -16px rgba(35,38,43,.35);max-width:620px}
+#syncPanel{margin-block:-8px 22px;padding:18px 20px;border-radius:8px;background:var(--card);box-shadow:0 1px 2px rgba(35,38,43,.06),0 12px 26px -16px rgba(35,38,43,.35);max-width:620px}
 #syncPanel h3{margin:0 0 6px;font-size:17px}
 #syncPanel p{margin:0 0 12px;color:var(--muted);font-size:14px;max-width:62ch}
 #syncPanel label{display:block;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
@@ -170,11 +172,16 @@ label.hard input{accent-color:var(--brass-text);width:16px;height:16px;margin:0}
   <div class="wrap">
     <header class="mast">
       <h1>Puzzle <span>Parlor</span></h1>
-      <div style="display:flex;flex-direction:column;gap:10px;align-items:flex-start">
-        <p id="lede">Jigsaw puzzles of spooky Halloween scenes, cozy Christmas and holiday pictures, famous paintings, fantasy worlds, fairy tales and landscapes. Pick any picture and choose from 400 to 1,000 pieces.</p>
-        <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center"><button id="syncBtn" aria-expanded="false" aria-controls="syncPanel"><i></i><span id="syncLbl">Sync across devices</span></button><label class="hard"><input type="checkbox" id="hardMode"> Hard mode: pieces come out rotated</label></div>
-      </div>
+      <p id="lede">Jigsaw puzzles of spooky Halloween scenes, cozy Christmas and holiday pictures, famous paintings, fantasy worlds, fairy tales and landscapes. Pick any picture and choose from 400 to 1,000 pieces.</p>
     </header>
+    <nav class="tabs" id="tabs" aria-label="Puzzle themes">
+      <div class="picker">
+        <button class="tab tab-cur" id="themeBtn" aria-haspopup="listbox" aria-expanded="false" aria-controls="themeMenu"><i></i><span id="themeName"></span><b id="themeCount"></b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+        <ul class="menu" id="themeMenu" role="listbox" hidden></ul>
+      </div>
+      <div class="pins" id="pins"></div>
+      <div class="tools-right"><label class="hard" title="Pieces come out rotated; double-tap or Rotate to turn them"><input type="checkbox" id="hardMode"> Hard mode</label><button id="syncBtn" aria-expanded="false" aria-controls="syncPanel"><i></i><span id="syncLbl">Sync</span></button></div>
+    </nav>
     <section id="syncPanel" hidden>
       <h3>Sync progress across devices</h3>
       <p>Use the same sync code on your iPad, phone and computer and your saved puzzles follow you. Anyone with the code can see your progress, so treat it like a password.</p>
@@ -183,13 +190,6 @@ label.hard input{accent-color:var(--brass-text);width:16px;height:16px;margin:0}
       <div class="row"><button class="btn" id="syncSave">Save and sync</button><button class="btn ghost" id="syncNew">Make a new code</button><button class="btn ghost" id="syncOff">Turn off</button></div>
       <p id="syncMsg"></p>
     </section>
-    <nav class="tabs" id="tabs" aria-label="Puzzle themes">
-      <div class="picker">
-        <button class="tab tab-cur" id="themeBtn" aria-haspopup="listbox" aria-expanded="false" aria-controls="themeMenu"><i></i><span id="themeName"></span><b id="themeCount"></b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
-        <ul class="menu" id="themeMenu" role="listbox" hidden></ul>
-      </div>
-      <div class="pins" id="pins"></div>
-    </nav>
     <section class="grid" id="grid" aria-live="polite"></section>
     <p class="credit">The "New scene" pictures are original illustrations made for this app with Canva's AI image tool. Everything else is public-domain art from Wikimedia Commons; tap an artist line to see its Commons page. Piece counts are rounded to fit each picture's shape, so a "1,000" puzzle may have a few more or fewer.</p>
   </div>
@@ -369,9 +369,9 @@ async function syncPullSave(key){
 }
 function syncStatus(){
   const b=$('syncBtn'), l=$('syncLbl'); b.classList.toggle('on',syncOn()&&!sync.err); b.classList.toggle('err',syncOn()&&!!sync.err);
-  if(!syncOn()) l.textContent='Sync across devices';
+  if(!syncOn()) l.textContent='Sync devices';
   else if(sync.err) l.textContent='Sync problem';
-  else l.textContent='Syncing · '+sync.code;
+  else l.textContent='Synced · '+sync.code;
   const m=$('syncMsg');
   if(!syncOn()) m.textContent='Sync is off. Progress stays in this browser only.';
   else if(sync.err) m.textContent='Could not reach the sync server ('+sync.err+'). Your progress is still saved on this device; it will sync when the server is reachable. Sync only works on the Cloudflare-hosted copy of the app.';
