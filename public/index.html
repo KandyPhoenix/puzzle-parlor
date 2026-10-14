@@ -181,7 +181,7 @@ label.hard input{accent-color:var(--brass-text);width:16px;height:16px;margin:0}
 #veil{position:absolute;inset:0;display:grid;place-items:center;background:rgba(241,242,244,.9);z-index:3}
 #veil p{font-family:var(--display);font-size:22px;margin:0}
 #win{position:absolute;inset:0;display:grid;place-items:center;z-index:4;background:rgba(35,38,43,.35);padding:16px}
-#paused{position:absolute;inset:0;display:grid;place-items:center;z-index:5;background:var(--table);padding:16px}
+#paused{position:fixed;inset:0;display:grid;place-items:center;z-index:5;background:var(--table);padding:16px}
 #paused .card{background:var(--card);border-radius:8px;padding:26px 28px;max-width:380px;width:100%;text-align:center;box-shadow:0 30px 60px rgba(35,38,43,.35)}
 #paused h2{font-family:var(--display);font-weight:400;font-size:30px;margin:0 0 6px;color:var(--brass-text)}
 #paused .row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:12px}
@@ -391,13 +391,14 @@ async function redeem(){
 }
 async function removeDevice(){
   const l=lic.get(); if(!l) return; const m=$('unlockMsg'); m.textContent='Removing…';
-  try{ await licCall('deactivate',{code:l.code,device:deviceId()}); }catch(e){}
+  try{ const r=await licCall('deactivate',{code:l.code,device:deviceId()}); if(!(r.body.ok||r.status===404)){ m.className='err'; m.textContent='Could not remove this device right now. Try again in a moment.'; return; } }
+  catch(e){ m.className='err'; m.textContent='Could not reach the server. Check your connection and try again.'; return; }
   lic.set(null); renderGrid(); lockUI(); closeUnlock();
 }
 async function recheckLicense(){
   const l=lic.get(); if(!LOCKING||!l||!l.ok||Date.now()-(l.v||0)<7*864e5||navigator.onLine===false) return;
   try{ const r=await licCall('activate',{code:l.code,device:deviceId()});
-    if(r.body.ok){l.v=Date.now();lic.set(l)} else if([403,404,409].includes(r.status)){lic.set(null);renderGrid();lockUI()} }catch(e){}
+    if(r.body.ok){l.v=Date.now();lic.set(l)} else if(['unknown','revoked','device_limit'].includes(r.body.error)){lic.set(null);renderGrid();lockUI()} }catch(e){}
 }
 
 
@@ -533,7 +534,7 @@ async function syncPullSave(key){
   const e=idx()[key], local=store.get(key);
   if(!e||e.pct==null) return;
   if(local&&(local.u||0)>=(e.u||0)) return;
-  try{ const r=await apiCall(key); if(r) store.set(key,r); }catch(err){ sync.err=err.message; syncStatus(); }
+  try{ const r=await apiCall(key); if(r&&(!local||(r.u||0)>(local.u||0))) store.set(key,r); }catch(err){ sync.err=err.message; syncStatus(); }
 }
 function syncStatus(){
   const b=$('syncBtn'), l=$('syncLbl'); b.classList.toggle('on',syncOn()&&!sync.err); b.classList.toggle('err',syncOn()&&!!sync.err);
@@ -583,23 +584,26 @@ function addEdge(path,pts,rev,ox,oy){
   for(let k=1;k<10;k+=3) path.bezierCurveTo(q[k][0]-ox,q[k][1]-oy,q[k+1][0]-ox,q[k+1][1]-oy,q[k+2][0]-ox,q[k+2][1]-oy);
 }
 
+let openGen=0;
 async function openPuzzle(img,n){
   if(!canPlay(img)){openUnlock(img);return}
+  const gen=++openGen; const stale=()=>gen!==openGen;
   $('gallery').hidden=true; $('play').hidden=false; $('veil').hidden=false; $('win').hidden=true; $('paused').hidden=true; $('pauseBtn').setAttribute('aria-pressed','false'); $('pauseIco').setAttribute('d','M7 5h4v14H7zM13 5h4v14h-4z'); $('veilMsg').textContent='Opening the box…';
   $('pTitle').textContent=img.title; $('peekImg').src='img/'+img.slug+'.jpg';
   resize();
   let im;
   try{ im=await loadImage('img/'+img.slug+'.jpg'); }
-  catch(err){ $('veilMsg').textContent='This picture did not load. Go back and try again.'; return; }
+  catch(err){ if(!stale()) $('veilMsg').textContent='This picture did not load. Go back and try again.'; return; }
+  if(stale()) return;
   const W=im.naturalWidth,H=im.naturalHeight,{cols,rows,count}=cut(n,W,H);
   const key=`jig:${img.slug}:${n}`;
-  await syncPullSave(key);
+  await syncPullSave(key); if(stale()) return;
   const saved=store.get(key);
   const okSave=saved&&saved.cols===cols&&saved.rows===rows&&saved.p&&saved.p.length===count*2;
   const seed=okSave?saved.seed:(Math.random()*4294967296>>>0);
   $('pSub').textContent=`${[img.artist,img.year].filter(Boolean).join(', ')} · ${fmtN(count)} pieces`;
   $('veilMsg').textContent=`Cutting ${fmtN(count)} pieces…`;
-  await new Promise(r=>setTimeout(r,30));
+  await new Promise(r=>setTimeout(r,30)); if(stale()) return;
   const pw=W/cols, ph=H/rows, s=Math.min(pw,ph), m=Math.ceil(s*.42), rng=mulberry32(seed);
   const hE=[],vE=[];
   for(let r=0;r<=rows;r++){hE[r]=[];for(let c=0;c<cols;c++) hE[r][c]=(r>0&&r<rows)?edgePoints(c*pw,r*ph,1,0,pw,s,edgeParams(rng)):null}
@@ -626,10 +630,11 @@ async function openPuzzle(img,n){
     g.lineWidth=lw*.7; g.lineJoin='round'; g.strokeStyle='rgba(0,0,0,.45)'; g.stroke(path);
     g.restore();
     pieces.push({r,c,x:0,y:0,rot:0,g:0,edge:r===0||c===0||r===rows-1||c===cols-1,cv:pc,hi:null,path,inTray:false});
-    if(pieces.length%120===0){ $('veilMsg').textContent=`Cutting ${fmtN(count)} pieces… ${Math.round(pieces.length/count*100)}%`; await new Promise(r=>setTimeout(r,0)); }
+    if(pieces.length%120===0){ $('veilMsg').textContent=`Cutting ${fmtN(count)} pieces… ${Math.round(pieces.length/count*100)}%`; await new Promise(r=>setTimeout(r,0)); if(stale()) return; }
   }
   const hard=okSave?!!saved.hard:!!store.get('jig-hard');
   P={img,n,key,W,H,cols,rows,count,pw,ph,s,m,cw,ch,lw,B,seed,im,pieces,hard,lastId:null,moves:0,groups:new Map(),z:[],tray:[],hi:[],elapsed:0,started:performance.now(),won:false};
+  HI_MAX=Math.max(12,Math.min(HI_MAX_COUNT,Math.floor(HI_MAX_BYTES/(cw*ch*4))));
   $('rotate').hidden=!hard; $('loupeBtn').hidden=!hard; loupeOn=store.get('jig-loupe')!==false; $('loupeBtn').setAttribute('aria-pressed',String(loupeOn)); if(hard) requestAnimationFrame(()=>{ const sv=store.get('jig-loupe-pos'); if(sv&&window.__placeLoupe) window.__placeLoupe(sv.x,sv.y); });
   $('pinBtn').setAttribute('aria-pressed',String(!!(idx()[key]||{}).pin));
   if(okSave){
@@ -738,7 +743,7 @@ function placeNear(i){
   takeFromTray(i,x,y); countMove(); const n=strip.querySelector(`.tp[data-i="${i}"]`); if(n)n.remove(); draw(); save();
 }
 strip.addEventListener('pointerdown',e=>{
-  const b=e.target.closest('.tp'); if(!b||!P) return; ensureAudio();
+  const b=e.target.closest('.tp'); if(!b||!P||P.paused) return; ensureAudio();
   trayDrag={i:+b.dataset.i,node:b,x0:e.clientX,y0:e.clientY,pid:e.pointerId,type:e.pointerType,started:false};
   if(e.pointerType==='mouse') e.preventDefault();
 });
@@ -848,7 +853,7 @@ function drawPiece(ctx,p,src){
 // rotate a vector by quarter turns (canvas y points down, so rot=1 is clockwise on screen)
 function rotv(x,y,rot){rot&=3;return rot===0?[x,y]:rot===1?[-y,x]:rot===2?[-x,-y]:[y,-x]}
 // Native-resolution piece, built on first use; at most HI_MAX kept (oldest dropped) so memory stays bounded.
-const HI_MAX=420;
+const HI_MAX_COUNT=420, HI_MAX_BYTES=96*1024*1024; let HI_MAX=HI_MAX_COUNT;
 function hiCanvas(p){
   if(p.hi) return p.hi;
   const c=document.createElement('canvas'); c.width=P.cw; c.height=P.ch;
@@ -897,7 +902,7 @@ function centreGroup(id){
 }
 function rotateGroup(id,steps){
   steps=((steps||1)%4+4)%4; if(!steps) return;
-  const g=P.groups.get(id); if(!g||g.locked) return;
+  const g=P.groups.get(id); if(!g||g.locked||P.paused||g.members.some(i=>P.pieces[i].inTray)) return;
   let sx=0,sy=0; for(const i of g.members){sx+=P.pieces[i].x+P.pw/2;sy+=P.pieces[i].y+P.ph/2}
   const C=[sx/g.members.length,sy/g.members.length];
   for(const i of g.members){const p=P.pieces[i];const [rx,ry]=rotv(p.x+P.pw/2-C[0],p.y+P.ph/2-C[1],steps);p.x=C[0]+rx-P.pw/2;p.y=C[1]+ry-P.ph/2;p.rot=(p.rot+steps)&3}
@@ -907,6 +912,7 @@ let lastTap={t:0,x:0,y:0,id:null};
 function toTop(id){const k=P.z.indexOf(id);if(k>=0)P.z.splice(k,1);P.z.push(id)}
 function moveGroup(g,dx,dy){for(const i of g.members){P.pieces[i].x+=dx;P.pieces[i].y+=dy}}
 function merge(into,from){
+  if(P.lastId===from.id) P.lastId=into.id;
   for(const i of from.members){P.pieces[i].g=into.id;into.members.push(i)}
   into.locked=into.locked||from.locked;
   P.groups.delete(from.id); const k=P.z.indexOf(from.id); if(k>=0)P.z.splice(k,1);
@@ -962,15 +968,16 @@ function local(e){const r=cv.getBoundingClientRect();return[e.clientX-r.left,e.c
 function world(sx,sy){return[sx/cam.z+cam.x,sy/cam.z+cam.y]}
 function startPinch(){const[a,b]=[...ptrs.values()];const mx=(a.x+b.x)/2,my=(a.y+b.y)/2;return{d0:Math.hypot(a.x-b.x,a.y-b.y)||1,z0:cam.z,w:world(mx,my)}}
 function endDrag(cx,cy){
-  if(!drag) return; const id=drag.id; drag=null; cv.classList.remove('grabbing'); $('tray').classList.remove('drop');
+  if(!drag) return; const id=drag.id, d=drag; drag=null; cv.classList.remove('grabbing'); $('tray').classList.remove('drop');
   const g=P.groups.get(id);
+  if(g&&d.lift&&!d.moved){ moveGroup(g,0,d.lift); draw(); return; } // a tap, not a drag: put it back, no move counted
   if(g&&cy!=null&&overTray(cy)&&g.members.length===1&&!g.locked){returnToTray(g.members[0],cx);return}
   countMove(); if(P.groups.has(id)) snap(id);
   updateProgress(); draw(); save();
   if(!P.won&&isWon()) celebrate();
 }
 cv.addEventListener('pointerdown',e=>{
-  if(!P) return; ensureAudio(); if(ac&&ac.state==='suspended') ac.resume();
+  if(!P||P.paused) return; ensureAudio(); if(ac&&ac.state==='suspended') ac.resume();
   try{cv.setPointerCapture(e.pointerId)}catch(_){}
   const[sx,sy]=local(e); ptrs.set(e.pointerId,{x:sx,y:sy});
   if(ptrs.size===2){ if(drag) endDrag(); pan=null; pinch=startPinch(); return; }
@@ -983,7 +990,7 @@ cv.addEventListener('pointerdown',e=>{
   const now=performance.now(), dbl=id!=null&&id===lastTap.id&&now-lastTap.t<400&&Math.hypot(sx-lastTap.x,sy-lastTap.y)<24;
   lastTap={t:now,x:sx,y:sy,id};
   if(dbl){lastTap.id=null;if(P.hard)rotateGroup(id);else centreGroup(id);return}
-  if(id!=null){P.lastId=id;drag={id,x:wx,y:wy,pid:e.pointerId};toTop(id);if(lift)moveGroup(P.groups.get(id),0,-lift);cv.classList.add('grabbing');draw()}
+  if(id!=null){P.lastId=id;drag={id,x:wx,y:wy,pid:e.pointerId,lift,sx,sy,moved:false};toTop(id);if(lift)moveGroup(P.groups.get(id),0,-lift);cv.classList.add('grabbing');draw()}
   else if(!flags.lock) pan={x:sx,y:sy,cx:cam.x,cy:cam.y,pid:e.pointerId};
 });
 cv.addEventListener('pointermove',e=>{
@@ -993,7 +1000,7 @@ cv.addEventListener('pointermove',e=>{
     const[a,b]=[...ptrs.values()], d=Math.hypot(a.x-b.x,a.y-b.y), mx=(a.x+b.x)/2,my=(a.y+b.y)/2;
     cam.z=Math.min(maxZ(),Math.max(fitZ()*.35,pinch.z0*d/pinch.d0)); cam.x=pinch.w[0]-mx/cam.z; cam.y=pinch.w[1]-my/cam.z; draw(); return;
   }
-  if(drag&&drag.pid===e.pointerId){const[wx,wy]=world(sx,sy);const g=P.groups.get(drag.id);moveGroup(g,wx-drag.x,wy-drag.y);drag.x=wx;drag.y=wy;$('tray').classList.toggle('drop',g.members.length===1&&overTray(e.clientY));draw()}
+  if(drag&&drag.pid===e.pointerId){const[wx,wy]=world(sx,sy);const g=P.groups.get(drag.id);if(!drag.moved&&Math.hypot(sx-drag.sx,sy-drag.sy)>6)drag.moved=true;moveGroup(g,wx-drag.x,wy-drag.y);drag.x=wx;drag.y=wy;$('tray').classList.toggle('drop',g.members.length===1&&overTray(e.clientY));draw()}
   else if(pan&&pan.pid===e.pointerId){cam.x=pan.cx-(sx-pan.x)/cam.z;cam.y=pan.cy-(sy-pan.y)/cam.z;draw()}
 });
 function up(e){
@@ -1026,13 +1033,14 @@ let armTimer=null;
 $('restart').onclick=()=>{
   const b=$('restart');
   if(!b.classList.contains('armed')){b.classList.add('armed');b.querySelector('.lbl').textContent='Tap again to restart';b.setAttribute('aria-label','Tap again to confirm restart');clearTimeout(armTimer);armTimer=setTimeout(()=>{b.classList.remove('armed');b.querySelector('.lbl').textContent='Restart';b.removeAttribute('aria-label')},3500);return}
-  clearTimeout(armTimer); const{img,n,key}=P; store.del(key); setIdx(key,null); P=null; syncPush(); openPuzzle(img,n);
+  clearTimeout(armTimer); const{img,n,key}=P; store.del(key); setIdx(key,{done:false,pct:null}); P=null; syncPush(); openPuzzle(img,n);
 };
 $('back').onclick=leave; $('winBack').onclick=leave;
 $('winStay').onclick=()=>{$('win').hidden=true;$('confetti').hidden=true};
-function leave(){ if(P){tick();save()} syncPush(); P=null; ptrs.clear(); drag=pan=pinch=trayDrag=null; strip.querySelectorAll('.tp').forEach(n=>n.remove()); $('play').hidden=true; $('gallery').hidden=false; renderGrid(); }
+function leave(){ openGen++; if(P){tick();save()} syncPush(); P=null; ptrs.clear(); drag=pan=pinch=trayDrag=null; strip.querySelectorAll('.tp').forEach(n=>n.remove()); $('play').hidden=true; $('gallery').hidden=false; renderGrid(); }
 document.addEventListener('keydown',e=>{
   if($('play').hidden||!P||e.target.closest('input,textarea')) return;
+  if(P.paused&&e.key!=='Escape'){ if(e.key===' '||e.key==='Enter'){ e.preventDefault(); setPaused(false); } return; }
   const k=e.key.toLowerCase();
   if(k==='+'||k==='=') $('zIn').click(); else if(k==='-') $('zOut').click(); else if(k==='0') fit();
   else if(k==='m'&&P&&P.hard) setLoupe(!loupeOn); else if(k==='e') $('edges').click(); else if(k==='g') $('ghost').click(); else if(k==='p') $('peekBtn').click(); else if(k==='s') $('sort').click(); else if(k==='t') $('toTray').click(); else if(k==='y') $('tidy').click(); else if(k==='l') $('lock').click(); else if(k==='r'&&P.hard) $('rotate').click();
@@ -1043,7 +1051,7 @@ document.addEventListener('keydown',e=>{
 /* ---------- timer & saving ---------- */
 function tick(){if(!P||P.won)return;const now=performance.now();if(document.visibilityState==='visible'&&!P.paused)P.elapsed+=now-P.started;P.started=now;$('pTime').textContent=fmtTime(P.elapsed)}
 function setPaused(on){ if(!P||P.won)return; tick(); P.paused=!!on; P.started=performance.now(); $('paused').hidden=!on; const b=$('pauseBtn'); b.setAttribute('aria-pressed',String(!!on)); b.setAttribute('aria-label',on?'Resume the timer':'Pause the timer'); b.title=b.getAttribute('aria-label'); $('pauseIco').setAttribute('d',on?'M8 5l11 7-11 7z':'M7 5h4v14H7zM13 5h4v14h-4z'); if(!on) draw(); }
-$('pauseBtn').onclick=()=>setPaused(!(P&&P.paused)); $('resumeBtn').onclick=()=>setPaused(false); $('pausedBack').onclick=()=>{setPaused(false);leave()};
+$('pauseBtn').onclick=e=>{setPaused(!(P&&P.paused)); e.currentTarget.blur();}; $('resumeBtn').onclick=()=>setPaused(false); $('pausedBack').onclick=()=>{setPaused(false);leave()};
 setInterval(tick,1000);
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){if(P){tick();save()}syncPush(true)}else if(P)P.started=performance.now()});
 function save(){

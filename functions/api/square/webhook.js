@@ -12,6 +12,16 @@ async function validSignature(request,raw,env){
   const got=request.headers.get('x-square-hmacsha256-signature')||'';
   if(expect.length!==got.length) return false; let d=0; for(let i=0;i<expect.length;i++) d|=expect.charCodeAt(i)^got.charCodeAt(i); return d===0;
 }
+// Checkout payments often carry the buyer's email on the order rather than the payment. Needs a Square access token in settings.
+async function orderEmail(env,orderId){
+  const token=await cfg(env,'SQUARE_ACCESS_TOKEN'); if(!token) return '';
+  try{ const r=await fetch('https://connect.squareup.com/v2/orders/'+encodeURIComponent(orderId),{headers:{authorization:'Bearer '+token,'Square-Version':'2025-01-23'}});
+    if(!r.ok) return ''; const o=(await r.json()).order||{};
+    for(const f of (o.fulfillments||[])){ const rc=(f.shipment_details||f.pickup_details||f.delivery_details||{}).recipient||f.recipient; if(rc&&rc.email_address) return rc.email_address; }
+    return o.customer_id?await customerEmail(env,token,o.customer_id):'';
+  }catch{ return ''; }
+}
+async function customerEmail(env,token,id){ try{ const r=await fetch('https://connect.squareup.com/v2/customers/'+encodeURIComponent(id),{headers:{authorization:'Bearer '+token,'Square-Version':'2025-01-23'}}); if(!r.ok) return ''; return ((await r.json()).customer||{}).email_address||''; }catch{ return ''; } }
 export async function onRequestPost({request,env}){
   const raw=await request.text();
   if(!(await validSignature(request,raw,env))) return new Response('Bad signature',{status:401});
@@ -22,7 +32,9 @@ export async function onRequestPost({request,env}){
   const amt=pay.amount_money&&pay.amount_money.amount; // base price, or base price plus up to ~17% sales tax if tax is ever switched on in Square
   if(price&&!(amt>=price&&amt<=Math.round(price*1.17)&&(pay.amount_money.currency||'USD')==='USD')) return json({ok:true,ignored:'amount does not match PUZZLE_PRICE_CENTS'});
   const dedupe=`sqpay:${pay.id}`; if(await env.PROGRESS.get(dedupe)) return json({ok:true,ignored:'already processed'});
-  const email=pay.buyer_email_address||'';
+  await env.PROGRESS.put(dedupe,JSON.stringify({claimed:Date.now()}),{expirationTtl:60*60*24*90}); // claim first: Square sends created+updated and retries
+  let email=pay.buyer_email_address||'';
+  if(!email&&pay.order_id){ email=await orderEmail(env,pay.order_id); }
   const lic=await mint(env,{src:'square',email,order:pay.order_id||pay.id,note:'Square payment'});
   let emailed=false; try{ emailed=await sendCodeEmail(env,{to:email,code:lic.code}); }catch{}
   if(emailed){ lic.emailed=Date.now(); await env.PROGRESS.put(`lic:${lic.code}`,JSON.stringify(lic)); }

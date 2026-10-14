@@ -3,7 +3,7 @@ export const CORS={'access-control-allow-origin':'*','access-control-allow-metho
 export const json=(obj,status=200)=>new Response(JSON.stringify(obj),{status,headers:Object.assign({'content-type':'application/json','cache-control':'no-store'},CORS)});
 export const MAX_DEVICES=3;
 // Settings: stored in KV under cfg:<NAME> (set from admin.html) with the Pages env var of the same name as fallback.
-export const SETTING_NAMES=['SQUARE_WEBHOOK_SIGNATURE_KEY','SQUARE_NOTIFICATION_URL','PUZZLE_PRICE_CENTS','RESEND_API_KEY','LICENSE_FROM_EMAIL','LICENSE_REPLY_TO','APP_URL'];
+export const SETTING_NAMES=['SQUARE_WEBHOOK_SIGNATURE_KEY','SQUARE_ACCESS_TOKEN','SQUARE_NOTIFICATION_URL','PUZZLE_PRICE_CENTS','RESEND_API_KEY','LICENSE_FROM_EMAIL','LICENSE_REPLY_TO','APP_URL'];
 export async function cfg(env,name){ const v=await env.PROGRESS.get('cfg:'+name); return (v!=null&&v!=='')?v:(env[name]||''); }
 const ALPHABET='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // no 0/O/1/I
 export function makeCode(){
