@@ -245,7 +245,7 @@ label.hard input{accent-color:var(--brass-text);width:16px;height:16px;margin:0}
     <div class="tray-side"><b id="trayCount">0</b><span>in tray</span></div>
   </div>
   <div class="tools" role="toolbar" aria-label="Puzzle tools">
-    <button class="tb" id="lock" aria-pressed="true" title="Lock: one finger only moves pieces; use two fingers (or a mouse) to move the table (L)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg><span class="lbl">Lock</span></button>
+    <button class="tb" id="lock" aria-pressed="true" title="Lock: dragging empty table does nothing. Move the table with two fingers, or Shift-drag / right-drag with a mouse (L)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg><span class="lbl">Lock</span></button>
     <button class="tb icon" id="zOut" aria-label="Zoom out" title="Zoom out (−)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M8 11h6M20 20l-4-4"/></svg></button>
     <button class="tb" id="zFit" title="Fit everything (0)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span class="lbl">Fit</span></button>
     <button class="tb icon" id="zIn" aria-label="Zoom in" title="Zoom in (+)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M8 11h6M11 8v6M20 20l-4-4"/></svg></button>
@@ -826,13 +826,15 @@ cv.addEventListener('pointerdown',e=>{
   if(ptrs.size===2){ if(drag) endDrag(); pan=null; pinch=startPinch(); return; }
   if(ptrs.size>2) return;
   const touch=e.pointerType==='touch';
+  const panGesture=e.button===1||e.button===2||e.shiftKey; // middle/right button or Shift: always pans
+  if(panGesture){pan={x:sx,y:sy,cx:cam.x,cy:cam.y,pid:e.pointerId};return}
   const[wx,wy]=world(sx,sy), id=hitTest(wx,wy,touch?24/cam.z:0);
   const lift=touch?P.ph*.6+36/cam.z:0; // on touch, the piece rides above the fingertip
   const now=performance.now(), dbl=id!=null&&id===lastTap.id&&now-lastTap.t<400&&Math.hypot(sx-lastTap.x,sy-lastTap.y)<24;
   lastTap={t:now,x:sx,y:sy,id};
   if(dbl){lastTap.id=null;if(P.hard)rotateGroup(id);else centreGroup(id);return}
   if(id!=null){P.lastId=id;drag={id,x:wx,y:wy,pid:e.pointerId};toTop(id);if(lift)moveGroup(P.groups.get(id),0,-lift);cv.classList.add('grabbing');draw()}
-  else if(!(touch&&flags.lock)) pan={x:sx,y:sy,cx:cam.x,cy:cam.y,pid:e.pointerId};
+  else if(!flags.lock) pan={x:sx,y:sy,cx:cam.x,cy:cam.y,pid:e.pointerId};
 });
 cv.addEventListener('pointermove',e=>{
   if(!P||!ptrs.has(e.pointerId)) return;
@@ -851,6 +853,7 @@ function up(e){
   if(pinch&&ptrs.size<2){pinch=null; if(ptrs.size===1&&!flags.lock){const[[pid,p]]=[...ptrs.entries()];pan={x:p.x,y:p.y,cx:cam.x,cy:cam.y,pid}}}
 }
 cv.addEventListener('pointerup',up); cv.addEventListener('pointercancel',up); cv.addEventListener('lostpointercapture',up);
+cv.addEventListener('contextmenu',e=>e.preventDefault());
 cv.addEventListener('wheel',e=>{e.preventDefault();const[sx,sy]=local(e);const dy=e.deltaMode===1?e.deltaY*16:e.deltaY;zoomAt(sx,sy,Math.exp(-dy*.0016))},{passive:false});
 
 /* ---------- toolbar ---------- */
