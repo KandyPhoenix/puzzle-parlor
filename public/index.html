@@ -162,7 +162,7 @@ label.hard input{accent-color:var(--brass-text);width:16px;height:16px;margin:0}
 .tb.icon{padding:8px}
 .sep{width:1px;background:var(--faint);margin-inline:4px}
 @media (max-width:720px){ .tb .lbl{display:none} .tb{padding:8px} .tools{gap:4px;padding-inline:6px} .sep{display:none} }
-#loupeWrap{position:absolute;top:12px;left:12px;touch-action:none;cursor:grab;user-select:none;width:min(210px,42vw);aspect-ratio:1;border-radius:10px;background:var(--card);box-shadow:0 12px 30px rgba(35,38,43,.3);border:3px solid #fff;z-index:3;overflow:hidden;display:grid;place-items:center}
+#loupeWrap{position:absolute;top:12px;left:12px;touch-action:none;cursor:grab;user-select:none;width:min(260px,48vw);aspect-ratio:1/1.18;border-radius:10px;background:var(--card);box-shadow:0 12px 30px rgba(35,38,43,.3);border:3px solid #fff;z-index:3;overflow:hidden;display:grid;place-items:center}
 #loupeWrap canvas{width:100%;height:100%;display:block;grid-area:1/1}
 #loupeWrap .lhint{grid-area:1/1;font-size:12px;color:var(--muted);text-align:center;padding:0 16px;display:none}
 #loupeWrap.empty .lhint{display:block}
@@ -815,13 +815,14 @@ const lctx=$('loupe').getContext('2d');
 function loupeVisible(){ return !!P&&P.hard&&loupeOn }
 function drawLoupe(){
   const w=$('loupeWrap'); if(!loupeVisible()){ w.hidden=true; return } w.hidden=false;
-  const cvs=$('loupe'), d=Math.min(2,window.devicePixelRatio||1), S=Math.round(w.clientWidth*d)||400;
-  if(cvs.width!==S){ cvs.width=S; cvs.height=S; }
-  lctx.setTransform(1,0,0,1,0,0); lctx.clearRect(0,0,S,S);
+  const cvs=$('loupe'), d=Math.min(2,window.devicePixelRatio||1), S=Math.round(w.clientWidth*d)||400, Hh=Math.round(w.clientHeight*d)||S;
+  if(cvs.width!==S||cvs.height!==Hh){ cvs.width=S; cvs.height=Hh; }
+  lctx.setTransform(1,0,0,1,0,0); lctx.clearRect(0,0,S,Hh);
   const g=P.lastId!=null&&P.groups.get(P.lastId); if(!g||g.locked){ w.classList.add('empty'); return } w.classList.remove('empty');
   const ps=g.members.map(i=>P.pieces[i]), {pw,ph,cw,ch}=P; let cx=0,cy=0; for(const p of ps){cx+=p.x+pw/2;cy+=p.y+ph/2} cx/=ps.length; cy/=ps.length;
   let ext=0; for(const p of ps) ext=Math.max(ext,Math.hypot(p.x+pw/2-cx,p.y+ph/2-cy)+Math.max(cw,ch)/2);
-  const z=S*0.9/(ext*2); lctx.setTransform(z,0,0,z,S/2-cx*z,S/2-cy*z); lctx.imageSmoothingQuality='high';
+  const bh=Math.round(50*d), A=Hh-bh; // keep the piece clear of the button strip
+  const z=Math.min(S,A)*0.88/(ext*2); lctx.setTransform(z,0,0,z,S/2-cx*z,A/2-cy*z); lctx.imageSmoothingQuality='high';
   for(const p of ps) drawPiece(lctx,p,hiCanvas(p));
 }
 /* the magnifier can be dragged anywhere on the table; its spot is remembered */
