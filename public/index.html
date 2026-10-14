@@ -943,7 +943,7 @@ function snap(id){
   return snapped;
 }
 function isWon(){for(const g of P.groups.values()) if(!g.locked) return false; return true}
-function pct(){return P.count<2?100:Math.round((P.count-P.groups.size)/(P.count-1)*100)}
+function pct(){let k=0;for(const g of P.groups.values()) if(g.locked) k+=g.members.length; return Math.round(k/P.count*100)} // pieces locked in their correct place
 function countMove(){P.moves++;$('pMoves').textContent=fmtN(P.moves)+(P.moves===1?' move':' moves')}
 function updateProgress(){
   $('pMoves').textContent=fmtN(P.moves)+(P.moves===1?' move':' moves');
