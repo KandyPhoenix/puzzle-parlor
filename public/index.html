@@ -444,7 +444,7 @@ function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a
 function loadImage(src){return new Promise((res,rej)=>{const im=new Image();im.onload=()=>res(im);im.onerror=()=>rej(new Error('Could not load '+src));im.src=src})}
 const cv=$('cv'), ctx=cv.getContext('2d');
 const hitCtx=document.createElement('canvas').getContext('2d');
-const TABLES=[{id:'gray',name:'Light gray',c:'#e2e3e6'},{id:'clear',name:'Clear (no board tint)',c:'#f4f5f7',clear:true},{id:'mist',name:'Mist',c:'#d6dadf'},{id:'sky',name:'Sky',c:'#d5e0ea'},{id:'sage',name:'Sage',c:'#d3dcd3'},{id:'lavender',name:'Lavender',c:'#e4dcf0'},{id:'slate',name:'Slate',c:'#4a4f57',dark:true}];
+const TABLES=[{id:'gray',name:'Light gray',c:'#e2e3e6'},{id:'clear',name:'Clear (no board tint)',c:'#f4f5f7',clear:true},{id:'sky',name:'Sky',c:'#d5e0ea'},{id:'sage',name:'Sage',c:'#d3dcd3'},{id:'lavender',name:'Lavender',c:'#e4dcf0'},{id:'slate',name:'Slate',c:'#4a4f57',dark:true}];
 let tableId=store.get('jig-table')||'gray'; if(!TABLES.some(t=>t.id===tableId)) tableId='gray';
 const curTable=()=>TABLES.find(t=>t.id===tableId);
 function applyTable(){document.documentElement.style.setProperty('--table',curTable().c);$('swatches').innerHTML=TABLES.map(t=>`<button class="sw${t.clear?' clear':''}" style="background:${t.c}" aria-label="${t.name} table" title="${t.name} table" aria-pressed="${t.id===tableId}" data-t="${t.id}"></button>`).join('');draw()}
