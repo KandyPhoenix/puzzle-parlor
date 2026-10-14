@@ -126,7 +126,7 @@ button{font:inherit;color:inherit}
 #trayStrip.edges .tp:not(.edge){display:none}
 .tp{flex:none;height:86px;padding:0;border:0;background:transparent;cursor:grab;border-radius:6px;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 .tp:hover{background:var(--chip)}
-.tp canvas{height:86px;width:auto;display:block;pointer-events:none}
+.tp canvas{height:86px;min-width:40px;display:block;pointer-events:none}
 .tp.lifted{opacity:.2}
 #trayEmpty{color:var(--muted);font-size:14px;padding-inline:12px;white-space:nowrap}
 .tray-side{flex:none;display:flex;flex-direction:column;justify-content:center;gap:4px;min-width:74px;text-align:center}
@@ -136,6 +136,7 @@ button{font:inherit;color:inherit}
 .swatches{display:inline-flex;gap:4px;align-items:center;padding-inline:4px}
 .sw{width:24px;height:24px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--faint);cursor:pointer;padding:0}
 .sw[aria-pressed="true"]{box-shadow:0 0 0 2px var(--brass-text)}
+.sw.clear{background-image:linear-gradient(45deg,#cfcfcf 25%,transparent 25%,transparent 75%,#cfcfcf 75%),linear-gradient(45deg,#cfcfcf 25%,transparent 25%,transparent 75%,#cfcfcf 75%)!important;background-size:8px 8px!important;background-position:0 0,4px 4px!important}
 @media (max-width:720px){ #trayStrip{height:78px} .tp,.tp canvas{height:70px} .tray-nav{display:none} .tray-side{min-width:54px} .sw{width:20px;height:20px} }
 @media (prefers-reduced-motion:reduce){ .box .art img{transition:none} }
 </style>
@@ -174,7 +175,7 @@ button{font:inherit;color:inherit}
     <div class="stat" id="pTime" title="Time spent">0:00</div>
   </div>
   <div id="table">
-    <canvas id="cv" aria-label="Puzzle table. Drag pieces to move them; drag the empty table to pan; scroll or pinch to zoom."></canvas>
+    <canvas id="cv" aria-label="Puzzle table. Drag pieces to move them; double-tap a piece to bring it to the centre of the board; drag the empty table to pan; scroll or pinch to zoom."></canvas>
     <div id="peek" hidden><img id="peekImg" alt="Finished picture for reference"></div>
     <div id="veil"><p id="veilMsg">Cutting pieces…</p></div>
     <canvas id="confetti" hidden></canvas>
@@ -196,7 +197,7 @@ button{font:inherit;color:inherit}
     <button class="tb icon" id="zIn" aria-label="Zoom in" title="Zoom in (+)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M8 11h6M11 8v6M20 20l-4-4"/></svg></button>
     <span class="sep"></span>
     <button class="tb" id="edges" aria-pressed="false" title="Show only edge pieces (E)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="1"/><rect x="9" y="9" width="6" height="6" stroke-dasharray="2 2"/></svg><span class="lbl">Edges only</span></button>
-    <button class="tb" id="sort" title="Lay every tray and loose piece out around the board, edges closest (S)"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="5" height="5" rx="1"/><rect x="10" y="3" width="5" height="5" rx="1"/><rect x="17" y="3" width="4" height="5" rx="1"/><rect x="3" y="10" width="5" height="5" rx="1"/><rect x="3" y="17" width="5" height="4" rx="1"/><rect x="10" y="17" width="5" height="4" rx="1"/></svg><span class="lbl">Spread out</span></button>
+    <button class="tb" id="sort" title="Shuffle every tray and loose piece out around the board (S)"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="5" height="5" rx="1"/><rect x="10" y="3" width="5" height="5" rx="1"/><rect x="17" y="3" width="4" height="5" rx="1"/><rect x="3" y="10" width="5" height="5" rx="1"/><rect x="3" y="17" width="5" height="4" rx="1"/><rect x="10" y="17" width="5" height="4" rx="1"/></svg><span class="lbl">Spread out</span></button>
     <button class="tb" id="toTray" title="Put loose pieces back in the tray (T)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5"/><rect x="3" y="17" width="18" height="4" rx="1"/></svg><span class="lbl">To tray</span></button>
     <button class="tb" id="ghost" aria-pressed="false" title="Faint picture on the board (G)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="1" opacity=".5"/><path d="M3 16l5-5 4 4 3-3 6 6"/></svg><span class="lbl">Ghost</span></button>
     <button class="tb" id="peekBtn" aria-pressed="false" title="Show the box picture (P)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg><span class="lbl">Box lid</span></button>
@@ -344,10 +345,10 @@ function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a
 function loadImage(src){return new Promise((res,rej)=>{const im=new Image();im.onload=()=>res(im);im.onerror=()=>rej(new Error('Could not load '+src));im.src=src})}
 const cv=$('cv'), ctx=cv.getContext('2d');
 const hitCtx=document.createElement('canvas').getContext('2d');
-const TABLES=[{id:'linen',name:'Linen',c:'#e6dfd1'},{id:'sage',name:'Sage',c:'#cfdccb'},{id:'sky',name:'Sky',c:'#d3e1ec'},{id:'blush',name:'Blush',c:'#efd9d6'},{id:'slate',name:'Slate',c:'#4a4f57',dark:true}];
+const TABLES=[{id:'linen',name:'Linen',c:'#e6dfd1'},{id:'sage',name:'Sage',c:'#cfdccb'},{id:'sky',name:'Sky',c:'#d3e1ec'},{id:'blush',name:'Blush',c:'#efd9d6'},{id:'gray',name:'Light gray',c:'#e2e2e2'},{id:'clear',name:'Clear (no board tint)',c:'#f4f4f2',clear:true},{id:'slate',name:'Slate',c:'#4a4f57',dark:true}];
 let tableId=store.get('jig-table')||'linen'; if(!TABLES.some(t=>t.id===tableId)) tableId='linen';
 const curTable=()=>TABLES.find(t=>t.id===tableId);
-function applyTable(){document.documentElement.style.setProperty('--table',curTable().c);$('swatches').innerHTML=TABLES.map(t=>`<button class="sw" style="background:${t.c}" aria-label="${t.name} table" title="${t.name} table" aria-pressed="${t.id===tableId}" data-t="${t.id}"></button>`).join('');draw()}
+function applyTable(){document.documentElement.style.setProperty('--table',curTable().c);$('swatches').innerHTML=TABLES.map(t=>`<button class="sw${t.clear?' clear':''}" style="background:${t.c}" aria-label="${t.name} table" title="${t.name} table" aria-pressed="${t.id===tableId}" data-t="${t.id}"></button>`).join('');draw()}
 $('swatches').addEventListener('click',e=>{const b=e.target.closest('.sw');if(!b)return;tableId=b.dataset.t;store.set('jig-table',tableId);applyTable()});
 let P=null, cam={x:0,y:0,z:1}, needDraw=false, flags={edges:false,ghost:false,peek:false,sound:store.get('jig-sound')!==false};
 
@@ -387,6 +388,8 @@ async function openPuzzle(img,n){
   // vE uses normal (-1,0) via (-uy,ux) -> fine, shape is shared by both neighbours
   const pieces=[], cw=Math.ceil(pw+2*m), ch=Math.ceil(ph+2*m);
   const lw=Math.max(1,s/40);
+  // oversample the piece cache so pieces stay crisp on retina screens; cap total cache at ~20M pixels
+  const B=Math.min(2,Math.max(1,Math.sqrt(2.0e7/(count*cw*ch))));
   for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
     const ox=c*pw, oy=r*ph, path=new Path2D();
     path.moveTo(0,0);
@@ -395,8 +398,8 @@ async function openPuzzle(img,n){
     if(hE[r+1][c]) addEdge(path,hE[r+1][c],true,ox,oy); else path.lineTo(0,ph);
     if(vE[r][c]) addEdge(path,vE[r][c],true,ox,oy); else path.lineTo(0,0);
     path.closePath();
-    const pc=document.createElement('canvas'); pc.width=cw; pc.height=ch;
-    const g=pc.getContext('2d'); g.translate(m,m);
+    const pc=document.createElement('canvas'); pc.width=Math.ceil(cw*B); pc.height=Math.ceil(ch*B);
+    const g=pc.getContext('2d'); g.scale(B,B); g.translate(m,m);
     g.save(); g.shadowColor='rgba(0,0,0,.55)'; g.shadowBlur=lw*2.5; g.shadowOffsetX=lw*.6; g.shadowOffsetY=lw*1.2; g.fillStyle='#2a2018'; g.fill(path); g.restore();
     g.save(); g.clip(path); g.drawImage(im,-ox,-oy);
     g.lineWidth=lw*1.6; g.lineJoin='round';
@@ -406,7 +409,7 @@ async function openPuzzle(img,n){
     pieces.push({r,c,x:0,y:0,g:0,edge:r===0||c===0||r===rows-1||c===cols-1,cv:pc,path,inTray:false});
     if(pieces.length%120===0){ $('veilMsg').textContent=`Cutting ${fmtN(count)} pieces… ${Math.round(pieces.length/count*100)}%`; await new Promise(r=>setTimeout(r,0)); }
   }
-  P={img,n,key,W,H,cols,rows,count,pw,ph,s,m,seed,im,pieces,groups:new Map(),z:[],tray:[],elapsed:0,started:performance.now(),won:false};
+  P={img,n,key,W,H,cols,rows,count,pw,ph,s,m,cw,ch,lw,B,seed,im,pieces,groups:new Map(),z:[],tray:[],elapsed:0,started:performance.now(),won:false};
   if(okSave){
     P.elapsed=saved.t||0;
     pieces.forEach((p,i)=>{p.x=saved.p[i*2];p.y=saved.p[i*2+1];p.g=saved.g[i]});
@@ -455,8 +458,7 @@ function spreadOut(){
   for(const g of P.groups.values()) if(!g.locked&&g.members.length===1) loose.push(g.members[0]);
   for(const i of loose) P.pieces[i].inTray=false; P.tray=[]; buildTray();
   for(let i=loose.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[loose[i],loose[j]]=[loose[j],loose[i]]}
-  loose.sort((a,b)=>P.pieces[b].edge-P.pieces[a].edge);
-  layoutLoose(loose,false); save(); fit();
+  layoutLoose(loose,true); save(); fit();
 }
 function collectToTray(){
   const back=[];
@@ -467,7 +469,15 @@ function collectToTray(){
 
 /* ---------- piece tray ---------- */
 const strip=$('trayStrip'); let trayDrag=null;
-function trayItem(i){const b=document.createElement('button');b.className='tp'+(P.pieces[i].edge?' edge':'');b.dataset.i=i;b.setAttribute('aria-label',(P.pieces[i].edge?'Edge piece':'Piece')+'. Drag onto the table, or tap to place it.');b.appendChild(P.pieces[i].cv);return b}
+const trayIO=new IntersectionObserver(es=>{for(const e of es){const b=e.target;if(!b.isConnected)continue;if(e.isIntersecting)paintThumb(b);else{const c=b.firstChild;if(c&&c.width){c.width=c.height=0;b.dataset.k=''}}}},{root:$('trayStrip'),rootMargin:'0px 500px'});
+function paintThumb(b){
+  if(!P) return; const i=+b.dataset.i, p=P.pieces[i], c=b.firstChild, d=window.devicePixelRatio||1;
+  const hCss=parseFloat(getComputedStyle(c).height)||86, k=hCss*d/P.ch;
+  if(b.dataset.k===String(k)&&c.width) return; b.dataset.k=k;
+  c.width=Math.ceil(P.cw*k); c.height=Math.ceil(P.ch*k); c.style.width=(P.cw*k/d)+'px';
+  const g=c.getContext('2d'); g.imageSmoothingQuality='high'; g.scale(k,k); g.translate(P.m,P.m); drawLive(g,p,0,0);
+}
+function trayItem(i){const b=document.createElement('button');b.className='tp'+(P.pieces[i].edge?' edge':'');b.dataset.i=i;b.setAttribute('aria-label',(P.pieces[i].edge?'Edge piece':'Piece')+'. Drag onto the table, or tap to place it.');const c=document.createElement('canvas');c.width=c.height=0;b.appendChild(c);trayIO.observe(b);return b}
 function buildTray(){
   strip.querySelectorAll('.tp').forEach(n=>n.remove());
   const f=document.createDocumentFragment(); for(const i of P.tray) f.appendChild(trayItem(i)); strip.appendChild(f); trayInfo();
@@ -532,7 +542,9 @@ function resize(){const r=$('table').getBoundingClientRect(),d=window.devicePixe
 function bounds(){let x0=0,y0=0,x1=P.W,y1=P.H;for(const p of P.pieces){if(p.inTray)continue;if(p.x<x0)x0=p.x;if(p.y<y0)y0=p.y;if(p.x+P.pw>x1)x1=p.x+P.pw;if(p.y+P.ph>y1)y1=p.y+P.ph}return[x0-P.m,y0-P.m,x1+P.m,y1+P.m]}
 function fitZ(){const[x0,y0,x1,y1]=bounds();return Math.min(cv.clientWidth/(x1-x0),cv.clientHeight/(y1-y0))*.96}
 function fit(){if(!P)return;const[x0,y0,x1,y1]=bounds();cam.z=fitZ();cam.x=(x0+x1)/2-cv.clientWidth/2/cam.z;cam.y=(y0+y1)/2-cv.clientHeight/2/cam.z;draw()}
-function zoomAt(sx,sy,f){if(!P)return;const wx=sx/cam.z+cam.x,wy=sy/cam.z+cam.y;cam.z=Math.min(6,Math.max(fitZ()*.35,cam.z*f));cam.x=wx-sx/cam.z;cam.y=wy-sy/cam.z;draw()}
+// zoom stops where the picture's own pixels would start to blur (about 2.5 screen pixels per picture pixel)
+function maxZ(){return Math.max(fitZ()*2.5,2.5/(window.devicePixelRatio||1))}
+function zoomAt(sx,sy,f){if(!P)return;const wx=sx/cam.z+cam.x,wy=sy/cam.z+cam.y;cam.z=Math.min(maxZ(),Math.max(fitZ()*.35,cam.z*f));cam.x=wx-sx/cam.z;cam.y=wy-sy/cam.z;draw()}
 window.addEventListener('resize',()=>{if(!$('play').hidden)resize()});
 
 /* ---------- drawing ---------- */
@@ -546,21 +558,32 @@ function render(){
   ctx.imageSmoothingEnabled=true; ctx.imageSmoothingQuality='high';
   // board
   const dk=curTable().dark;
-  ctx.fillStyle=dk?'rgba(0,0,0,.28)':'rgba(255,255,255,.55)'; ctx.fillRect(0,0,P.W,P.H);
+  if(!curTable().clear){ctx.fillStyle=dk?'rgba(0,0,0,.28)':'rgba(255,255,255,.55)'; ctx.fillRect(0,0,P.W,P.H);}
   if(flags.ghost){ctx.globalAlpha=dk?.22:.3;ctx.drawImage(P.im,0,0);ctx.globalAlpha=1}
   ctx.setLineDash([8/z,6/z]); ctx.lineWidth=1.5/z; ctx.strokeStyle=dk?'rgba(255,255,255,.35)':'rgba(42,33,25,.35)'; ctx.strokeRect(0,0,P.W,P.H); ctx.setLineDash([]);
-  const vx0=cam.x,vy0=cam.y,vx1=cam.x+cv.clientWidth/z,vy1=cam.y+cv.clientHeight/z,{m,pw,ph}=P;
+  const vx0=cam.x,vy0=cam.y,vx1=cam.x+cv.clientWidth/z,vy1=cam.y+cv.clientHeight/z,{m,pw,ph,cw,ch}=P;
+  const live=z*d>P.B*1.15; // zoomed in past the cached resolution: draw straight from the full picture
   for(const id of P.z){
     const g=P.groups.get(id); if(hiddenGroup(g)) continue;
     for(const i of g.members){const p=P.pieces[i];
       if(p.x+pw+m<vx0||p.x-m>vx1||p.y+ph+m<vy0||p.y-m>vy1) continue;
-      ctx.drawImage(p.cv,p.x-m,p.y-m);
+      if(live) drawLive(ctx,p,p.x,p.y); else ctx.drawImage(p.cv,p.x-m,p.y-m,cw,ch);
     }
   }
 }
+function drawLive(g,p,x,y){
+  const {lw,pw,ph}=P;
+  g.save(); g.translate(x,y);
+  g.save(); g.translate(lw*.6,lw*1.2); g.fillStyle='rgba(0,0,0,.35)'; g.fill(p.path); g.restore();
+  g.save(); g.clip(p.path); g.drawImage(P.im,-p.c*pw,-p.r*ph);
+  g.lineWidth=lw*1.6; g.lineJoin='round';
+  g.save(); g.translate(lw*.8,lw*.8); g.strokeStyle='rgba(255,255,255,.30)'; g.stroke(p.path); g.restore();
+  g.save(); g.translate(-lw*.8,-lw*.8); g.strokeStyle='rgba(0,0,0,.38)'; g.stroke(p.path); g.restore();
+  g.restore(); g.restore();
+}
 
 /* ---------- hit test & groups ---------- */
-function hitTest(wx,wy){
+function hitTest(wx,wy,tol){
   const {m,pw,ph}=P;
   for(let k=P.z.length-1;k>=0;k--){
     const g=P.groups.get(P.z[k]); if(g.locked||hiddenGroup(g)) continue;
@@ -569,8 +592,25 @@ function hitTest(wx,wy){
       if(hitCtx.isPointInPath(p.path,wx-p.x,wy-p.y)) return g.id;
     }
   }
-  return null;
+  if(!tol) return null;
+  // fingers are wide: fall back to the nearest loose piece within tol (world units)
+  let best=null,bd=Infinity;
+  for(const g of P.groups.values()){ if(g.locked||hiddenGroup(g)) continue;
+    for(const i of g.members){const p=P.pieces[i];
+      const dx=Math.max(p.x-wx,0,wx-(p.x+pw)), dy=Math.max(p.y-wy,0,wy-(p.y+ph)), d=Math.hypot(dx,dy);
+      if(d<tol&&d<bd){bd=d;best=g.id}
+    }
+  }
+  return best;
 }
+function centreGroup(id){
+  const g=P.groups.get(id); if(!g||g.locked) return;
+  let x0=Infinity,y0=Infinity,x1=-Infinity,y1=-Infinity;
+  for(const i of g.members){const p=P.pieces[i];x0=Math.min(x0,p.x);y0=Math.min(y0,p.y);x1=Math.max(x1,p.x+P.pw);y1=Math.max(y1,p.y+P.ph)}
+  const jx=(Math.random()-.5)*P.pw, jy=(Math.random()-.5)*P.ph;
+  moveGroup(g,P.W/2-(x0+x1)/2+jx,P.H/2-(y0+y1)/2+jy); toTop(id); draw(); save();
+}
+let lastTap={t:0,x:0,y:0,id:null};
 function toTop(id){const k=P.z.indexOf(id);if(k>=0)P.z.splice(k,1);P.z.push(id)}
 function moveGroup(g,dx,dy){for(const i of g.members){P.pieces[i].x+=dx;P.pieces[i].y+=dy}}
 function merge(into,from){
@@ -639,7 +679,10 @@ cv.addEventListener('pointerdown',e=>{
   const[sx,sy]=local(e); ptrs.set(e.pointerId,{x:sx,y:sy});
   if(ptrs.size===2){ if(drag) endDrag(); pan=null; pinch=startPinch(); return; }
   if(ptrs.size>2) return;
-  const[wx,wy]=world(sx,sy), id=hitTest(wx,wy);
+  const[wx,wy]=world(sx,sy), id=hitTest(wx,wy,e.pointerType==='touch'?14/cam.z:0);
+  const now=performance.now(), dbl=id!=null&&id===lastTap.id&&now-lastTap.t<400&&Math.hypot(sx-lastTap.x,sy-lastTap.y)<24;
+  lastTap={t:now,x:sx,y:sy,id};
+  if(dbl){lastTap.id=null;centreGroup(id);return}
   if(id!=null){drag={id,x:wx,y:wy,pid:e.pointerId};toTop(id);cv.classList.add('grabbing');draw()}
   else pan={x:sx,y:sy,cx:cam.x,cy:cam.y,pid:e.pointerId};
 });
@@ -648,7 +691,7 @@ cv.addEventListener('pointermove',e=>{
   const[sx,sy]=local(e); ptrs.set(e.pointerId,{x:sx,y:sy});
   if(pinch&&ptrs.size>=2){
     const[a,b]=[...ptrs.values()], d=Math.hypot(a.x-b.x,a.y-b.y), mx=(a.x+b.x)/2,my=(a.y+b.y)/2;
-    cam.z=Math.min(6,Math.max(fitZ()*.35,pinch.z0*d/pinch.d0)); cam.x=pinch.w[0]-mx/cam.z; cam.y=pinch.w[1]-my/cam.z; draw(); return;
+    cam.z=Math.min(maxZ(),Math.max(fitZ()*.35,pinch.z0*d/pinch.d0)); cam.x=pinch.w[0]-mx/cam.z; cam.y=pinch.w[1]-my/cam.z; draw(); return;
   }
   if(drag&&drag.pid===e.pointerId){const[wx,wy]=world(sx,sy);const g=P.groups.get(drag.id);moveGroup(g,wx-drag.x,wy-drag.y);drag.x=wx;drag.y=wy;$('tray').classList.toggle('drop',g.members.length===1&&overTray(e.clientY));draw()}
   else if(pan&&pan.pid===e.pointerId){cam.x=pan.cx-(sx-pan.x)/cam.z;cam.y=pan.cy-(sy-pan.y)/cam.z;draw()}
