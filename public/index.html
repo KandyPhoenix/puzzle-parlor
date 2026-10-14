@@ -42,7 +42,24 @@ button{font:inherit;color:inherit}
 .mast h1{font-family:var(--display);font-weight:400;font-size:clamp(34px,6vw,58px);line-height:1;letter-spacing:.01em;margin:0;color:var(--ink);text-wrap:balance}
 .mast h1 span{color:var(--brass-text)}
 .mast p{margin:0;max-width:52ch;color:var(--muted)}
-.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-block:22px 26px}
+.tabs{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-block:22px 26px}
+.picker{position:relative}
+.tab-cur{background:var(--ink);color:var(--wood);border-color:var(--ink);padding-right:12px}
+.tab-cur svg{width:16px;height:16px;opacity:.8}
+.menu{position:absolute;top:calc(100% + 6px);left:0;z-index:20;list-style:none;margin:0;padding:6px;min-width:260px;background:var(--card);border:1px solid var(--faint);border-radius:10px;box-shadow:0 14px 34px -12px rgba(35,38,43,.35)}
+.menu li{display:flex;align-items:center;gap:8px;border-radius:7px}
+.menu li:hover,.menu li.cur{background:var(--chip)}
+.menu .pick{flex:1;display:flex;align-items:center;gap:9px;padding:9px 10px;border:0;background:transparent;cursor:pointer;font-weight:600;font-size:14px;text-align:left}
+.menu .pick i{width:10px;height:10px;border-radius:50%;background:var(--dot);flex:none}
+.menu .pick b{font-family:var(--mono);font-weight:500;font-size:12px;opacity:.6;margin-left:auto}
+.menu .pinb{border:0;background:transparent;cursor:pointer;padding:8px;border-radius:6px;color:var(--muted);display:grid;place-items:center}
+.menu .pinb svg{width:16px;height:16px}
+.menu .pinb[aria-pressed="true"]{color:var(--brass-text)}
+.menu .pinb:hover{background:var(--chip-hi)}
+.menu .hint{padding:6px 10px 4px;font-size:11px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+.pins{display:flex;flex-wrap:wrap;gap:8px}
+.pins .tab{padding-left:12px}
+.pins .tab svg{width:13px;height:13px;opacity:.55}
 .tab{display:inline-flex;align-items:center;gap:9px;padding:9px 16px;border-radius:999px;border:1px solid var(--faint);background:transparent;cursor:pointer;font-weight:600;font-size:14px;color:var(--muted)}
 .tab i{width:10px;height:10px;border-radius:50%;background:var(--dot)}
 .tab b{font-family:var(--mono);font-weight:500;font-size:12px;opacity:.7}
@@ -166,7 +183,13 @@ label.hard input{accent-color:var(--brass-text);width:16px;height:16px;margin:0}
       <div class="row"><button class="btn" id="syncSave">Save and sync</button><button class="btn ghost" id="syncNew">Make a new code</button><button class="btn ghost" id="syncOff">Turn off</button></div>
       <p id="syncMsg"></p>
     </section>
-    <nav class="tabs" role="tablist" id="tabs" aria-label="Puzzle themes"></nav>
+    <nav class="tabs" id="tabs" aria-label="Puzzle themes">
+      <div class="picker">
+        <button class="tab tab-cur" id="themeBtn" aria-haspopup="listbox" aria-expanded="false" aria-controls="themeMenu"><i></i><span id="themeName"></span><b id="themeCount"></b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+        <ul class="menu" id="themeMenu" role="listbox" hidden></ul>
+      </div>
+      <div class="pins" id="pins"></div>
+    </nav>
     <section class="grid" id="grid" aria-live="polite"></section>
     <p class="credit">The "New scene" pictures are original illustrations made for this app with Canva's AI image tool. Everything else is public-domain art from Wikimedia Commons; tap an artist line to see its Commons page. Piece counts are rounded to fit each picture's shape, so a "1,000" puzzle may have a few more or fewer.</p>
   </div>
@@ -247,9 +270,24 @@ const fmtN=n=>n.toLocaleString('en-US');
 /* ---------- gallery ---------- */
 let cat=store.get('jig-cat')||'halloween';
 if(!CATS.some(c=>c.id===cat)) cat='halloween';
+let pins=store.get('jig-pins')||['halloween','christmas']; pins=pins.filter(p=>CATS.some(c=>c.id===p));
+const PIN_SVG='<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16 3l5 5-4 1-3 3 1 5-2 2-4-4-5 5-1-1 5-5-4-4 2-2 5 1 3-3z"/></svg>';
+const countOf=id=>IMAGES.filter(i=>i.cat===id).length;
 function renderTabs(){
-  $('tabs').innerHTML=CATS.map(c=>`<button class="tab" role="tab" id="tab-${c.id}" aria-selected="${c.id===cat}" style="--dot:var(--c-${c.id})" data-cat="${c.id}"><i></i>${c.label}<b>${IMAGES.filter(i=>i.cat===c.id).length}</b></button>`).join('');
+  const c=CATS.find(x=>x.id===cat);
+  $('themeBtn').style.setProperty('--dot',`var(--c-${c.id})`); $('themeBtn').querySelector('i').style.background=`var(--c-${c.id})`;
+  $('themeName').textContent=c.label; $('themeCount').textContent=countOf(c.id);
+  $('themeMenu').innerHTML='<li class="hint" role="presentation">Choose a theme · star it to keep a shortcut</li>'+CATS.map(x=>`<li role="option" aria-selected="${x.id===cat}" class="${x.id===cat?'cur':''}"><button class="pick" data-cat="${x.id}" style="--dot:var(--c-${x.id})"><i></i>${x.label}<b>${countOf(x.id)}</b></button><button class="pinb" data-pin="${x.id}" aria-pressed="${pins.includes(x.id)}" aria-label="${pins.includes(x.id)?'Unpin':'Pin'} ${x.label}" title="${pins.includes(x.id)?'Remove shortcut':'Keep as a shortcut'}">${PIN_SVG}</button></li>`).join('');
+  $('pins').innerHTML=pins.map(id=>{const x=CATS.find(c=>c.id===id);return `<button class="tab" id="tab-${id}" aria-pressed="${id===cat}" aria-selected="${id===cat}" style="--dot:var(--c-${id})" data-cat="${id}"><i></i>${x.label}<b>${countOf(id)}</b></button>`}).join('');
 }
+function openMenu(v){$('themeMenu').hidden=!v;$('themeBtn').setAttribute('aria-expanded',String(v))}
+$('themeBtn').onclick=e=>{e.stopPropagation();openMenu($('themeMenu').hidden)};
+document.addEventListener('click',e=>{if(!e.target.closest('.picker'))openMenu(false)});
+$('themeMenu').addEventListener('click',e=>{
+  const pk=e.target.closest('.pick'), pb=e.target.closest('.pinb'); e.stopPropagation();
+  if(pk){cat=pk.dataset.cat;store.set('jig-cat',cat);renderTabs();renderGrid();openMenu(false)}
+  else if(pb){const id=pb.dataset.pin;pins=pins.includes(id)?pins.filter(p=>p!==id):[...pins,id];store.set('jig-pins',pins);renderTabs()}
+});
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
 function renderGrid(){
   const ix=idx();
@@ -265,11 +303,12 @@ function renderGrid(){
       <div class="meta"><h3>${esc(img.title)}</h3>${img.page?`<a class="by" href="${esc(img.page)}" target="_blank" rel="noopener">${esc(img.artist)}, ${esc(img.year)}</a>`:`<span class="by">${esc(img.artist)}</span>`}${img.isNew?'<span class="new">New scene</span>':''}</div>
       <div class="sizes">${sizes}</div></article>`}).join('');
 }
-$('tabs').addEventListener('click',e=>{const b=e.target.closest('.tab');if(!b)return;cat=b.dataset.cat;store.set('jig-cat',cat);renderTabs();renderGrid()});
+$('pins').addEventListener('click',e=>{const b=e.target.closest('.tab');if(!b)return;cat=b.dataset.cat;store.set('jig-cat',cat);renderTabs();renderGrid()});
 $('tabs').addEventListener('keydown',e=>{
+  if(e.key==='Escape'){openMenu(false);return}
   if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;
   const i=CATS.findIndex(c=>c.id===cat), j=(i+(e.key==='ArrowRight'?1:-1)+CATS.length)%CATS.length;
-  cat=CATS[j].id;store.set('jig-cat',cat);renderTabs();renderGrid();$('tab-'+cat).focus();
+  cat=CATS[j].id;store.set('jig-cat',cat);renderTabs();renderGrid();
 });
 $('grid').addEventListener('click',e=>{const b=e.target.closest('.size');if(!b)return;openPuzzle(IMAGES.find(i=>i.slug===b.dataset.slug),+b.dataset.n)});
 $('lede').textContent='Jigsaw puzzles of spooky Halloween scenes, cozy Christmas and holiday pictures, famous paintings, fantasy worlds, fairy tales and landscapes. Pick any picture and choose from 400 to 1,000 pieces.';
