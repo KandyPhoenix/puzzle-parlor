@@ -29,8 +29,8 @@ Your progress is saved automatically. Pick a puzzle, start placing pieces, and c
 
 **Category:** Game > Puzzle
 **Tags:** jigsaw, puzzle, relaxing, paintings
-**Contact email:** (fill in)
-**Privacy policy URL:** https://puzzle-parlor-app.pages.dev/privacy.html  (replace CONTACT_EMAIL in public/privacy.html first)
+**Contact email:** puzzles@phoenixmethodseo.com
+**Privacy policy URL:** https://puzzle-parlor-app.pages.dev/privacy.html
 
 ## Data safety form answers (as the app is built today)
 - Does the app collect or share user data? Data is collected only if the user turns on sync: "App activity > Other app activity" (puzzle progress), optional, not shared, encrypted in transit, user can request deletion. No personal info, no location, no device IDs collected by the app.
