@@ -134,7 +134,7 @@ label.hard input{accent-color:var(--brass-text);width:16px;height:16px;margin:0}
     repeating-linear-gradient(45deg, rgba(0,0,0,.025) 0 2px, transparent 2px 5px),
     var(--table)}
 #cv{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:grab;display:block}
-#cv.grabbing{cursor:grabbing}
+#cv.grabbing{cursor:none}
 .tools{display:flex;justify-content:center;align-items:center;gap:6px;flex-wrap:wrap;padding:8px 10px;background:var(--bar);border-top:1px solid var(--faint);
   padding-bottom:calc(8px + env(safe-area-inset-bottom,0px))}
 .tb{display:inline-flex;align-items:center;gap:7px;padding:8px 12px;border-radius:5px;border:1px solid transparent;background:var(--chip);cursor:pointer;font-size:13px;font-weight:600}
@@ -634,7 +634,8 @@ window.addEventListener('pointermove',e=>{
     trayDrag.started=true; trayDrag.node.classList.add('lifted'); cv.classList.add('grabbing');
   }
   e.preventDefault();
-  const r=cv.getBoundingClientRect(), [wx,wy]=world(e.clientX-r.left,e.clientY-r.top), p=P.pieces[trayDrag.i];
+  const r=cv.getBoundingClientRect(), [wx,wy0]=world(e.clientX-r.left,e.clientY-r.top), p=P.pieces[trayDrag.i];
+  const wy=trayDrag.type==='touch'?wy0-(P.ph*.6+36/cam.z):wy0;
   if(p.inTray) takeFromTray(trayDrag.i,wx,wy); else {p.x=wx-P.pw/2;p.y=wy-P.ph/2}
   $('tray').classList.toggle('drop',overTray(e.clientY)); draw();
 },{passive:false});
@@ -826,10 +827,11 @@ cv.addEventListener('pointerdown',e=>{
   if(ptrs.size>2) return;
   const touch=e.pointerType==='touch';
   const[wx,wy]=world(sx,sy), id=hitTest(wx,wy,touch?24/cam.z:0);
+  const lift=touch?P.ph*.6+36/cam.z:0; // on touch, the piece rides above the fingertip
   const now=performance.now(), dbl=id!=null&&id===lastTap.id&&now-lastTap.t<400&&Math.hypot(sx-lastTap.x,sy-lastTap.y)<24;
   lastTap={t:now,x:sx,y:sy,id};
   if(dbl){lastTap.id=null;if(P.hard)rotateGroup(id);else centreGroup(id);return}
-  if(id!=null){P.lastId=id;drag={id,x:wx,y:wy,pid:e.pointerId};toTop(id);cv.classList.add('grabbing');draw()}
+  if(id!=null){P.lastId=id;drag={id,x:wx,y:wy,pid:e.pointerId};toTop(id);if(lift)moveGroup(P.groups.get(id),0,-lift);cv.classList.add('grabbing');draw()}
   else if(!(touch&&flags.lock)) pan={x:sx,y:sy,cx:cam.x,cy:cam.y,pid:e.pointerId};
 });
 cv.addEventListener('pointermove',e=>{
