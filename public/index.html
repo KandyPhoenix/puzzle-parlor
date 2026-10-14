@@ -630,7 +630,7 @@ async function openPuzzle(img,n){
   }
   const hard=okSave?!!saved.hard:!!store.get('jig-hard');
   P={img,n,key,W,H,cols,rows,count,pw,ph,s,m,cw,ch,lw,B,seed,im,pieces,hard,lastId:null,moves:0,groups:new Map(),z:[],tray:[],hi:[],elapsed:0,started:performance.now(),won:false};
-  $('rotate').hidden=!hard; $('loupeBtn').hidden=!hard; $('loupeBtn').setAttribute('aria-pressed',String(loupeOn));
+  $('rotate').hidden=!hard; $('loupeBtn').hidden=!hard; loupeOn=store.get('jig-loupe')!==false; $('loupeBtn').setAttribute('aria-pressed',String(loupeOn)); if(hard) requestAnimationFrame(()=>{ const sv=store.get('jig-loupe-pos'); if(sv&&window.__placeLoupe) window.__placeLoupe(sv.x,sv.y); });
   $('pinBtn').setAttribute('aria-pressed',String(!!(idx()[key]||{}).pin));
   if(okSave){
     P.elapsed=saved.t||0; P.moves=saved.mv||0;
@@ -829,15 +829,15 @@ function drawLoupe(){
 (function(){
   const w=$('loupeWrap'), tbl=$('table'); let dg=null;
   function place(x,y){ const r=tbl.getBoundingClientRect(); x=Math.max(4,Math.min(r.width-w.offsetWidth-4,x)); y=Math.max(4,Math.min(r.height-w.offsetHeight-4,y)); w.style.left=x+'px'; w.style.top=y+'px'; return [x,y]; }
-  const saved=store.get('jig-loupe-pos'); if(saved) requestAnimationFrame(()=>place(saved.x,saved.y));
+  window.__placeLoupe=place;
   w.addEventListener('pointerdown',e=>{ if(e.target.closest('button')) return; dg={id:e.pointerId,dx:e.clientX-w.offsetLeft,dy:e.clientY-w.offsetTop}; w.setPointerCapture(e.pointerId); w.classList.add('dragging'); e.preventDefault(); e.stopPropagation(); });
   w.addEventListener('pointermove',e=>{ if(!dg||e.pointerId!==dg.id) return; place(e.clientX-dg.dx,e.clientY-dg.dy); e.preventDefault(); });
   const end=e=>{ if(!dg||e.pointerId!==dg.id) return; const [x,y]=place(e.clientX-dg.dx,e.clientY-dg.dy); store.set('jig-loupe-pos',{x,y}); dg=null; w.classList.remove('dragging'); };
   w.addEventListener('pointerup',end); w.addEventListener('pointercancel',end);
   window.addEventListener('resize',()=>{ const sv=store.get('jig-loupe-pos'); if(sv&&!w.hidden) place(sv.x,sv.y); });
 })();
-function setLoupe(on){ loupeOn=!!on; store.set('jig-loupe',loupeOn); $('loupeBtn').setAttribute('aria-pressed',String(loupeOn)); draw(); }
-$('loupeBtn').onclick=()=>setLoupe(!loupeOn); $('loupeHide').onclick=()=>setLoupe(false);
+function setLoupe(on,remember){ loupeOn=!!on; if(remember!==false) store.set('jig-loupe',loupeOn); $('loupeBtn').setAttribute('aria-pressed',String(loupeOn)); draw(); }
+$('loupeBtn').onclick=()=>setLoupe(!loupeOn); $('loupeHide').onclick=()=>setLoupe(false,false);
 $('loupeCW').onclick=()=>{ if(P&&P.lastId!=null&&P.groups.has(P.lastId)) rotateGroup(P.lastId) };
 $('loupeCCW').onclick=()=>{ if(P&&P.lastId!=null&&P.groups.has(P.lastId)) rotateGroup(P.lastId,3) };
 function drawPiece(ctx,p,src){
