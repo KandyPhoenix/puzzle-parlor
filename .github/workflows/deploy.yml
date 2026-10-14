@@ -22,6 +22,26 @@ jobs:
           accountId: d3aefe8ad2b7a8399b3f47238cde9599
           command: pages project create puzzle-parlor-app --production-branch=main
         continue-on-error: true
+      - name: Copy licensing secrets from GitHub to the Pages project (only the ones that are set)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: d3aefe8ad2b7a8399b3f47238cde9599
+          LICENSE_ADMIN_KEY: ${{ secrets.LICENSE_ADMIN_KEY }}
+          SQUARE_WEBHOOK_SIGNATURE_KEY: ${{ secrets.SQUARE_WEBHOOK_SIGNATURE_KEY }}
+          PUZZLE_PRICE_CENTS: ${{ secrets.PUZZLE_PRICE_CENTS }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          LICENSE_FROM_EMAIL: ${{ secrets.LICENSE_FROM_EMAIL }}
+          LICENSE_REPLY_TO: ${{ secrets.LICENSE_REPLY_TO }}
+          APP_URL: ${{ secrets.APP_URL }}
+        run: |
+          for name in LICENSE_ADMIN_KEY SQUARE_WEBHOOK_SIGNATURE_KEY PUZZLE_PRICE_CENTS RESEND_API_KEY LICENSE_FROM_EMAIL LICENSE_REPLY_TO APP_URL; do
+            val="${!name}"
+            if [ -n "$val" ]; then
+              printf '%s' "$val" | npx --yes wrangler@3 pages secret put "$name" --project-name=puzzle-parlor-app >/dev/null && echo "set $name"
+            else
+              echo "skip $name (not set in GitHub secrets)"
+            fi
+          done
       - name: Deploy
         uses: cloudflare/wrangler-action@v3
         with:
