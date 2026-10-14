@@ -1,4 +1,4 @@
-import {json,CORS,activate,deactivate,mint,adminOk,getLicense,putLicense,normCode,SETTING_NAMES} from '../../_lib/license.js';
+import {json,CORS,activate,deactivate,mint,adminOk,getLicense,putLicense,normCode,SETTING_NAMES,sendCodeEmail} from '../../_lib/license.js';
 export async function onRequest({request,env,params}){
   if(request.method==='OPTIONS') return new Response(null,{status:204,headers:CORS});
   const action=String(params.action||'');
@@ -8,9 +8,15 @@ export async function onRequest({request,env,params}){
     case 'activate': { if(request.method!=='POST') break; const r=await activate(env,body.code,body.device,body.name); return json(r.body,r.status); }
     case 'deactivate': { if(request.method!=='POST') break; const r=await deactivate(env,body.code,body.device); return json(r.body,r.status); }
     // ---- admin (header x-admin-key must match the LICENSE_ADMIN_KEY secret) ----
-    case 'mint': case 'list': case 'revoke': case 'unrevoke': case 'settings': {
+    case 'mint': case 'list': case 'revoke': case 'unrevoke': case 'settings': case 'testemail': {
       if(!env.LICENSE_ADMIN_KEY) return json({ok:false,error:'admin_not_configured',message:'Set the LICENSE_ADMIN_KEY secret on the Pages project.'},503);
       if(!adminOk(request,env)) return json({ok:false,error:'forbidden'},403);
+      if(action==='testemail'){
+        const to=String(body.to||'').trim(); if(!/^[^@\s]+@[^@\s]+$/.test(to)) return json({ok:false,error:'bad_email'},400);
+        const lic=await mint(env,{note:'test email',email:to});
+        try{ const sent=await sendCodeEmail(env,{to,code:lic.code}); if(sent){lic.emailed=Date.now(); await putLicense(env,lic.code,lic);} return json({ok:true,code:lic.code,emailed:sent,note:sent?'':'Email not sent: RESEND_API_KEY or LICENSE_FROM_EMAIL is missing.'}); }
+        catch(e){ return json({ok:false,code:lic.code,emailed:false,error:String(e.message||e)}); }
+      }
       if(action==='settings'){
         const set=body.set||{};
         for(const k of Object.keys(set)){ if(!SETTING_NAMES.includes(k)) return json({ok:false,error:'unknown_setting',name:k},400); const v=String(set[k]||'').trim(); if(v) await env.PROGRESS.put('cfg:'+k,v); else await env.PROGRESS.delete('cfg:'+k); }

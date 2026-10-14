@@ -57,5 +57,6 @@ export async function sendCodeEmail(env,{to,code}){
   const appUrl=(await cfg(env,'APP_URL'))||'https://puzzle-parlor-app.pages.dev/';
   const text=`Thank you for buying Puzzle Parlor!\n\nYour unlock code: ${code}\n\nHow to use it:\n1. Open ${appUrl} on your tablet, phone or computer (on iPad, use Safari and choose Share > Add to Home Screen to install it).\n2. Tap "Unlock" at the top of the puzzle gallery.\n3. Enter the code. Every puzzle opens on up to ${MAX_DEVICES} devices.\n\nKeep this email; the code is your proof of purchase.\n\nQuestions? Reply to this email.`;
   const r=await fetch('https://api.resend.com/emails',{method:'POST',headers:{authorization:'Bearer '+key,'content-type':'application/json'},body:JSON.stringify({from,to:[to],reply_to:replyTo||undefined,subject:'Your Puzzle Parlor unlock code',text})});
-  return r.ok;
+  if(!r.ok){ let detail=''; try{detail=(await r.text()).slice(0,300)}catch{} throw new Error('Resend '+r.status+': '+detail); }
+  return true;
 }
