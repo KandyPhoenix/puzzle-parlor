@@ -66,6 +66,8 @@ button{font:inherit;color:inherit}
 .size .bar{position:absolute;left:0;bottom:0;height:3px;background:var(--brass)}
 .size.done{border-color:var(--brass)}
 .size.done .s{color:var(--brass-text)}
+label.hard{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--ink);cursor:pointer;padding:8px 12px;border-radius:999px;border:1px solid var(--faint);background:var(--card)}
+label.hard input{accent-color:var(--brass-text);width:16px;height:16px;margin:0}
 #syncBtn{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;border:1px solid var(--faint);background:var(--card);cursor:pointer;font-weight:600;font-size:13px;color:var(--ink)}
 #syncBtn i{width:9px;height:9px;border-radius:50%;background:#b9ab9a}
 #syncBtn.on i{background:#4f9d6b}
@@ -106,7 +108,10 @@ button{font:inherit;color:inherit}
 .sep{width:1px;background:var(--faint);margin-inline:4px}
 @media (max-width:720px){ .tb .lbl{display:none} .tb{padding:8px} .tools{gap:4px;padding-inline:6px} .sep{display:none} }
 #peek{position:absolute;right:14px;bottom:14px;width:min(300px,45vw);border-radius:6px;overflow:hidden;box-shadow:0 12px 30px rgba(42,33,25,.35);border:4px solid #fff;background:#fff}
-#peek img{display:block;width:100%;height:auto}
+#peek img{display:block;width:100%;height:auto;cursor:zoom-in}
+#big{position:absolute;inset:0;z-index:5;background:rgba(42,33,25,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:zoom-out;padding:12px}
+#big img{max-width:100%;max-height:calc(100% - 30px);object-fit:contain;border:3px solid #fff;box-shadow:0 20px 50px rgba(0,0,0,.5)}
+#big span{color:#f4eadb;font-size:13px}
 #veil{position:absolute;inset:0;display:grid;place-items:center;background:rgba(243,239,232,.9);z-index:3}
 #veil p{font-family:var(--display);font-size:22px;margin:0}
 #win{position:absolute;inset:0;display:grid;place-items:center;z-index:4;background:rgba(42,33,25,.35);padding:16px}
@@ -150,7 +155,7 @@ button{font:inherit;color:inherit}
       <h1>Puzzle <span>Parlor</span></h1>
       <div style="display:flex;flex-direction:column;gap:10px;align-items:flex-start">
         <p id="lede">Public-domain paintings cut into 500, 750 or 1,000 pieces. Your progress saves in this browser, so you can stop and pick up where you left off.</p>
-        <button id="syncBtn" aria-expanded="false" aria-controls="syncPanel"><i></i><span id="syncLbl">Sync across devices</span></button>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center"><button id="syncBtn" aria-expanded="false" aria-controls="syncPanel"><i></i><span id="syncLbl">Sync across devices</span></button><label class="hard"><input type="checkbox" id="hardMode"> Hard mode: pieces come out rotated</label></div>
       </div>
     </header>
     <section id="syncPanel" hidden>
@@ -172,11 +177,13 @@ button{font:inherit;color:inherit}
     <button class="tb" id="back" aria-label="Back to all puzzles"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg><span class="lbl">Puzzles</span></button>
     <div class="ttl"><strong id="pTitle"></strong><span id="pSub"></span></div>
     <div class="stat" id="pProg" title="Pieces joined"><em>0%</em></div>
+    <div class="stat" id="pMoves" title="Moves (pieces placed)">0 moves</div>
     <div class="stat" id="pTime" title="Time spent">0:00</div>
   </div>
   <div id="table">
     <canvas id="cv" aria-label="Puzzle table. Drag pieces to move them; double-tap a piece to bring it to the centre of the board; drag the empty table to pan; scroll or pinch to zoom."></canvas>
-    <div id="peek" hidden><img id="peekImg" alt="Finished picture for reference"></div>
+    <div id="peek" hidden><img id="peekImg" alt="Finished picture for reference. Tap to enlarge."></div>
+    <div id="big" hidden><img id="bigImg" alt="Finished picture, full screen"><span>Tap anywhere to close</span></div>
     <div id="veil"><p id="veilMsg">Cutting pieces…</p></div>
     <canvas id="confetti" hidden></canvas>
     <div id="win" hidden><div class="card">
@@ -198,6 +205,8 @@ button{font:inherit;color:inherit}
     <span class="sep"></span>
     <button class="tb" id="edges" aria-pressed="false" title="Show only edge pieces (E)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="1"/><rect x="9" y="9" width="6" height="6" stroke-dasharray="2 2"/></svg><span class="lbl">Edges only</span></button>
     <button class="tb" id="sort" title="Shuffle every tray and loose piece out around the board (S)"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="5" height="5" rx="1"/><rect x="10" y="3" width="5" height="5" rx="1"/><rect x="17" y="3" width="4" height="5" rx="1"/><rect x="3" y="10" width="5" height="5" rx="1"/><rect x="3" y="17" width="5" height="4" rx="1"/><rect x="10" y="17" width="5" height="4" rx="1"/></svg><span class="lbl">Spread out</span></button>
+    <button class="tb" id="tidy" title="Tidy loose pieces on the table into neat rows (Y)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="7" height="7" rx="1"/><rect x="14" y="4" width="7" height="7" rx="1"/><rect x="3" y="15" width="7" height="6" rx="1"/><rect x="14" y="15" width="7" height="6" rx="1"/></svg><span class="lbl">Tidy</span></button>
+    <button class="tb" id="rotate" hidden title="Rotate the last piece you touched a quarter turn (R)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 11-3-6.7"/><path d="M21 4v5h-5"/></svg><span class="lbl">Rotate</span></button>
     <button class="tb" id="toTray" title="Put loose pieces back in the tray (T)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5"/><rect x="3" y="17" width="18" height="4" rx="1"/></svg><span class="lbl">To tray</span></button>
     <button class="tb" id="ghost" aria-pressed="false" title="Faint picture on the board (G)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="1" opacity=".5"/><path d="M3 16l5-5 4 4 3-3 6 6"/></svg><span class="lbl">Ghost</span></button>
     <button class="tb" id="peekBtn" aria-pressed="false" title="Show the box picture (P)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg><span class="lbl">Box lid</span></button>
@@ -218,7 +227,7 @@ const CATS=[
   {id:'fantasy',label:'Fantasy'},
   {id:'fairytales',label:'Fairy tales'},
   {id:'landscapes',label:'Landscapes'}];
-const IMAGES=[{"cat": "halloween", "slug": "haunted-village", "title": "Haunted Hollow Village", "artist": "Original art · made with Canva AI", "year": "", "w": 2912, "h": 2176, "page": "", "isNew": true}, {"cat": "halloween", "slug": "monster-ball", "title": "The Monster Ball", "artist": "Original art · made with Canva AI", "year": "", "w": 1456, "h": 1088, "page": "", "isNew": true}, {"cat": "halloween", "slug": "witch-kitchen", "title": "The Witch's Kitchen", "artist": "Original art · made with Canva AI", "year": "", "w": 1456, "h": 1088, "page": "", "isNew": true}, {"cat": "halloween", "slug": "midnight-graveyard", "title": "Midnight Graveyard", "artist": "Original art · made with Canva AI", "year": "", "w": 1456, "h": 1088, "page": "", "isNew": true}, {"cat": "fairytales", "slug": "fairytale-kingdom", "title": "Once Upon a Kingdom", "artist": "Original art · made with Canva AI", "year": "", "w": 2912, "h": 2176, "page": "", "isNew": true}, {"cat": "fairytales", "slug": "gingerbread-house", "title": "Hansel and Gretel's Gingerbread House", "artist": "Original art · made with Canva AI", "year": "", "w": 2912, "h": 2176, "page": "", "isNew": true}, {"cat": "christmas", "slug": "santa-workshop", "title": "Santa's Workshop", "artist": "Original art · made with Canva AI", "year": "", "w": 1456, "h": 1088, "page": "", "isNew": true}, {"cat": "christmas", "slug": "gingerbread-village", "title": "Gingerbread Village", "artist": "Original art · made with Canva AI", "year": "", "w": 1456, "h": 1088, "page": "", "isNew": true}, {"cat": "christmas", "slug": "sleigh-over-town", "title": "Christmas Eve Flight", "artist": "Original art · made with Canva AI", "year": "", "w": 1456, "h": 1088, "page": "", "isNew": true}, {"cat": "halloween", "slug": "witches-sabbath", "title": "Witches' Sabbath", "artist": "Francisco Goya", "year": "1797–98", "w": 1792, "h": 2560, "page": "https://commons.wikimedia.org/wiki/File:Francisco_de_Goya_y_Lucientes_-_Witches_Sabbath_-_Google_Art_Project.jpg", "isNew": false}, {"cat": "halloween", "slug": "triumph-of-death", "title": "The Triumph of Death", "artist": "Pieter Bruegel the Elder", "year": "c. 1562", "w": 2126, "h": 1517, "page": "https://commons.wikimedia.org/wiki/File:The_Triumph_of_Death_by_Pieter_Bruegel_the_Elder.jpg", "isNew": false}, {"cat": "halloween", "slug": "isle-of-the-dead", "title": "Isle of the Dead", "artist": "Arnold Böcklin", "year": "1880", "w": 2560, "h": 1825, "page": "https://commons.wikimedia.org/wiki/File:Arnold_B%C3%B6cklin_-_Die_Toteninsel_I_(Basel,_Kunstmuseum).jpg", "isNew": false}, {"cat": "halloween", "slug": "the-nightmare", "title": "The Nightmare", "artist": "Henry Fuseli", "year": "1781", "w": 1920, "h": 1556, "page": "https://commons.wikimedia.org/wiki/File:John_Henry_Fuseli_-_The_Nightmare.JPG", "isNew": false}, {"cat": "halloween", "slug": "flight-of-witches", "title": "Flight of the Witches", "artist": "Francisco Goya", "year": "1798", "w": 1681, "h": 2400, "page": "https://commons.wikimedia.org/wiki/File:Francisco_de_Goya_-_Vuelo_de_brujas_(1798).jpg", "isNew": false}, {"cat": "holiday", "slug": "ice-skaters", "title": "Ice Scene", "artist": "Hendrick Avercamp", "year": "1610", "w": 2400, "h": 1204, "page": "https://commons.wikimedia.org/wiki/File:Hendrick_Avercamp_-_Ice_Scene_-_785_-_Rijksmuseum.jpg", "isNew": false}, {"cat": "holiday", "slug": "st-nicholas", "title": "The Feast of St. Nicholas", "artist": "Jan Steen", "year": "c. 1663–65", "w": 2047, "h": 2400, "page": "https://commons.wikimedia.org/wiki/File:Jan_Havicksz._Steen_%E2%80%93_Het_Sint-Nicolaasfeest_%E2%80%93_Google_Art_Project.jpg", "isNew": false}, {"cat": "holiday", "slug": "thanksgiving", "title": "Thanksgiving at Plymouth", "artist": "Jennie Augusta Brownscombe", "year": "1925", "w": 2400, "h": 1808, "page": "https://commons.wikimedia.org/wiki/File:Thanksgiving_at_Plymouth,_1925,_Brownscombe.jpg", "isNew": false}, {"cat": "holiday", "slug": "childrens-games", "title": "Children's Games", "artist": "Pieter Bruegel the Elder", "year": "1560", "w": 2400, "h": 1743, "page": "https://commons.wikimedia.org/wiki/File:Pieter_Bruegel_the_Elder_-_Children%E2%80%99s_Games_-_Google_Art_Project.jpg", "isNew": false}, {"cat": "christmas", "slug": "hunters-in-snow", "title": "Hunters in the Snow", "artist": "Pieter Bruegel the Elder", "year": "1565", "w": 2400, "h": 1708, "page": "https://commons.wikimedia.org/wiki/File:Pieter_Bruegel_the_Elder_-_Hunters_in_the_Snow_(Winter)_-_Google_Art_Project.jpg", "isNew": false}, {"cat": "christmas", "slug": "bethlehem", "title": "The Census at Bethlehem", "artist": "Pieter Bruegel the Elder", "year": "1566", "w": 2400, "h": 1663, "page": "https://commons.wikimedia.org/wiki/File:Pieter_Bruegel_the_Elder_-_The_Numbering_at_Bethlehem_-_Google_Art_Project.jpg", "isNew": false}, {"cat": "christmas", "slug": "merry-christmas", "title": "Merry Christmas (Glade jul)", "artist": "Viggo Johansen", "year": "1891", "w": 2400, "h": 1933, "page": "https://commons.wikimedia.org/wiki/File:Viggo_Johansen_-_Glade_jul_-_1891.jpg", "isNew": false}, {"cat": "christmas", "slug": "christmas-eve", "title": "Christmas Eve", "artist": "Carl Larsson", "year": "1904–05", "w": 2400, "h": 1648, "page": "https://commons.wikimedia.org/wiki/File:Julaftonen_av_Carl_Larsson_1904.jpg", "isNew": false}, {"cat": "christmas", "slug": "mystic-nativity", "title": "Mystic Nativity", "artist": "Sandro Botticelli", "year": "c. 1500", "w": 1661, "h": 2400, "page": "https://commons.wikimedia.org/wiki/File:Mystic_Nativity_by_Sandro_Botticelli.jpg", "isNew": false}, {"cat": "paintings", "slug": "starry-night", "title": "The Starry Night", "artist": "Vincent van Gogh", "year": "1889", "w": 2400, "h": 1901, "page": "https://commons.wikimedia.org/wiki/File:Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg", "isNew": false}, {"cat": "paintings", "slug": "great-wave", "title": "The Great Wave off Kanagawa", "artist": "After Katsushika Hokusai", "year": "c. 1830–32 design", "w": 2400, "h": 1656, "page": "https://commons.wikimedia.org/wiki/File:The_Great_Wave_off_Kanagawa.jpg", "isNew": false}, {"cat": "paintings", "slug": "grande-jatte", "title": "A Sunday on La Grande Jatte", "artist": "Georges Seurat", "year": "1884–86", "w": 2400, "h": 1598, "page": "https://commons.wikimedia.org/wiki/File:Georges_Seurat_-_A_Sunday_on_La_Grande_Jatte_--_1884_-_Google_Art_Project.jpg", "isNew": false}, {"cat": "paintings", "slug": "the-kiss", "title": "The Kiss", "artist": "Gustav Klimt", "year": "1907–08", "w": 2392, "h": 2400, "page": "https://commons.wikimedia.org/wiki/File:The_Kiss_-_Gustav_Klimt_-_Google_Cultural_Institute.jpg", "isNew": false}, {"cat": "paintings", "slug": "water-lilies", "title": "Water Lilies", "artist": "Claude Monet", "year": "1916", "w": 1920, "h": 1923, "page": "https://commons.wikimedia.org/wiki/File:Claude_Monet_-_Water_Lilies_-_Google_Art_Project_(462013).jpg", "isNew": false}, {"cat": "paintings", "slug": "cafe-terrace", "title": "Café Terrace at Night", "artist": "Vincent van Gogh", "year": "1888", "w": 1913, "h": 2400, "page": "https://commons.wikimedia.org/wiki/File:Vincent_Willem_van_Gogh_-_Cafe_Terrace_at_Night_(Yorck).jpg", "isNew": false}, {"cat": "paintings", "slug": "boating-party", "title": "Luncheon of the Boating Party", "artist": "Pierre-Auguste Renoir", "year": "1880–81", "w": 2400, "h": 1778, "page": "https://commons.wikimedia.org/wiki/File:Pierre-Auguste_Renoir_-_Luncheon_of_the_Boating_Party_-_Google_Art_Project.jpg", "isNew": false}, {"cat": "fantasy", "slug": "earthly-delights", "title": "The Garden of Earthly Delights", "artist": "Hieronymus Bosch", "year": "c. 1480–1505", "w": 2400, "h": 1366, "page": "https://commons.wikimedia.org/wiki/File:The_Garden_of_earthly_delights.jpg", "isNew": false}, {"cat": "fantasy", "slug": "titans-goblet", "title": "The Titan's Goblet", "artist": "Thomas Cole", "year": "1833", "w": 1920, "h": 2288, "page": "https://commons.wikimedia.org/wiki/File:The_Titan%27s_Goblet_MET_DP-12799-001.jpg", "isNew": false}, {"cat": "fantasy", "slug": "midsummer-eve", "title": "Midsummer Eve", "artist": "Edward Robert Hughes", "year": "c. 1908", "w": 1600, "h": 2400, "page": "https://commons.wikimedia.org/wiki/File:Midsummer_Eve_-_Edward_Robert_Hughes_(1908).jpg", "isNew": false}, {"cat": "fantasy", "slug": "bogatyrs", "title": "Bogatyrs", "artist": "Viktor Vasnetsov", "year": "1898", "w": 1920, "h": 1234, "page": "https://commons.wikimedia.org/wiki/File:1898_Vasnetsov_Bogatyrs_anagoria.JPG", "isNew": false}, {"cat": "fantasy", "slug": "fairy-feller", "title": "The Fairy Feller's Master-Stroke", "artist": "Richard Dadd", "year": "c. 1855–64", "w": 1728, "h": 2400, "page": "https://commons.wikimedia.org/wiki/File:Richard_Dadd_-_The_Fairy_Feller%27s_Master-Stroke_-_Google_Art_Project.jpg", "isNew": false}, {"cat": "fantasy", "slug": "voyage-of-life", "title": "The Voyage of Life: Childhood", "artist": "Thomas Cole", "year": "1842", "w": 2400, "h": 1621, "page": "https://commons.wikimedia.org/wiki/File:Thomas_Cole_-_The_Voyage_of_Life_Childhood,_1842_(National_Gallery_of_Art).jpg", "isNew": false}, {"cat": "fantasy", "slug": "wrath", "title": "The Great Day of His Wrath", "artist": "John Martin", "year": "c. 1851–53", "w": 2400, "h": 1548, "page": "https://commons.wikimedia.org/wiki/File:John_Martin_-_The_Great_Day_of_His_Wrath_-_Google_Art_Project.jpg", "isNew": false}, {"cat": "landscapes", "slug": "sierra-nevada", "title": "Among the Sierra Nevada, California", "artist": "Albert Bierstadt", "year": "1868", "w": 1920, "h": 1148, "page": "https://commons.wikimedia.org/wiki/File:Albert_Bierstadt_-_Among_the_Sierra_Nevada,_California_-_Google_Art_Project.jpg", "isNew": false}, {"cat": "landscapes", "slug": "landers-peak", "title": "The Rocky Mountains, Lander's Peak", "artist": "Albert Bierstadt", "year": "1863", "w": 1920, "h": 1150, "page": "https://commons.wikimedia.org/wiki/File:Albert_Bierstadt_-_The_Rocky_Mountains,_Lander%27s_Peak.jpg", "isNew": false}, {"cat": "landscapes", "slug": "heart-of-andes", "title": "Heart of the Andes", "artist": "Frederic Edwin Church", "year": "1859", "w": 1920, "h": 1051, "page": "https://commons.wikimedia.org/wiki/File:Church_Heart_of_the_Andes.jpg", "isNew": false}, {"cat": "landscapes", "slug": "yellowstone", "title": "The Grand Canyon of the Yellowstone", "artist": "Thomas Moran", "year": "1872", "w": 1496, "h": 876, "page": "https://commons.wikimedia.org/wiki/File:Smithsonian-Moran-The_Grand_Canyon_of_the_Yellowstone-2283.jpg", "isNew": false}, {"cat": "landscapes", "slug": "the-oxbow", "title": "The Oxbow", "artist": "Thomas Cole", "year": "1836", "w": 1920, "h": 1304, "page": "https://commons.wikimedia.org/wiki/File:Cole_Thomas_The_Oxbow_(The_Connecticut_River_near_Northampton_1836).jpg", "isNew": false}, {"cat": "landscapes", "slug": "pine-forest", "title": "Morning in a Pine Forest", "artist": "Ivan Shishkin and Konstantin Savitsky", "year": "1889", "w": 1920, "h": 1301, "page": "https://commons.wikimedia.org/wiki/File:Shishkin,_Ivan_-_Morning_in_a_Pine_Forest.jpg", "isNew": false}, {"cat": "landscapes", "slug": "wheat-cypresses", "title": "Wheat Field with Cypresses", "artist": "Vincent van Gogh", "year": "1889", "w": 1920, "h": 1527, "page": "https://commons.wikimedia.org/wiki/File:Vincent_van_Gogh_-_Wheat_Field_with_Cypresses_(National_Gallery_version).jpg", "isNew": false}, {"cat": "landscapes", "slug": "sea-of-fog", "title": "Wanderer above the Sea of Fog", "artist": "Caspar David Friedrich", "year": "c. 1817", "w": 1874, "h": 2400, "page": "https://commons.wikimedia.org/wiki/File:Caspar_David_Friedrich_-_Wanderer_above_the_sea_of_fog.jpg", "isNew": false}, {"cat": "fairytales", "slug": "grey-wolf", "title": "Ivan Tsarevich Riding the Grey Wolf", "artist": "Viktor Vasnetsov", "year": "1889", "w": 1824, "h": 2400, "page": "https://commons.wikimedia.org/wiki/File:Moscou,_galerie_Tretiakov_Ivan-Tsarevitch_at_the_Grey_Wolf_(Vasnetsov).jpg", "isNew": false}, {"cat": "fairytales", "slug": "flying-carpet", "title": "The Flying Carpet", "artist": "Viktor Vasnetsov", "year": "1880", "w": 1920, "h": 1057, "page": "https://commons.wikimedia.org/wiki/File:Vasnetsov_samolet.jpg", "isNew": false}, {"cat": "fairytales", "slug": "sleeping-princess", "title": "The Sleeping Princess", "artist": "Viktor Vasnetsov", "year": "1900–26", "w": 1920, "h": 898, "page": "https://commons.wikimedia.org/wiki/File:%D0%A1%D0%BF%D1%8F%D1%89%D0%B0%D1%8F_%D1%86%D0%B0%D1%80%D0%B5%D0%B2%D0%BD%D0%B0.jpg", "isNew": false}, {"cat": "fairytales", "slug": "tuvstarr", "title": "Princess Tuvstarr Gazing into the Forest Pool", "artist": "John Bauer", "year": "1913", "w": 1920, "h": 1936, "page": "https://commons.wikimedia.org/wiki/File:%C3%84nnu_sitter_Tuvstarr_kvar_och_ser_ner_i_vattnet.jpg", "isNew": false}];
+const IMAGES=[{"cat": "halloween", "slug": "haunted-village", "title": "Haunted Hollow Village", "artist": "Original art · made with Canva AI", "year": "", "w": 2912, "h": 2176, "page": "", "isNew": true}, {"cat": "halloween", "slug": "monster-ball", "title": "The Monster Ball", "artist": "Original art · made with Canva AI", "year": "", "w": 1456, "h": 1088, "page": "", "isNew": true}, {"cat": "halloween", "slug": "witch-kitchen", "title": "The Witch's Kitchen", "artist": "Original art · made with Canva AI", "year": "", "w": 1456, "h": 1088, "page": "", "isNew": true}, {"cat": "halloween", "slug": "midnight-graveyard", "title": "Midnight Graveyard", "artist": "Original art · made with Canva AI", "year": "", "w": 1456, "h": 1088, "page": "", "isNew": true}, {"cat": "fairytales", "slug": "fairytale-kingdom", "title": "Once Upon a Kingdom", "artist": "Original art · made with Canva AI", "year": "", "w": 2912, "h": 2176, "page": "", "isNew": true}, {"cat": "fairytales", "slug": "gingerbread-house", "title": "Hansel and Gretel's Gingerbread House", "artist": "Original art · made with Canva AI", "year": "", "w": 2912, "h": 2176, "page": "", "isNew": true}, {"cat": "christmas", "slug": "santa-workshop", "title": "Santa's Workshop", "artist": "Original art · made with Canva AI", "year": "", "w": 1456, "h": 1088, "page": "", "isNew": true}, {"cat": "christmas", "slug": "gingerbread-village", "title": "Gingerbread Village", "artist": "Original art · made with Canva AI", "year": "", "w": 2912, "h": 2176, "page": "", "isNew": true}, {"cat": "christmas", "slug": "sleigh-over-town", "title": "Christmas Eve Flight", "artist": "Original art · made with Canva AI", "year": "", "w": 1456, "h": 1088, "page": "", "isNew": true}, {"cat": "halloween", "slug": "witches-sabbath", "title": "Witches' Sabbath", "artist": "Francisco Goya", "year": "1797–98", "w": 1792, "h": 2560, "page": "https://commons.wikimedia.org/wiki/File:Francisco_de_Goya_y_Lucientes_-_Witches_Sabbath_-_Google_Art_Project.jpg", "isNew": false}, {"cat": "halloween", "slug": "triumph-of-death", "title": "The Triumph of Death", "artist": "Pieter Bruegel the Elder", "year": "c. 1562", "w": 2126, "h": 1517, "page": "https://commons.wikimedia.org/wiki/File:The_Triumph_of_Death_by_Pieter_Bruegel_the_Elder.jpg", "isNew": false}, {"cat": "halloween", "slug": "isle-of-the-dead", "title": "Isle of the Dead", "artist": "Arnold Böcklin", "year": "1880", "w": 2560, "h": 1825, "page": "https://commons.wikimedia.org/wiki/File:Arnold_B%C3%B6cklin_-_Die_Toteninsel_I_(Basel,_Kunstmuseum).jpg", "isNew": false}, {"cat": "halloween", "slug": "the-nightmare", "title": "The Nightmare", "artist": "Henry Fuseli", "year": "1781", "w": 1920, "h": 1556, "page": "https://commons.wikimedia.org/wiki/File:John_Henry_Fuseli_-_The_Nightmare.JPG", "isNew": false}, {"cat": "halloween", "slug": "flight-of-witches", "title": "Flight of the Witches", "artist": "Francisco Goya", "year": "1798", "w": 1681, "h": 2400, "page": "https://commons.wikimedia.org/wiki/File:Francisco_de_Goya_-_Vuelo_de_brujas_(1798).jpg", "isNew": false}, {"cat": "holiday", "slug": "ice-skaters", "title": "Ice Scene", "artist": "Hendrick Avercamp", "year": "1610", "w": 2400, "h": 1204, "page": "https://commons.wikimedia.org/wiki/File:Hendrick_Avercamp_-_Ice_Scene_-_785_-_Rijksmuseum.jpg", "isNew": false}, {"cat": "holiday", "slug": "st-nicholas", "title": "The Feast of St. Nicholas", "artist": "Jan Steen", "year": "c. 1663–65", "w": 2047, "h": 2400, "page": "https://commons.wikimedia.org/wiki/File:Jan_Havicksz._Steen_%E2%80%93_Het_Sint-Nicolaasfeest_%E2%80%93_Google_Art_Project.jpg", "isNew": false}, {"cat": "holiday", "slug": "thanksgiving", "title": "Thanksgiving at Plymouth", "artist": "Jennie Augusta Brownscombe", "year": "1925", "w": 2400, "h": 1808, "page": "https://commons.wikimedia.org/wiki/File:Thanksgiving_at_Plymouth,_1925,_Brownscombe.jpg", "isNew": false}, {"cat": "holiday", "slug": "childrens-games", "title": "Children's Games", "artist": "Pieter Bruegel the Elder", "year": "1560", "w": 2400, "h": 1743, "page": "https://commons.wikimedia.org/wiki/File:Pieter_Bruegel_the_Elder_-_Children%E2%80%99s_Games_-_Google_Art_Project.jpg", "isNew": false}, {"cat": "christmas", "slug": "hunters-in-snow", "title": "Hunters in the Snow", "artist": "Pieter Bruegel the Elder", "year": "1565", "w": 2400, "h": 1708, "page": "https://commons.wikimedia.org/wiki/File:Pieter_Bruegel_the_Elder_-_Hunters_in_the_Snow_(Winter)_-_Google_Art_Project.jpg", "isNew": false}, {"cat": "christmas", "slug": "bethlehem", "title": "The Census at Bethlehem", "artist": "Pieter Bruegel the Elder", "year": "1566", "w": 2400, "h": 1663, "page": "https://commons.wikimedia.org/wiki/File:Pieter_Bruegel_the_Elder_-_The_Numbering_at_Bethlehem_-_Google_Art_Project.jpg", "isNew": false}, {"cat": "christmas", "slug": "merry-christmas", "title": "Merry Christmas (Glade jul)", "artist": "Viggo Johansen", "year": "1891", "w": 2400, "h": 1933, "page": "https://commons.wikimedia.org/wiki/File:Viggo_Johansen_-_Glade_jul_-_1891.jpg", "isNew": false}, {"cat": "christmas", "slug": "christmas-eve", "title": "Christmas Eve", "artist": "Carl Larsson", "year": "1904–05", "w": 2400, "h": 1648, "page": "https://commons.wikimedia.org/wiki/File:Julaftonen_av_Carl_Larsson_1904.jpg", "isNew": false}, {"cat": "christmas", "slug": "mystic-nativity", "title": "Mystic Nativity", "artist": "Sandro Botticelli", "year": "c. 1500", "w": 1661, "h": 2400, "page": "https://commons.wikimedia.org/wiki/File:Mystic_Nativity_by_Sandro_Botticelli.jpg", "isNew": false}, {"cat": "paintings", "slug": "starry-night", "title": "The Starry Night", "artist": "Vincent van Gogh", "year": "1889", "w": 2400, "h": 1901, "page": "https://commons.wikimedia.org/wiki/File:Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg", "isNew": false}, {"cat": "paintings", "slug": "great-wave", "title": "The Great Wave off Kanagawa", "artist": "After Katsushika Hokusai", "year": "c. 1830–32 design", "w": 2400, "h": 1656, "page": "https://commons.wikimedia.org/wiki/File:The_Great_Wave_off_Kanagawa.jpg", "isNew": false}, {"cat": "paintings", "slug": "grande-jatte", "title": "A Sunday on La Grande Jatte", "artist": "Georges Seurat", "year": "1884–86", "w": 2400, "h": 1598, "page": "https://commons.wikimedia.org/wiki/File:Georges_Seurat_-_A_Sunday_on_La_Grande_Jatte_--_1884_-_Google_Art_Project.jpg", "isNew": false}, {"cat": "paintings", "slug": "the-kiss", "title": "The Kiss", "artist": "Gustav Klimt", "year": "1907–08", "w": 2392, "h": 2400, "page": "https://commons.wikimedia.org/wiki/File:The_Kiss_-_Gustav_Klimt_-_Google_Cultural_Institute.jpg", "isNew": false}, {"cat": "paintings", "slug": "water-lilies", "title": "Water Lilies", "artist": "Claude Monet", "year": "1916", "w": 1920, "h": 1923, "page": "https://commons.wikimedia.org/wiki/File:Claude_Monet_-_Water_Lilies_-_Google_Art_Project_(462013).jpg", "isNew": false}, {"cat": "paintings", "slug": "cafe-terrace", "title": "Café Terrace at Night", "artist": "Vincent van Gogh", "year": "1888", "w": 1913, "h": 2400, "page": "https://commons.wikimedia.org/wiki/File:Vincent_Willem_van_Gogh_-_Cafe_Terrace_at_Night_(Yorck).jpg", "isNew": false}, {"cat": "paintings", "slug": "boating-party", "title": "Luncheon of the Boating Party", "artist": "Pierre-Auguste Renoir", "year": "1880–81", "w": 2400, "h": 1778, "page": "https://commons.wikimedia.org/wiki/File:Pierre-Auguste_Renoir_-_Luncheon_of_the_Boating_Party_-_Google_Art_Project.jpg", "isNew": false}, {"cat": "fantasy", "slug": "earthly-delights", "title": "The Garden of Earthly Delights", "artist": "Hieronymus Bosch", "year": "c. 1480–1505", "w": 2400, "h": 1366, "page": "https://commons.wikimedia.org/wiki/File:The_Garden_of_earthly_delights.jpg", "isNew": false}, {"cat": "fantasy", "slug": "titans-goblet", "title": "The Titan's Goblet", "artist": "Thomas Cole", "year": "1833", "w": 1920, "h": 2288, "page": "https://commons.wikimedia.org/wiki/File:The_Titan%27s_Goblet_MET_DP-12799-001.jpg", "isNew": false}, {"cat": "fantasy", "slug": "midsummer-eve", "title": "Midsummer Eve", "artist": "Edward Robert Hughes", "year": "c. 1908", "w": 1600, "h": 2400, "page": "https://commons.wikimedia.org/wiki/File:Midsummer_Eve_-_Edward_Robert_Hughes_(1908).jpg", "isNew": false}, {"cat": "fantasy", "slug": "bogatyrs", "title": "Bogatyrs", "artist": "Viktor Vasnetsov", "year": "1898", "w": 1920, "h": 1234, "page": "https://commons.wikimedia.org/wiki/File:1898_Vasnetsov_Bogatyrs_anagoria.JPG", "isNew": false}, {"cat": "fantasy", "slug": "fairy-feller", "title": "The Fairy Feller's Master-Stroke", "artist": "Richard Dadd", "year": "c. 1855–64", "w": 1728, "h": 2400, "page": "https://commons.wikimedia.org/wiki/File:Richard_Dadd_-_The_Fairy_Feller%27s_Master-Stroke_-_Google_Art_Project.jpg", "isNew": false}, {"cat": "fantasy", "slug": "voyage-of-life", "title": "The Voyage of Life: Childhood", "artist": "Thomas Cole", "year": "1842", "w": 2400, "h": 1621, "page": "https://commons.wikimedia.org/wiki/File:Thomas_Cole_-_The_Voyage_of_Life_Childhood,_1842_(National_Gallery_of_Art).jpg", "isNew": false}, {"cat": "fantasy", "slug": "wrath", "title": "The Great Day of His Wrath", "artist": "John Martin", "year": "c. 1851–53", "w": 2400, "h": 1548, "page": "https://commons.wikimedia.org/wiki/File:John_Martin_-_The_Great_Day_of_His_Wrath_-_Google_Art_Project.jpg", "isNew": false}, {"cat": "landscapes", "slug": "sierra-nevada", "title": "Among the Sierra Nevada, California", "artist": "Albert Bierstadt", "year": "1868", "w": 1920, "h": 1148, "page": "https://commons.wikimedia.org/wiki/File:Albert_Bierstadt_-_Among_the_Sierra_Nevada,_California_-_Google_Art_Project.jpg", "isNew": false}, {"cat": "landscapes", "slug": "landers-peak", "title": "The Rocky Mountains, Lander's Peak", "artist": "Albert Bierstadt", "year": "1863", "w": 1920, "h": 1150, "page": "https://commons.wikimedia.org/wiki/File:Albert_Bierstadt_-_The_Rocky_Mountains,_Lander%27s_Peak.jpg", "isNew": false}, {"cat": "landscapes", "slug": "heart-of-andes", "title": "Heart of the Andes", "artist": "Frederic Edwin Church", "year": "1859", "w": 1920, "h": 1051, "page": "https://commons.wikimedia.org/wiki/File:Church_Heart_of_the_Andes.jpg", "isNew": false}, {"cat": "landscapes", "slug": "yellowstone", "title": "The Grand Canyon of the Yellowstone", "artist": "Thomas Moran", "year": "1872", "w": 1496, "h": 876, "page": "https://commons.wikimedia.org/wiki/File:Smithsonian-Moran-The_Grand_Canyon_of_the_Yellowstone-2283.jpg", "isNew": false}, {"cat": "landscapes", "slug": "the-oxbow", "title": "The Oxbow", "artist": "Thomas Cole", "year": "1836", "w": 1920, "h": 1304, "page": "https://commons.wikimedia.org/wiki/File:Cole_Thomas_The_Oxbow_(The_Connecticut_River_near_Northampton_1836).jpg", "isNew": false}, {"cat": "landscapes", "slug": "pine-forest", "title": "Morning in a Pine Forest", "artist": "Ivan Shishkin and Konstantin Savitsky", "year": "1889", "w": 1920, "h": 1301, "page": "https://commons.wikimedia.org/wiki/File:Shishkin,_Ivan_-_Morning_in_a_Pine_Forest.jpg", "isNew": false}, {"cat": "landscapes", "slug": "wheat-cypresses", "title": "Wheat Field with Cypresses", "artist": "Vincent van Gogh", "year": "1889", "w": 1920, "h": 1527, "page": "https://commons.wikimedia.org/wiki/File:Vincent_van_Gogh_-_Wheat_Field_with_Cypresses_(National_Gallery_version).jpg", "isNew": false}, {"cat": "landscapes", "slug": "sea-of-fog", "title": "Wanderer above the Sea of Fog", "artist": "Caspar David Friedrich", "year": "c. 1817", "w": 1874, "h": 2400, "page": "https://commons.wikimedia.org/wiki/File:Caspar_David_Friedrich_-_Wanderer_above_the_sea_of_fog.jpg", "isNew": false}, {"cat": "fairytales", "slug": "grey-wolf", "title": "Ivan Tsarevich Riding the Grey Wolf", "artist": "Viktor Vasnetsov", "year": "1889", "w": 1824, "h": 2400, "page": "https://commons.wikimedia.org/wiki/File:Moscou,_galerie_Tretiakov_Ivan-Tsarevitch_at_the_Grey_Wolf_(Vasnetsov).jpg", "isNew": false}, {"cat": "fairytales", "slug": "flying-carpet", "title": "The Flying Carpet", "artist": "Viktor Vasnetsov", "year": "1880", "w": 1920, "h": 1057, "page": "https://commons.wikimedia.org/wiki/File:Vasnetsov_samolet.jpg", "isNew": false}, {"cat": "fairytales", "slug": "sleeping-princess", "title": "The Sleeping Princess", "artist": "Viktor Vasnetsov", "year": "1900–26", "w": 1920, "h": 898, "page": "https://commons.wikimedia.org/wiki/File:%D0%A1%D0%BF%D1%8F%D1%89%D0%B0%D1%8F_%D1%86%D0%B0%D1%80%D0%B5%D0%B2%D0%BD%D0%B0.jpg", "isNew": false}, {"cat": "fairytales", "slug": "tuvstarr", "title": "Princess Tuvstarr Gazing into the Forest Pool", "artist": "John Bauer", "year": "1913", "w": 1920, "h": 1936, "page": "https://commons.wikimedia.org/wiki/File:%C3%84nnu_sitter_Tuvstarr_kvar_och_ser_ner_i_vattnet.jpg", "isNew": false}];
 const SIZES=[500,750,1000];
 const $=id=>document.getElementById(id);
 
@@ -248,8 +257,8 @@ function renderGrid(){
     const sizes=SIZES.map(n=>{
       const {count}=cut(n,img.w,img.h), k=`jig:${img.slug}:${n}`, s=ix[k];
       let sub='pieces',cls='size',bar='';
-      if(s&&s.done){sub='Done '+fmtTime(s.best);cls+=' done'}
-      else if(s&&s.pct!=null){sub='Resume '+s.pct+'%';bar=`<span class="bar" style="width:${s.pct}%"></span>`}
+      if(s&&s.done){sub='Done '+fmtTime(s.best)+(s.moves?' · '+fmtN(s.moves)+' mv':'')+(s.hard?' ↻':'');cls+=' done'}
+      else if(s&&s.pct!=null){sub='Resume '+s.pct+'%'+(s.hard?' ↻':'');bar=`<span class="bar" style="width:${s.pct}%"></span>`}
       return `<button class="${cls}" data-slug="${img.slug}" data-n="${n}" aria-label="${esc(img.title)}, ${count} pieces${s&&s.done?', completed':s&&s.pct!=null?', '+s.pct+'% done':''}"><span class="n">${fmtN(count)}</span><span class="s">${sub}</span>${bar}</button>`}).join('');
     return `<article class="box" style="--cat:var(--c-${img.cat})">
       <div class="art"><img src="thumbs/${img.slug}.jpg" alt="${esc(img.title)} by ${esc(img.artist)}" loading="lazy" width="520" height="390"></div>
@@ -264,6 +273,8 @@ $('tabs').addEventListener('keydown',e=>{
 });
 $('grid').addEventListener('click',e=>{const b=e.target.closest('.size');if(!b)return;openPuzzle(IMAGES.find(i=>i.slug===b.dataset.slug),+b.dataset.n)});
 $('lede').textContent=`${IMAGES.length} pictures for Halloween, the holidays, Christmas, famous paintings, fantasy, fairy tales and landscapes, each cut into 500, 750 or 1,000 pieces. Progress saves in this browser so you can stop and pick up later.`;
+$('hardMode').checked=!!store.get('jig-hard');
+$('hardMode').onchange=()=>store.set('jig-hard',$('hardMode').checked);
 renderTabs();renderGrid();
 
 /* ---------- cross-device sync (Cloudflare KV behind /api) ---------- */
@@ -402,19 +413,19 @@ async function openPuzzle(img,n){
     path.closePath();
     const pc=document.createElement('canvas'); pc.width=Math.ceil(cw*B); pc.height=Math.ceil(ch*B);
     const g=pc.getContext('2d'); g.scale(B,B); g.translate(m,m);
-    g.save(); g.shadowColor='rgba(0,0,0,.55)'; g.shadowBlur=lw*2.5; g.shadowOffsetX=lw*.6; g.shadowOffsetY=lw*1.2; g.fillStyle='#2a2018'; g.fill(path); g.restore();
+    // picture only, plus a hairline outline so pieces read as separate (no bevel/shadow: they smear when zoomed)
     g.save(); g.clip(path); g.drawImage(im,-ox,-oy);
-    g.lineWidth=lw*1.6; g.lineJoin='round';
-    g.save(); g.translate(lw*.8,lw*.8); g.strokeStyle='rgba(255,255,255,.30)'; g.stroke(path); g.restore();
-    g.save(); g.translate(-lw*.8,-lw*.8); g.strokeStyle='rgba(0,0,0,.38)'; g.stroke(path); g.restore();
+    g.lineWidth=lw*.7; g.lineJoin='round'; g.strokeStyle='rgba(0,0,0,.45)'; g.stroke(path);
     g.restore();
-    pieces.push({r,c,x:0,y:0,g:0,edge:r===0||c===0||r===rows-1||c===cols-1,cv:pc,hi:null,path,inTray:false});
+    pieces.push({r,c,x:0,y:0,rot:0,g:0,edge:r===0||c===0||r===rows-1||c===cols-1,cv:pc,hi:null,path,inTray:false});
     if(pieces.length%120===0){ $('veilMsg').textContent=`Cutting ${fmtN(count)} pieces… ${Math.round(pieces.length/count*100)}%`; await new Promise(r=>setTimeout(r,0)); }
   }
-  P={img,n,key,W,H,cols,rows,count,pw,ph,s,m,cw,ch,lw,B,seed,im,pieces,groups:new Map(),z:[],tray:[],hi:[],elapsed:0,started:performance.now(),won:false};
+  const hard=okSave?!!saved.hard:!!store.get('jig-hard');
+  P={img,n,key,W,H,cols,rows,count,pw,ph,s,m,cw,ch,lw,B,seed,im,pieces,hard,lastId:null,moves:0,groups:new Map(),z:[],tray:[],hi:[],elapsed:0,started:performance.now(),won:false};
+  $('rotate').hidden=!hard;
   if(okSave){
-    P.elapsed=saved.t||0;
-    pieces.forEach((p,i)=>{p.x=saved.p[i*2];p.y=saved.p[i*2+1];p.g=saved.g[i]});
+    P.elapsed=saved.t||0; P.moves=saved.mv||0;
+    pieces.forEach((p,i)=>{p.x=saved.p[i*2];p.y=saved.p[i*2+1];p.g=saved.g[i];p.rot=(saved.ro&&saved.ro[i])||0});
     const lockedSet=new Set(saved.L||[]);
     pieces.forEach((p,i)=>{let g=P.groups.get(p.g);if(!g){g={id:p.g,members:[],locked:lockedSet.has(p.g)};P.groups.set(p.g,g)}g.members.push(i)});
     const order=(saved.z||[]).filter(id=>P.groups.has(id));
@@ -426,6 +437,7 @@ async function openPuzzle(img,n){
     pieces.forEach((p,i)=>{p.g=i;P.groups.set(i,{id:i,members:[i],locked:false});P.z.push(i)});
     const order=pieces.map((_,i)=>i); for(let i=order.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[order[i],order[j]]=[order[j],order[i]]}
     P.tray=order; for(const i of order) pieces[i].inTray=true;
+    if(hard) for(const p of pieces) p.rot=1+Math.floor(Math.random()*3); // every piece starts turned
   }
   buildTray();
   setFlag('edges',false); strip.classList.remove('edges'); setFlag('ghost',false); setFlag('peek',false); setFlag('sound',flags.sound);
@@ -462,6 +474,13 @@ function spreadOut(){
   for(let i=loose.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[loose[i],loose[j]]=[loose[j],loose[i]]}
   layoutLoose(loose,true); save(); fit();
 }
+function tidy(){
+  const loose=[];
+  for(const g of P.groups.values()) if(!g.locked&&g.members.length===1&&!P.pieces[g.members[0]].inTray) loose.push(g.members[0]);
+  // keep rough left-to-right, top-to-bottom order so pieces don't jump across the table
+  loose.sort((a,b)=>(P.pieces[a].y-P.pieces[b].y)*4+(P.pieces[a].x-P.pieces[b].x));
+  layoutLoose(loose,false); save(); draw();
+}
 function collectToTray(){
   const back=[];
   for(const g of P.groups.values()){if(g.locked||g.members.length!==1)continue;const i=g.members[0];if(!P.pieces[i].inTray){back.push(i);P.pieces[i].inTray=true}}
@@ -477,7 +496,9 @@ function paintThumb(b){
   const hCss=parseFloat(getComputedStyle(c).height)||86, k=hCss*d/P.ch;
   if(b.dataset.k===String(k)&&c.width) return; b.dataset.k=k;
   c.width=Math.ceil(P.cw*k); c.height=Math.ceil(P.ch*k); c.style.width=(P.cw*k/d)+'px';
-  const g=c.getContext('2d'); g.imageSmoothingQuality='high'; g.scale(k,k); g.translate(P.m,P.m); drawLive(g,p,0,0);
+  const g=c.getContext('2d'); g.imageSmoothingQuality='high'; g.scale(k,k);
+  if(p.rot){g.translate(P.cw/2,P.ch/2);g.rotate(p.rot*Math.PI/2);g.translate(-P.cw/2,-P.ch/2)}
+  g.translate(P.m,P.m); drawLive(g,p,0,0);
 }
 function trayItem(i){const b=document.createElement('button');b.className='tp'+(P.pieces[i].edge?' edge':'');b.dataset.i=i;b.setAttribute('aria-label',(P.pieces[i].edge?'Edge piece':'Piece')+'. Drag onto the table, or tap to place it.');const c=document.createElement('canvas');c.width=c.height=0;b.appendChild(c);trayIO.observe(b);return b}
 function buildTray(){
@@ -497,14 +518,14 @@ function returnToTray(i,cx){
 }
 function takeFromTray(i,wx,wy){
   const p=P.pieces[i]; p.inTray=false; const k=P.tray.indexOf(i); if(k>=0)P.tray.splice(k,1);
-  p.x=wx-P.pw/2; p.y=wy-P.ph/2; toTop(p.g); trayInfo();
+  p.x=wx-P.pw/2; p.y=wy-P.ph/2; toTop(p.g); P.lastId=p.g; trayInfo();
 }
 function placeNear(i){
   // keyboard / tap: drop the piece just outside the board, inside the current view
   const z=cam.z, vx0=cam.x, vy0=cam.y, vx1=vx0+cv.clientWidth/z, vy1=vy0+cv.clientHeight/z;
   let x=Math.min(vx1-P.pw,Math.max(vx0+P.pw,P.W+P.pw*1.2+Math.random()*P.pw*3)), y=Math.min(vy1-P.ph,Math.max(vy0+P.ph,P.H*Math.random()));
   if(x>vx1-P.pw) x=vx0+P.pw+Math.random()*(vx1-vx0-2*P.pw);
-  takeFromTray(i,x,y); const n=strip.querySelector(`.tp[data-i="${i}"]`); if(n)n.remove(); draw(); save();
+  takeFromTray(i,x,y); countMove(); const n=strip.querySelector(`.tp[data-i="${i}"]`); if(n)n.remove(); draw(); save();
 }
 strip.addEventListener('pointerdown',e=>{
   const b=e.target.closest('.tp'); if(!b||!P) return; ensureAudio();
@@ -529,7 +550,7 @@ function trayUp(e){
   const t=trayDrag; trayDrag=null; $('tray').classList.remove('drop'); cv.classList.remove('grabbing');
   if(!t.started){ if(e.type==='pointerup'&&Math.hypot(e.clientX-t.x0,e.clientY-t.y0)<8) placeNear(t.i); return; }
   if(e.type==='pointercancel'||overTray(e.clientY)){ returnToTray(t.i,e.clientX); return; }
-  t.node.remove(); snap(P.pieces[t.i].g); updateProgress(); draw(); save();
+  t.node.remove(); countMove(); snap(P.pieces[t.i].g); updateProgress(); draw(); save();
   if(!P.won&&isWon()) celebrate();
 }
 window.addEventListener('pointerup',trayUp); window.addEventListener('pointercancel',trayUp);
@@ -564,18 +585,25 @@ function render(){
   if(flags.ghost){ctx.globalAlpha=dk?.22:.3;ctx.drawImage(P.im,0,0);ctx.globalAlpha=1}
   ctx.setLineDash([8/z,6/z]); ctx.lineWidth=1.5/z; ctx.strokeStyle=dk?'rgba(255,255,255,.35)':'rgba(42,33,25,.35)'; ctx.strokeRect(0,0,P.W,P.H); ctx.setLineDash([]);
   const vx0=cam.x,vy0=cam.y,vx1=cam.x+cv.clientWidth/z,vy1=cam.y+cv.clientHeight/z,{m,pw,ph,cw,ch}=P;
-  const vis=[];
+  const vis=[], R=Math.hypot(pw,ph)/2+m;
   for(const id of P.z){
     const g=P.groups.get(id); if(hiddenGroup(g)) continue;
-    for(const i of g.members){const p=P.pieces[i];
-      if(p.x+pw+m<vx0||p.x-m>vx1||p.y+ph+m<vy0||p.y-m>vy1) continue;
+    for(const i of g.members){const p=P.pieces[i], cx=p.x+pw/2, cy=p.y+ph/2;
+      if(cx+R<vx0||cx-R>vx1||cy+R<vy0||cy-R>vy1) continue;
       vis.push(p);
     }
   }
   // zoomed in past the overview cache: use native-resolution pieces (unless so many are on screen that the cache would thrash)
   const hi=z*d>P.B*1.15&&vis.length<=HI_MAX;
-  for(const p of vis) ctx.drawImage(hi?hiCanvas(p):p.cv,p.x-m,p.y-m,cw,ch);
+  for(const p of vis) drawPiece(ctx,p,hi?hiCanvas(p):p.cv);
 }
+function drawPiece(ctx,p,src){
+  const {m,pw,ph,cw,ch}=P;
+  if(!p.rot){ctx.drawImage(src,p.x-m,p.y-m,cw,ch);return}
+  ctx.save(); ctx.translate(p.x+pw/2,p.y+ph/2); ctx.rotate(p.rot*Math.PI/2); ctx.drawImage(src,-pw/2-m,-ph/2-m,cw,ch); ctx.restore();
+}
+// rotate a vector by quarter turns (canvas y points down, so rot=1 is clockwise on screen)
+function rotv(x,y,rot){rot&=3;return rot===0?[x,y]:rot===1?[-y,x]:rot===2?[-x,-y]:[y,-x]}
 // Native-resolution piece, built on first use; at most HI_MAX kept (oldest dropped) so memory stays bounded.
 const HI_MAX=420;
 function hiCanvas(p){
@@ -589,11 +617,8 @@ function hiCanvas(p){
 function drawLive(g,p,x,y){
   const {lw,pw,ph}=P;
   g.save(); g.translate(x,y);
-  g.save(); g.translate(lw*.6,lw*1.2); g.fillStyle='rgba(0,0,0,.35)'; g.fill(p.path); g.restore();
   g.save(); g.clip(p.path); g.drawImage(P.im,-p.c*pw,-p.r*ph);
-  g.lineWidth=lw*1.6; g.lineJoin='round';
-  g.save(); g.translate(lw*.8,lw*.8); g.strokeStyle='rgba(255,255,255,.30)'; g.stroke(p.path); g.restore();
-  g.save(); g.translate(-lw*.8,-lw*.8); g.strokeStyle='rgba(0,0,0,.38)'; g.stroke(p.path); g.restore();
+  g.lineWidth=lw*.7; g.lineJoin='round'; g.strokeStyle='rgba(0,0,0,.45)'; g.stroke(p.path);
   g.restore(); g.restore();
 }
 
@@ -603,6 +628,8 @@ function hitTest(wx,wy,tol){
   for(let k=P.z.length-1;k>=0;k--){
     const g=P.groups.get(P.z[k]); if(g.locked||hiddenGroup(g)) continue;
     for(const i of g.members){const p=P.pieces[i];
+      if(p.rot){ const cx=p.x+pw/2, cy=p.y+ph/2; if(Math.hypot(wx-cx,wy-cy)>Math.hypot(pw,ph)/2+m) continue;
+        const [lx,ly]=rotv(wx-cx,wy-cy,-p.rot); if(hitCtx.isPointInPath(p.path,lx+pw/2,ly+ph/2)) return g.id; continue; }
       if(wx<p.x-m||wx>p.x+pw+m||wy<p.y-m||wy>p.y+ph+m) continue;
       if(hitCtx.isPointInPath(p.path,wx-p.x,wy-p.y)) return g.id;
     }
@@ -625,6 +652,13 @@ function centreGroup(id){
   const jx=(Math.random()-.5)*P.pw, jy=(Math.random()-.5)*P.ph;
   moveGroup(g,P.W/2-(x0+x1)/2+jx,P.H/2-(y0+y1)/2+jy); toTop(id); draw(); save();
 }
+function rotateGroup(id){
+  const g=P.groups.get(id); if(!g||g.locked) return;
+  let sx=0,sy=0; for(const i of g.members){sx+=P.pieces[i].x+P.pw/2;sy+=P.pieces[i].y+P.ph/2}
+  const C=[sx/g.members.length,sy/g.members.length];
+  for(const i of g.members){const p=P.pieces[i];const [rx,ry]=rotv(p.x+P.pw/2-C[0],p.y+P.ph/2-C[1],1);p.x=C[0]+rx-P.pw/2;p.y=C[1]+ry-P.ph/2;p.rot=(p.rot+1)&3}
+  toTop(id); countMove(); snap(id); updateProgress(); draw(); save(); if(!P.won&&isWon()) celebrate();
+}
 let lastTap={t:0,x:0,y:0,id:null};
 function toTop(id){const k=P.z.indexOf(id);if(k>=0)P.z.splice(k,1);P.z.push(id)}
 function moveGroup(g,dx,dy){for(const i of g.members){P.pieces[i].x+=dx;P.pieces[i].y+=dy}}
@@ -642,8 +676,9 @@ function snap(id){
     for(const i of g.members){const p=pieces[i];
       for(const[dr,dc]of[[-1,0],[1,0],[0,-1],[0,1]]){
         const r=p.r+dr,c=p.c+dc; if(r<0||c<0||r>=rows||c>=cols) continue;
-        const q=pieces[r*cols+c]; if(q.g===g.id) continue;
-        const ex=(q.x-p.x)-dc*pw, ey=(q.y-p.y)-dr*ph;
+        const q=pieces[r*cols+c]; if(q.g===g.id||q.rot!==p.rot||q.inTray) continue;
+        const [ox,oy]=rotv(dc*pw,dr*ph,p.rot);
+        const ex=(q.x-p.x)-ox, ey=(q.y-p.y)-oy;
         if(Math.hypot(ex,ey)<tol){
           const other=P.groups.get(q.g);
           moveGroup(g,ex,ey);
@@ -654,18 +689,20 @@ function snap(id){
       if(again) break;
     }
   }
-  if(!g.locked){
+  if(!g.locked&&!pieces[g.members[0]].rot){
     const p=pieces[g.members[0]], ex=p.c*pw-p.x, ey=p.r*ph-p.y;
     if(Math.hypot(ex,ey)<tol){moveGroup(g,ex,ey);g.locked=true;snapped=true}
   }
-  if(g.members.length===P.count&&!g.locked){const p=pieces[0];moveGroup(g,-p.x,-p.y);g.locked=true}
+  if(g.members.length===P.count&&!g.locked&&!pieces[0].rot){const p=pieces[0];moveGroup(g,-p.x,-p.y);g.locked=true}
   if(g.locked){const k=P.z.indexOf(g.id);if(k>=0)P.z.splice(k,1);P.z.unshift(g.id)}
   if(snapped) clack();
   return snapped;
 }
 function isWon(){for(const g of P.groups.values()) if(!g.locked) return false; return true}
 function pct(){return P.count<2?100:Math.round((P.count-P.groups.size)/(P.count-1)*100)}
+function countMove(){P.moves++;$('pMoves').textContent=fmtN(P.moves)+(P.moves===1?' move':' moves')}
 function updateProgress(){
+  $('pMoves').textContent=fmtN(P.moves)+(P.moves===1?' move':' moves');
   const v=isWon()?100:Math.min(99,pct());
   $('pProg').innerHTML=`<em>${v}%</em>`; $('pProg').title=`${fmtN(P.count-P.groups.size)} of ${fmtN(P.count-1)} joins made`;
 }
@@ -684,7 +721,7 @@ function endDrag(cx,cy){
   if(!drag) return; const id=drag.id; drag=null; cv.classList.remove('grabbing'); $('tray').classList.remove('drop');
   const g=P.groups.get(id);
   if(g&&cy!=null&&overTray(cy)&&g.members.length===1&&!g.locked){returnToTray(g.members[0],cx);return}
-  if(P.groups.has(id)) snap(id);
+  countMove(); if(P.groups.has(id)) snap(id);
   updateProgress(); draw(); save();
   if(!P.won&&isWon()) celebrate();
 }
@@ -697,8 +734,8 @@ cv.addEventListener('pointerdown',e=>{
   const[wx,wy]=world(sx,sy), id=hitTest(wx,wy,e.pointerType==='touch'?14/cam.z:0);
   const now=performance.now(), dbl=id!=null&&id===lastTap.id&&now-lastTap.t<400&&Math.hypot(sx-lastTap.x,sy-lastTap.y)<24;
   lastTap={t:now,x:sx,y:sy,id};
-  if(dbl){lastTap.id=null;centreGroup(id);return}
-  if(id!=null){drag={id,x:wx,y:wy,pid:e.pointerId};toTop(id);cv.classList.add('grabbing');draw()}
+  if(dbl){lastTap.id=null;if(P.hard)rotateGroup(id);else centreGroup(id);return}
+  if(id!=null){P.lastId=id;drag={id,x:wx,y:wy,pid:e.pointerId};toTop(id);cv.classList.add('grabbing');draw()}
   else pan={x:sx,y:sy,cx:cam.x,cy:cam.y,pid:e.pointerId};
 });
 cv.addEventListener('pointermove',e=>{
@@ -724,8 +761,12 @@ cv.addEventListener('wheel',e=>{e.preventDefault();const[sx,sy]=local(e);const d
 function setFlag(name,v){flags[name]=v;const b=$(name==='peek'?'peekBtn':name);if(b)b.setAttribute('aria-pressed',String(v));if(name==='peek')$('peek').hidden=!v;if(name==='sound')store.set('jig-sound',v);draw()}
 $('edges').onclick=()=>{setFlag('edges',!flags.edges);strip.classList.toggle('edges',flags.edges)};
 $('toTray').onclick=()=>{if(P)collectToTray()};
+$('tidy').onclick=()=>{if(P)tidy()};
+$('rotate').onclick=()=>{if(P&&P.lastId!=null&&P.groups.has(P.lastId))rotateGroup(P.lastId)};
 $('ghost').onclick=()=>setFlag('ghost',!flags.ghost);
 $('peekBtn').onclick=()=>setFlag('peek',!flags.peek);
+$('peek').onclick=()=>{$('bigImg').src=$('peekImg').src;$('big').hidden=false};
+$('big').onclick=()=>{$('big').hidden=true};
 $('sound').onclick=()=>{setFlag('sound',!flags.sound);if(flags.sound){ensureAudio();clack()}};
 $('sort').onclick=()=>{if(P)spreadOut()};
 $('zFit').onclick=fit;
@@ -744,8 +785,9 @@ document.addEventListener('keydown',e=>{
   if($('play').hidden||!P||e.target.closest('input,textarea')) return;
   const k=e.key.toLowerCase();
   if(k==='+'||k==='=') $('zIn').click(); else if(k==='-') $('zOut').click(); else if(k==='0') fit();
-  else if(k==='e') $('edges').click(); else if(k==='g') $('ghost').click(); else if(k==='p') $('peekBtn').click(); else if(k==='s') $('sort').click(); else if(k==='t') $('toTray').click();
-  else if(k==='escape'){ if(!$('win').hidden) $('winStay').click(); else if(flags.peek) setFlag('peek',false); }
+  else if(k==='e') $('edges').click(); else if(k==='g') $('ghost').click(); else if(k==='p') $('peekBtn').click(); else if(k==='s') $('sort').click(); else if(k==='t') $('toTray').click(); else if(k==='y') $('tidy').click(); else if(k==='r'&&P.hard) $('rotate').click();
+  else if(k==='f'){ if($('big').hidden){$('bigImg').src=$('peekImg').src;$('big').hidden=false} else $('big').hidden=true; }
+  else if(k==='escape'){ if(!$('big').hidden) $('big').hidden=true; else if(!$('win').hidden) $('winStay').click(); else if(flags.peek) setFlag('peek',false); }
 });
 
 /* ---------- timer & saving ---------- */
@@ -759,17 +801,18 @@ function save(){
   const p=new Array(P.count*2);P.pieces.forEach((q,i)=>{p[i*2]=Math.round(q.x*10)/10;p[i*2+1]=Math.round(q.y*10)/10});
   const L=[];for(const g of P.groups.values())if(g.locked)L.push(g.id);
   const ts=Date.now();
-  store.set(P.key,{v:1,u:ts,seed:P.seed,cols:P.cols,rows:P.rows,t:Math.round(P.elapsed),p,g:P.pieces.map(q=>q.g),L,z:P.z,tr:P.tray});
-  setIdx(P.key,{pct:pct()},ts);
+  store.set(P.key,{v:1,u:ts,seed:P.seed,hard:P.hard,cols:P.cols,rows:P.rows,t:Math.round(P.elapsed),mv:P.moves,p,g:P.pieces.map(q=>q.g),L,z:P.z,tr:P.tray,ro:P.hard?P.pieces.map(q=>q.rot):undefined});
+  setIdx(P.key,{pct:pct(),hard:P.hard},ts);
 }
 
 /* ---------- finish ---------- */
 function celebrate(){
   tick(); P.won=true;
   const prev=idx()[P.key], best=prev&&prev.best?Math.min(prev.best,P.elapsed):P.elapsed;
-  store.del(P.key); setIdx(P.key,{done:true,best:Math.round(best),pct:null}); syncPush();
+  const prevMv=prev&&prev.moves, bestMv=prevMv?Math.min(prevMv,P.moves):P.moves;
+  store.del(P.key); setIdx(P.key,{done:true,best:Math.round(best),moves:bestMv,pct:null,hard:P.hard}); syncPush();
   $('pProg').innerHTML='<em>100%</em>';
-  $('winMsg').textContent=`${P.img.title}, ${fmtN(P.count)} pieces, in ${fmtTime(P.elapsed)}.`;
+  $('winMsg').textContent=`${P.img.title}, ${fmtN(P.count)} pieces${P.hard?' (hard mode)':''}: ${fmtTime(P.elapsed)} and ${fmtN(P.moves)} moves.`;
   $('win').hidden=false; fit();
   if(!matchMedia('(prefers-reduced-motion: reduce)').matches) confetti();
 }
