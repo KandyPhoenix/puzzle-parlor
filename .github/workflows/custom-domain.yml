@@ -1,0 +1,24 @@
+name: Add custom domain to Pages
+
+on:
+  workflow_dispatch:
+    inputs:
+      domain:
+        description: Hostname to attach to the puzzle-parlor-app Pages project
+        required: true
+        default: puzzles.kandyphoenix.com
+
+jobs:
+  attach:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Attach the domain and report its status
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          ACCOUNT: d3aefe8ad2b7a8399b3f47238cde9599
+          DOMAIN: ${{ github.event.inputs.domain }}
+        run: |
+          api="https://api.cloudflare.com/client/v4/accounts/$ACCOUNT/pages/projects/puzzle-parlor-app/domains"
+          curl -sS -X POST "$api" -H "Authorization: Bearer $CF_TOKEN" -H "Content-Type: application/json" --data "{\"name\":\"$DOMAIN\"}" | python3 -c 'import json,sys; j=json.load(sys.stdin); print("success:", j.get("success")); [print("error:", e) for e in j.get("errors",[])]; r=j.get("result") or {}; print("status:", r.get("status"), "cert:", (r.get("certificate_authority") or ""), "validation:", r.get("validation_data"))'
+          echo "--- all domains on the project"
+          curl -sS "$api" -H "Authorization: Bearer $CF_TOKEN" | python3 -c 'import json,sys; [print(d["name"], d.get("status")) for d in json.load(sys.stdin).get("result",[])]'
