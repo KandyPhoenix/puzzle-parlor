@@ -1,0 +1,7 @@
+name = "puzzle-parlor"
+compatibility_date = "2026-01-01"
+pages_build_output_dir = "public"
+
+[[kv_namespaces]]
+binding = "PROGRESS"
+id = "1d77e8f1b9c74f8f9ce22b5b279f697a"
