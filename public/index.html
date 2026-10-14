@@ -321,7 +321,7 @@ function setIdx(key,val,ts){const i=idx(); i[key]=Object.assign(i[key]||{},val==
 
 /* ---------- unlock codes (web version only; store builds are paid upfront and fully open) ---------- */
 const PAID_BUILD=!!window.Capacitor;
-const FORCE_LOCK=/[?&]lock=1/.test(location.search), WEB_SALES=!PAID_BUILD&&/\.pages\.dev$/.test(location.hostname);
+const FORCE_LOCK=/[?&]lock=1/.test(location.search), WEB_SALES=!PAID_BUILD&&/\.pages\.dev$|kandyphoenix\.com$/.test(location.hostname);
 // Locking is on only when the server has an admin key configured (so codes can exist). The answer is cached between visits.
 let LOCKING=FORCE_LOCK||(WEB_SALES&&!!store.get('jig-lockcfg'));
 async function refreshLockConfig(){

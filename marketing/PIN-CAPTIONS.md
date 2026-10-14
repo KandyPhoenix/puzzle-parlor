@@ -1,6 +1,6 @@
 # Pinterest pins – titles, descriptions and link
 
-Link for every pin: https://puzzle-parlor-app.pages.dev/buy
+Link for every pin: https://puzzles.kandyphoenix.com/buy
 Board suggestions: "Halloween Puzzles", "Christmas Jigsaw Puzzles", "Famous Painting Puzzles", "Relaxing Games for iPad".
 Post 2 or 3 pins a week rather than all at once; Pinterest rewards steady posting. Halloween pins first (now), Christmas pins from early November.
 

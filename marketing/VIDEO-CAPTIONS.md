@@ -1,7 +1,7 @@
 # Time-lapse videos (1080×1920, 15 fps, ~14 s, no audio)
 
 Add trending audio in the app you post from. Post one or two a week, Halloween ones first.
-Link in bio / first comment: https://puzzle-parlor-app.pages.dev/buy
+Link in bio / first comment: https://puzzles.kandyphoenix.com/buy
 
 | File | Caption | Hashtags |
 |---|---|---|
