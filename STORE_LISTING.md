@@ -5,13 +5,13 @@
 **App name** (30 chars max): Puzzle Parlor
 
 **Short description** (80 chars max):
-Relaxing jigsaw puzzles, 400 to 1,000 pieces, with sharp zoom and cross-device sync.
+Relaxing jigsaw puzzles, 100 to 1,000 pieces, with sharp zoom and cross-device sync.
 
 **Full description** (4,000 chars max):
 
 Puzzle Parlor is a calm, beautifully made jigsaw puzzle app for phones and tablets.
 
-Choose from Halloween scenes, cozy Christmas and holiday pictures, classic paintings, fantasy worlds, fairy tales and landscapes. Every puzzle can be played at 400, 500, 750 or 1,000 pieces.
+Choose from Halloween scenes, cozy Christmas and holiday pictures, classic paintings, fantasy worlds, fairy tales and landscapes. Every puzzle can be played at 100, 150, 200, 300, 400, 500, 750 or 1,000 pieces, so it suits a quick phone session or a long tablet evening.
 
 Features
 • Full-resolution pieces that stay sharp however far you zoom in
