@@ -1,4 +1,4 @@
-const C='puzzle-parlor-c12b680ac4';
+const C='puzzle-parlor-f29eb2f31c';
 self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(['./index.html','./manifest.webmanifest','./icon-192.png'])));self.skipWaiting()});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C&&k!=='puzzle-parlor-media').map(k=>caches.delete(k)))));self.clients.claim()});
 self.addEventListener('fetch',e=>{
