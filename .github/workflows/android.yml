@@ -13,7 +13,10 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest   # ships with the Android SDK preinstalled (ANDROID_HOME is set)
+    env:
+      KS: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+      KS_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
 
@@ -26,8 +29,6 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      - uses: android-actions/setup-android@v3
-
       - name: Install Capacitor and copy the web app into the Android project
         run: |
           npm ci
@@ -35,9 +36,6 @@ jobs:
 
       - name: Restore the upload keystore from secrets (release signing)
         if: ${{ env.KS != '' }}
-        env:
-          KS: ${{ secrets.ANDROID_KEYSTORE_B64 }}
-          KS_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
         run: |
           echo "$KS" | base64 -d > android/upload.jks
           printf 'storeFile=upload.jks\nstorePassword=%s\nkeyAlias=upload\nkeyPassword=%s\n' "$KS_PASSWORD" "$KS_PASSWORD" > android/keystore.properties
@@ -49,6 +47,7 @@ jobs:
           ./gradlew --no-daemon bundleRelease assembleDebug
 
       - name: Verify the bundle is signed
+        if: ${{ env.KS != '' }}
         run: jarsigner -verify android/app/build/outputs/bundle/release/app-release.aab
 
       - uses: actions/upload-artifact@v4
