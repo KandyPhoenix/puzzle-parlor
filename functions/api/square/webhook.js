@@ -19,7 +19,8 @@ export async function onRequestPost({request,env}){
   const pay=ev&&ev.data&&ev.data.object&&ev.data.object.payment;
   if(!pay||pay.status!=='COMPLETED') return json({ok:true,ignored:'not a completed payment'});
   const price=parseInt((await cfg(env,'PUZZLE_PRICE_CENTS'))||'0')||0;
-  if(price&&!(pay.amount_money&&pay.amount_money.amount===price&&(pay.amount_money.currency||'USD')==='USD')) return json({ok:true,ignored:'amount does not match PUZZLE_PRICE_CENTS'});
+  const amt=pay.amount_money&&pay.amount_money.amount; // base price, or base price plus up to ~17% sales tax if tax is ever switched on in Square
+  if(price&&!(amt>=price&&amt<=Math.round(price*1.17)&&(pay.amount_money.currency||'USD')==='USD')) return json({ok:true,ignored:'amount does not match PUZZLE_PRICE_CENTS'});
   const dedupe=`sqpay:${pay.id}`; if(await env.PROGRESS.get(dedupe)) return json({ok:true,ignored:'already processed'});
   const email=pay.buyer_email_address||'';
   const lic=await mint(env,{src:'square',email,order:pay.order_id||pay.id,note:'Square payment'});

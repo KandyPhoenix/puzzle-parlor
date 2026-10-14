@@ -17,7 +17,7 @@ Add these as **GitHub repository secrets** (puzzle-parlor → Settings → Secre
 |---|---|
 | `LICENSE_ADMIN_KEY` | Long random string; paste it into admin.html to manage codes. Required for admin.html. |
 | `SQUARE_WEBHOOK_SIGNATURE_KEY` | From the Square webhook subscription (below). Required for automatic codes. |
-| `PUZZLE_PRICE_CENTS` | e.g. `299`. Only payments for exactly this amount mint a code, so Phoenix Method client payments on the same Square account never do. Strongly recommended. |
+| `PUZZLE_PRICE_CENTS` | e.g. `299`. Only payments of this amount (up to 17% more, to allow for sales tax) mint a code, so Phoenix Method client payments on the same Square account never do. Strongly recommended. |
 | `RESEND_API_KEY` | Resend API key, to email codes automatically. Without it, codes are minted but you must email them by hand (they show in admin.html with the buyer's email). |
 | `LICENSE_FROM_EMAIL` | Sender for the code email, e.g. `Puzzle Parlor <puzzles@phoenixmethodseo.com>`. The domain must be verified in Resend. |
 | `LICENSE_REPLY_TO` | Optional, e.g. `puzzles@phoenixmethodseo.com`. |
