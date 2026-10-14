@@ -30,7 +30,7 @@ Your progress is saved automatically. Pick a puzzle, start placing pieces, and c
 
 **Category:** Game > Puzzle
 **Tags:** jigsaw, puzzle, relaxing, paintings
-**Contact email:** puzzles@phoenixmethodseo.com
+**Contact email:** puzzles@kandyphoenix.com
 **Privacy policy URL:** https://puzzles.kandyphoenix.com/privacy
 
 ## Data safety form answers (as the app is built today)

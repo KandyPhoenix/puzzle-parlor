@@ -19,8 +19,8 @@ Add these as **GitHub repository secrets** (puzzle-parlor → Settings → Secre
 | `SQUARE_WEBHOOK_SIGNATURE_KEY` | From the Square webhook subscription (below). Required for automatic codes. |
 | `PUZZLE_PRICE_CENTS` | e.g. `299`. Only payments of this amount (up to 17% more, to allow for sales tax) mint a code, so Phoenix Method client payments on the same Square account never do. Strongly recommended. |
 | `RESEND_API_KEY` | Resend API key, to email codes automatically. Without it, codes are minted but you must email them by hand (they show in admin.html with the buyer's email). |
-| `LICENSE_FROM_EMAIL` | Sender for the code email, e.g. `Puzzle Parlor <puzzles@phoenixmethodseo.com>`. The domain must be verified in Resend. |
-| `LICENSE_REPLY_TO` | Optional, e.g. `puzzles@phoenixmethodseo.com`. |
+| `LICENSE_FROM_EMAIL` | Sender for the code email, e.g. `Puzzle Parlor <puzzles@kandyphoenix.com>`. The domain must be verified in Resend. |
+| `LICENSE_REPLY_TO` | Optional, e.g. `puzzles@kandyphoenix.com`. |
 | `APP_URL` | Optional, defaults to the pages.dev address. Set it when a custom domain exists. |
 
 After adding a secret, run the "Deploy to Cloudflare Pages" workflow from the Actions tab (Run workflow) so it is copied across.
