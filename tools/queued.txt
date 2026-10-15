@@ -12,3 +12,4 @@ landscapes	blossom-village
 animals	koi-pond
 vibes	forest-shrine
 vibes	zen-morning
+vibes	zen-sunset
