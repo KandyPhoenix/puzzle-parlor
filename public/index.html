@@ -36,7 +36,7 @@
   --brass:#5b7fb8; --brass-ink:#ffffff; --brass-text:#3d5f96;
   --bar:rgba(255,255,255,.95); --chip:rgba(35,38,43,.06); --chip-hi:rgba(35,38,43,.11);
   --table:#e2e3e6; --tray:#f7f8fa;
-  --c-halloween:#f07a2a; --c-holiday:#e9c35a; --c-christmas:#d8443c; --c-paintings:#5d9be0; --c-fantasy:#a983ec; --c-landscapes:#6fb880; --c-fairytales:#ec7fb4;
+  --c-halloween:#f07a2a; --c-holiday:#e9c35a; --c-christmas:#d8443c; --c-paintings:#5d9be0; --c-fantasy:#a983ec; --c-landscapes:#6fb880; --c-fairytales:#ec7fb4; --c-photos:#3aa6a0;
   --display:"Alfa Slab One", "Rockwell", "Roboto Slab", Georgia, serif;
   --body:"Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
@@ -191,16 +191,25 @@ label.hard input{accent-color:var(--brass-text);width:16px;height:16px;margin:0}
 #paused h2{font-family:var(--display);font-weight:400;font-size:30px;margin:0 0 6px;color:var(--brass-text)}
 #paused .row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:12px}
 #pauseBtn[aria-pressed="true"]{color:var(--brass-text)}
-#unlock,#help{position:fixed;inset:0;display:grid;place-items:center;z-index:40;background:rgba(35,38,43,.45);padding:16px}
-#unlock .card,#help .card{background:var(--card);border-radius:8px;padding:26px 28px;max-width:460px;width:100%;box-shadow:0 30px 60px rgba(35,38,43,.35)}
-#unlock h2,#help h2{font-family:var(--display);font-weight:400;font-size:28px;margin:0 0 8px;color:var(--brass-text)}
-#unlock p,#help p{margin:0 0 12px;line-height:1.5}
-#unlock label,#help label{display:block;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:6px 0 4px}
+#unlock,#help,#photoDlg{position:fixed;inset:0;display:grid;place-items:center;z-index:40;background:rgba(35,38,43,.45);padding:16px}
+.addbox{justify-content:center;min-height:300px;border:2px dashed var(--faint);background:var(--card-hi)}
+.addphoto{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;height:100%;min-height:300px;padding:24px;border:0;background:none;color:var(--ink);cursor:pointer;font:inherit;text-align:center}
+.addphoto b{font-size:44px;line-height:1;color:var(--brass-text)}.addphoto span{font-weight:700;font-size:17px}.addphoto small{color:var(--muted);max-width:260px;line-height:1.4}.addphoto .btn{margin-top:6px}
+.addbox.locked .addphoto{cursor:default}
+.rmphoto{margin:0 14px 12px;align-self:flex-start;background:none;border:0;color:var(--muted);font:inherit;font-size:12px;text-decoration:underline;cursor:pointer;padding:0}.rmphoto.armed{color:#b7412f;font-weight:700}
+#photoDlg .prev{width:100%;aspect-ratio:4/3;background:var(--card-hi);border:1px solid var(--faint);border-radius:6px;display:grid;place-items:center;overflow:hidden;margin:6px 0 10px}
+#photoDlg .prev img{max-width:100%;max-height:100%;display:block}#photoDlg .prev span{color:var(--muted);padding:20px;text-align:center}
+#photoDlg input[type=text]{width:100%;box-sizing:border-box;font:inherit;font-size:16px;padding:10px 12px;border-radius:5px;border:1px solid var(--faint);background:var(--card-hi);color:var(--ink)}
+#photoDlg input[type=file]{display:none}
+#unlock .card,#help .card,#photoDlg .card{background:var(--card);border-radius:8px;padding:26px 28px;max-width:460px;width:100%;box-shadow:0 30px 60px rgba(35,38,43,.35)}
+#unlock h2,#help h2,#photoDlg h2{font-family:var(--display);font-weight:400;font-size:28px;margin:0 0 8px;color:var(--brass-text)}
+#unlock p,#help p,#photoDlg p{margin:0 0 12px;line-height:1.5}
+#unlock label,#help label,#photoDlg label{display:block;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:6px 0 4px}
 #unlock input{width:100%;box-sizing:border-box;font-family:var(--mono);font-size:18px;letter-spacing:.08em;padding:10px 12px;border-radius:5px;border:1px solid var(--faint);background:var(--card-hi);color:var(--ink);text-transform:uppercase}
-#unlock .row,#help .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+#unlock .row,#help .row,#photoDlg .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
 #unlock a.btn{text-decoration:none;display:inline-block}
-#unlockMsg,#helpMsg{min-height:1.4em;color:var(--brass-text);font-weight:600;margin-top:10px}
-#unlockMsg.err,#helpMsg.err{color:#c8452f}
+#unlockMsg,#helpMsg,#photoMsg{min-height:1.4em;color:var(--brass-text);font-weight:600;margin-top:10px}
+#unlockMsg.err,#helpMsg.err,#photoMsg.err{color:#c8452f}
 #help input,#help textarea{width:100%;box-sizing:border-box;font:inherit;font-size:16px;padding:10px 12px;border-radius:5px;border:1px solid var(--faint);background:var(--card-hi);color:var(--ink)}
 #help textarea{min-height:110px;resize:vertical}
 #help .hp{position:absolute;left:-9999px;opacity:0;height:0;overflow:hidden}
@@ -270,7 +279,7 @@ label.hard input{accent-color:var(--brass-text);width:16px;height:16px;margin:0}
 </main>
 <div id="unlock" hidden role="dialog" aria-modal="true" aria-labelledby="unlockTitle"><div class="card">
   <h2 id="unlockTitle">Unlock every puzzle</h2>
-  <p id="unlockLead">The free version includes a selection of puzzles at every piece count. An unlock code opens every picture on up to 3 of your devices.</p>
+  <p id="unlockLead">The free version includes a selection of puzzles at every piece count. An unlock code opens every picture, and lets you turn your own photos into puzzles, on up to 3 of your devices.</p>
   <div id="unlockForm">
     <label for="unlockInput">Unlock code</label>
     <input id="unlockInput" placeholder="PP-XXXX-XXXX-XXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="24">
@@ -293,6 +302,16 @@ label.hard input{accent-color:var(--brass-text);width:16px;height:16px;margin:0}
     <div class="row"><button class="btn" id="helpSend" type="submit">Send message</button><button class="btn ghost" id="helpClose" type="button">Cancel</button></div>
   </form>
   <p id="helpMsg" aria-live="polite"></p>
+</div></div>
+<div id="photoDlg" hidden role="dialog" aria-modal="true" aria-labelledby="photoTitle"><div class="card">
+  <h2 id="photoTitle">Add a photo</h2>
+  <p>Pick a picture from this device. It is resized and saved on this device only, never uploaded anywhere.</p>
+  <input type="file" id="photoFile" accept="image/*">
+  <div class="row" style="margin-top:0"><button class="btn ghost" id="photoPick" type="button">Choose a picture</button></div>
+  <div class="prev" id="photoPrev"><span>No picture chosen yet</span></div>
+  <label for="photoName">Name this puzzle</label><input type="text" id="photoName" maxlength="60" placeholder="Grandma's garden">
+  <div class="row"><button class="btn" id="photoAdd" disabled>Add to my puzzles</button><button class="btn ghost" id="photoCancel">Cancel</button></div>
+  <p id="photoMsg" aria-live="polite"></p>
 </div></div>
 
 <section id="play" hidden>
@@ -357,9 +376,14 @@ const CATS=[
   {id:'paintings',label:'Famous paintings'},
   {id:'fantasy',label:'Fantasy'},
   {id:'fairytales',label:'Fairy tales'},
-  {id:'landscapes',label:'Landscapes'}];
+  {id:'landscapes',label:'Landscapes'},
+  {id:'photos',label:'My photos'}];
 const IMAGES=[{"cat": "halloween", "slug": "haunted-village", "title": "Haunted Hollow Village", "artist": "Original art", "year": "", "w": 2912, "h": 2176, "page": "", "isNew": true}, {"cat": "halloween", "slug": "monster-ball", "title": "The Monster Ball", "artist": "Original art", "year": "", "w": 2912, "h": 2176, "page": "", "isNew": true}, {"cat": "halloween", "slug": "witch-kitchen", "title": "The Witch's Kitchen", "artist": "Original art", "year": "", "w": 2912, "h": 2176, "page": "", "isNew": true}, {"cat": "halloween", "slug": "midnight-graveyard", "title": "Midnight Graveyard", "artist": "Original art", "year": "", "w": 2912, "h": 2176, "page": "", "isNew": true}, {"cat": "fairytales", "slug": "fairytale-kingdom", "title": "Once Upon a Kingdom", "artist": "Original art", "year": "", "w": 2912, "h": 2176, "page": "", "isNew": true}, {"cat": "fairytales", "slug": "gingerbread-house", "title": "Hansel and Gretel's Gingerbread House", "artist": "Original art", "year": "", "w": 2912, "h": 2176, "page": "", "isNew": true}, {"cat": "christmas", "slug": "santa-workshop", "title": "Santa's Workshop", "artist": "Original art", "year": "", "w": 2912, "h": 2176, "page": "", "isNew": true}, {"cat": "christmas", "slug": "gingerbread-village", "title": "Gingerbread Village", "artist": "Original art", "year": "", "w": 2912, "h": 2176, "page": "", "isNew": true}, {"cat": "christmas", "slug": "sleigh-over-town", "title": "Christmas Eve Flight", "artist": "Original art", "year": "", "w": 2912, "h": 2176, "page": "", "isNew": true}, {"cat": "halloween", "slug": "witches-sabbath", "title": "Witches' Sabbath", "artist": "Francisco Goya", "year": "1797–98", "w": 1792, "h": 2560, "page": "https://commons.wikimedia.org/wiki/File:Francisco_de_Goya_y_Lucientes_-_Witches_Sabbath_-_Google_Art_Project.jpg", "isNew": false}, {"cat": "halloween", "slug": "triumph-of-death", "title": "The Triumph of Death", "artist": "Pieter Bruegel the Elder", "year": "c. 1562", "w": 2126, "h": 1517, "page": "https://commons.wikimedia.org/wiki/File:The_Triumph_of_Death_by_Pieter_Bruegel_the_Elder.jpg", "isNew": false}, {"cat": "halloween", "slug": "isle-of-the-dead", "title": "Isle of the Dead", "artist": "Arnold Böcklin", "year": "1880", "w": 2560, "h": 1825, "page": "https://commons.wikimedia.org/wiki/File:Arnold_B%C3%B6cklin_-_Die_Toteninsel_I_(Basel,_Kunstmuseum).jpg", "isNew": false}, {"cat": "halloween", "slug": "the-nightmare", "title": "The Nightmare", "artist": "Henry Fuseli", "year": "1781", "w": 3000, "h": 2431, "page": "https://commons.wikimedia.org/wiki/File:John_Henry_Fuseli_-_The_Nightmare.JPG", "isNew": false}, {"cat": "halloween", "slug": "flight-of-witches", "title": "Flight of the Witches", "artist": "Francisco Goya", "year": "1798", "w": 1681, "h": 2400, "page": "https://commons.wikimedia.org/wiki/File:Francisco_de_Goya_-_Vuelo_de_brujas_(1798).jpg", "isNew": false}, {"cat": "holiday", "slug": "ice-skaters", "title": "Ice Scene", "artist": "Hendrick Avercamp", "year": "1610", "w": 2400, "h": 1204, "page": "https://commons.wikimedia.org/wiki/File:Hendrick_Avercamp_-_Ice_Scene_-_785_-_Rijksmuseum.jpg", "isNew": false}, {"cat": "holiday", "slug": "st-nicholas", "title": "The Feast of St. Nicholas", "artist": "Jan Steen", "year": "c. 1663–65", "w": 2047, "h": 2400, "page": "https://commons.wikimedia.org/wiki/File:Jan_Havicksz._Steen_%E2%80%93_Het_Sint-Nicolaasfeest_%E2%80%93_Google_Art_Project.jpg", "isNew": false}, {"cat": "holiday", "slug": "thanksgiving", "title": "Thanksgiving at Plymouth", "artist": "Jennie Augusta Brownscombe", "year": "1925", "w": 2400, "h": 1808, "page": "https://commons.wikimedia.org/wiki/File:Thanksgiving_at_Plymouth,_1925,_Brownscombe.jpg", "isNew": false}, {"cat": "holiday", "slug": "childrens-games", "title": "Children's Games", "artist": "Pieter Bruegel the Elder", "year": "1560", "w": 2400, "h": 1743, "page": "https://commons.wikimedia.org/wiki/File:Pieter_Bruegel_the_Elder_-_Children%E2%80%99s_Games_-_Google_Art_Project.jpg", "isNew": false}, {"cat": "christmas", "slug": "hunters-in-snow", "title": "Hunters in the Snow", "artist": "Pieter Bruegel the Elder", "year": "1565", "w": 2400, "h": 1708, "page": "https://commons.wikimedia.org/wiki/File:Pieter_Bruegel_the_Elder_-_Hunters_in_the_Snow_(Winter)_-_Google_Art_Project.jpg", "isNew": false}, {"cat": "christmas", "slug": "bethlehem", "title": "The Census at Bethlehem", "artist": "Pieter Bruegel the Elder", "year": "1566", "w": 2400, "h": 1663, "page": "https://commons.wikimedia.org/wiki/File:Pieter_Bruegel_the_Elder_-_The_Numbering_at_Bethlehem_-_Google_Art_Project.jpg", "isNew": false}, {"cat": "christmas", "slug": "merry-christmas", "title": "Merry Christmas (Glade jul)", "artist": "Viggo Johansen", "year": "1891", "w": 2400, "h": 1933, "page": "https://commons.wikimedia.org/wiki/File:Viggo_Johansen_-_Glade_jul_-_1891.jpg", "isNew": false}, {"cat": "christmas", "slug": "christmas-eve", "title": "Christmas Eve", "artist": "Carl Larsson", "year": "1904–05", "w": 2400, "h": 1648, "page": "https://commons.wikimedia.org/wiki/File:Julaftonen_av_Carl_Larsson_1904.jpg", "isNew": false}, {"cat": "christmas", "slug": "mystic-nativity", "title": "Mystic Nativity", "artist": "Sandro Botticelli", "year": "c. 1500", "w": 1661, "h": 2400, "page": "https://commons.wikimedia.org/wiki/File:Mystic_Nativity_by_Sandro_Botticelli.jpg", "isNew": false}, {"cat": "paintings", "slug": "starry-night", "title": "The Starry Night", "artist": "Vincent van Gogh", "year": "1889", "w": 2400, "h": 1901, "page": "https://commons.wikimedia.org/wiki/File:Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg", "isNew": false}, {"cat": "paintings", "slug": "great-wave", "title": "The Great Wave off Kanagawa", "artist": "After Katsushika Hokusai", "year": "c. 1830–32 design", "w": 2400, "h": 1656, "page": "https://commons.wikimedia.org/wiki/File:The_Great_Wave_off_Kanagawa.jpg", "isNew": false}, {"cat": "paintings", "slug": "grande-jatte", "title": "A Sunday on La Grande Jatte", "artist": "Georges Seurat", "year": "1884–86", "w": 2400, "h": 1598, "page": "https://commons.wikimedia.org/wiki/File:Georges_Seurat_-_A_Sunday_on_La_Grande_Jatte_--_1884_-_Google_Art_Project.jpg", "isNew": false}, {"cat": "paintings", "slug": "the-kiss", "title": "The Kiss", "artist": "Gustav Klimt", "year": "1907–08", "w": 2392, "h": 2400, "page": "https://commons.wikimedia.org/wiki/File:The_Kiss_-_Gustav_Klimt_-_Google_Cultural_Institute.jpg", "isNew": false}, {"cat": "paintings", "slug": "water-lilies", "title": "Water Lilies", "artist": "Claude Monet", "year": "1916", "w": 3000, "h": 3005, "page": "https://commons.wikimedia.org/wiki/File:Claude_Monet_-_Water_Lilies_-_Google_Art_Project_(462013).jpg", "isNew": false}, {"cat": "paintings", "slug": "cafe-terrace", "title": "Café Terrace at Night", "artist": "Vincent van Gogh", "year": "1888", "w": 1913, "h": 2400, "page": "https://commons.wikimedia.org/wiki/File:Vincent_Willem_van_Gogh_-_Cafe_Terrace_at_Night_(Yorck).jpg", "isNew": false}, {"cat": "paintings", "slug": "boating-party", "title": "Luncheon of the Boating Party", "artist": "Pierre-Auguste Renoir", "year": "1880–81", "w": 2400, "h": 1778, "page": "https://commons.wikimedia.org/wiki/File:Pierre-Auguste_Renoir_-_Luncheon_of_the_Boating_Party_-_Google_Art_Project.jpg", "isNew": false}, {"cat": "paintings", "slug": "earthly-delights", "title": "The Garden of Earthly Delights", "artist": "Hieronymus Bosch", "year": "c. 1480–1505", "w": 2400, "h": 1366, "page": "https://commons.wikimedia.org/wiki/File:The_Garden_of_earthly_delights.jpg", "isNew": false}, {"cat": "fantasy", "slug": "titans-goblet", "title": "The Titan's Goblet", "artist": "Thomas Cole", "year": "1833", "w": 1920, "h": 2288, "page": "https://commons.wikimedia.org/wiki/File:The_Titan%27s_Goblet_MET_DP-12799-001.jpg", "isNew": false}, {"cat": "fantasy", "slug": "midsummer-eve", "title": "Midsummer Eve", "artist": "Edward Robert Hughes", "year": "c. 1908", "w": 1600, "h": 2400, "page": "https://commons.wikimedia.org/wiki/File:Midsummer_Eve_-_Edward_Robert_Hughes_(1908).jpg", "isNew": false}, {"cat": "fantasy", "slug": "bogatyrs", "title": "Bogatyrs", "artist": "Viktor Vasnetsov", "year": "1898", "w": 3000, "h": 1928, "page": "https://commons.wikimedia.org/wiki/File:1898_Vasnetsov_Bogatyrs_anagoria.JPG", "isNew": false}, {"cat": "fantasy", "slug": "fairy-feller", "title": "The Fairy Feller's Master-Stroke", "artist": "Richard Dadd", "year": "c. 1855–64", "w": 1728, "h": 2400, "page": "https://commons.wikimedia.org/wiki/File:Richard_Dadd_-_The_Fairy_Feller%27s_Master-Stroke_-_Google_Art_Project.jpg", "isNew": false}, {"cat": "fantasy", "slug": "voyage-of-life", "title": "The Voyage of Life: Childhood", "artist": "Thomas Cole", "year": "1842", "w": 2400, "h": 1621, "page": "https://commons.wikimedia.org/wiki/File:Thomas_Cole_-_The_Voyage_of_Life_Childhood,_1842_(National_Gallery_of_Art).jpg", "isNew": false}, {"cat": "fantasy", "slug": "wrath", "title": "The Great Day of His Wrath", "artist": "John Martin", "year": "c. 1851–53", "w": 2400, "h": 1548, "page": "https://commons.wikimedia.org/wiki/File:John_Martin_-_The_Great_Day_of_His_Wrath_-_Google_Art_Project.jpg", "isNew": false}, {"cat": "landscapes", "slug": "sierra-nevada", "title": "Among the Sierra Nevada, California", "artist": "Albert Bierstadt", "year": "1868", "w": 3000, "h": 1794, "page": "https://commons.wikimedia.org/wiki/File:Albert_Bierstadt_-_Among_the_Sierra_Nevada,_California_-_Google_Art_Project.jpg", "isNew": false}, {"cat": "landscapes", "slug": "landers-peak", "title": "The Rocky Mountains, Lander's Peak", "artist": "Albert Bierstadt", "year": "1863", "w": 3000, "h": 1797, "page": "https://commons.wikimedia.org/wiki/File:Albert_Bierstadt_-_The_Rocky_Mountains,_Lander%27s_Peak.jpg", "isNew": false}, {"cat": "landscapes", "slug": "heart-of-andes", "title": "Heart of the Andes", "artist": "Frederic Edwin Church", "year": "1859", "w": 3000, "h": 1642, "page": "https://commons.wikimedia.org/wiki/File:Church_Heart_of_the_Andes.jpg", "isNew": false}, {"cat": "landscapes", "slug": "yellowstone", "title": "The Grand Canyon of the Yellowstone", "artist": "Thomas Moran", "year": "1872", "w": 3000, "h": 1757, "page": "https://commons.wikimedia.org/wiki/File:Smithsonian-Moran-The_Grand_Canyon_of_the_Yellowstone-2283.jpg", "isNew": false}, {"cat": "landscapes", "slug": "the-oxbow", "title": "The Oxbow", "artist": "Thomas Cole", "year": "1836", "w": 3000, "h": 2038, "page": "https://commons.wikimedia.org/wiki/File:Cole_Thomas_The_Oxbow_(The_Connecticut_River_near_Northampton_1836).jpg", "isNew": false}, {"cat": "landscapes", "slug": "pine-forest", "title": "Morning in a Pine Forest", "artist": "Ivan Shishkin and Konstantin Savitsky", "year": "1889", "w": 3000, "h": 2033, "page": "https://commons.wikimedia.org/wiki/File:Shishkin,_Ivan_-_Morning_in_a_Pine_Forest.jpg", "isNew": false}, {"cat": "landscapes", "slug": "wheat-cypresses", "title": "Wheat Field with Cypresses", "artist": "Vincent van Gogh", "year": "1889", "w": 3000, "h": 2386, "page": "https://commons.wikimedia.org/wiki/File:Vincent_van_Gogh_-_Wheat_Field_with_Cypresses_(National_Gallery_version).jpg", "isNew": false}, {"cat": "landscapes", "slug": "sea-of-fog", "title": "Wanderer above the Sea of Fog", "artist": "Caspar David Friedrich", "year": "c. 1817", "w": 1874, "h": 2400, "page": "https://commons.wikimedia.org/wiki/File:Caspar_David_Friedrich_-_Wanderer_above_the_sea_of_fog.jpg", "isNew": false}, {"cat": "fairytales", "slug": "grey-wolf", "title": "Ivan Tsarevich Riding the Grey Wolf", "artist": "Viktor Vasnetsov", "year": "1889", "w": 1824, "h": 2400, "page": "https://commons.wikimedia.org/wiki/File:Moscou,_galerie_Tretiakov_Ivan-Tsarevitch_at_the_Grey_Wolf_(Vasnetsov).jpg", "isNew": false}, {"cat": "fairytales", "slug": "flying-carpet", "title": "The Flying Carpet", "artist": "Viktor Vasnetsov", "year": "1880", "w": 3000, "h": 1652, "page": "https://commons.wikimedia.org/wiki/File:Vasnetsov_samolet.jpg", "isNew": false}, {"cat": "fairytales", "slug": "sleeping-princess", "title": "The Sleeping Princess", "artist": "Viktor Vasnetsov", "year": "1900–26", "w": 3000, "h": 1403, "page": "https://commons.wikimedia.org/wiki/File:%D0%A1%D0%BF%D1%8F%D1%89%D0%B0%D1%8F_%D1%86%D0%B0%D1%80%D0%B5%D0%B2%D0%BD%D0%B0.jpg", "isNew": false}, {"cat": "fairytales", "slug": "tuvstarr", "title": "Princess Tuvstarr Gazing into the Forest Pool", "artist": "John Bauer", "year": "1913", "w": 3000, "h": 3025, "page": "https://commons.wikimedia.org/wiki/File:%C3%84nnu_sitter_Tuvstarr_kvar_och_ser_ner_i_vattnet.jpg", "isNew": false}];
 const SIZES=[100,150,200,300,400,500,750,1000];
+const PHOTOS=[]; // the player's own pictures, loaded from this device's IndexedDB
+const findImg=slug=>IMAGES.find(i=>i.slug===slug)||PHOTOS.find(i=>i.slug===slug);
+const srcOf=img=>img.photo?img.url:'img/'+img.slug+'.jpg';
+const thumbOf=img=>img.photo?img.thumbUrl:'thumbs/'+img.slug+'.jpg';
 const $=id=>document.getElementById(id);
 
 /* ---------- storage (best effort) ---------- */
@@ -432,7 +456,7 @@ let cat=store.get('jig-cat')||'halloween';
 if(!CATS.some(c=>c.id===cat)) cat='halloween';
 let pins=store.get('jig-pins')||['halloween','christmas']; pins=pins.filter(p=>CATS.some(c=>c.id===p));
 const PIN_SVG='<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16 3l5 5-4 1-3 3 1 5-2 2-4-4-5 5-1-1 5-5-4-4 2-2 5 1 3-3z"/></svg>';
-const countOf=id=>IMAGES.filter(i=>i.cat===id).length;
+const countOf=id=>id==='photos'?PHOTOS.length:IMAGES.filter(i=>i.cat===id).length;
 function renderTabs(){
   const c=CATS.find(x=>x.id===cat);
   $('themeBtn').style.setProperty('--dot',`var(--c-${c.id})`); $('themeBtn').querySelector('i').style.background=`var(--c-${c.id})`;
@@ -456,12 +480,12 @@ function renderPinned(){
   const ix=idx(), keys=pinnedKeys();
   $('pinned').hidden=keys.length===0;
   $('pinrow').innerHTML=keys.map(k=>{
-    const q=parseKey(k), img=q&&IMAGES.find(i=>i.slug===q.slug); if(!img) return '';
+    const q=parseKey(k), img=q&&findImg(q.slug); if(!img) return '';
     const {count}=cut(q.n,img.w,img.h), e=ix[k];
     const done=!!e.done, p=done?100:(e.pct||0);
     const status=done?'Finished'+(e.best?' in '+fmtTime(e.best):''):(e.pct!=null?p+'% done':'Not started');
     return `<article class="pcard" role="button" tabindex="0" data-slug="${q.slug}" data-n="${q.n}" style="--cat:var(--c-${img.cat})" aria-label="${esc(img.title)}, ${count} pieces, ${status}">
-      <img src="thumbs/${q.slug}.jpg" alt="" width="84" height="63">
+      <img src="${thumbOf(img)}" alt="" width="84" height="63">
       <div class="pinfo"><h3>${esc(img.title)}</h3><span class="pm">${fmtN(count)} pieces${e.hard?' ↻':''} · ${status}</span><div class="pbar${done?' done':''}"><i style="width:${p}%"></i></div></div>
       <button class="unpin" data-unpin="${k}" aria-label="Unpin ${esc(img.title)}" title="Unpin">×</button></article>`}).join('');
 }
@@ -472,14 +496,18 @@ function setPin(key,on){
 }
 $('pinrow').addEventListener('click',e=>{
   const u=e.target.closest('.unpin'); if(u){e.stopPropagation();setPin(u.dataset.unpin,false);return}
-  const c=e.target.closest('.pcard'); if(c) openPuzzle(IMAGES.find(i=>i.slug===c.dataset.slug),+c.dataset.n);
+  const c=e.target.closest('.pcard'); if(c) openPuzzle(findImg(c.dataset.slug),+c.dataset.n);
 });
-$('pinrow').addEventListener('keydown',e=>{const c=e.target.closest('.pcard');if(c&&(e.key==='Enter'||e.key===' ')){e.preventDefault();openPuzzle(IMAGES.find(i=>i.slug===c.dataset.slug),+c.dataset.n)}});
+$('pinrow').addEventListener('keydown',e=>{const c=e.target.closest('.pcard');if(c&&(e.key==='Enter'||e.key===' ')){e.preventDefault();openPuzzle(findImg(c.dataset.slug),+c.dataset.n)}});
 $('pinBtn').onclick=()=>{if(!P)return;const on=$('pinBtn').getAttribute('aria-pressed')!=='true';setPin(P.key,on);syncPush()};
 function renderGrid(){
   renderPinned();
   const ix=idx();
-  $('grid').innerHTML=IMAGES.filter(i=>i.cat===cat).map(img=>{
+  const list=cat==='photos'?PHOTOS:IMAGES.filter(i=>i.cat===cat);
+  const lead=cat!=='photos'?'':unlocked()
+    ?`<article class="box addbox"><button class="addphoto" id="addPhoto"><b>+</b><span>Add a photo</span><small>Turn any picture on this device into a puzzle. It stays on this device only.</small></button></article>`
+    :`<article class="box addbox locked"><div class="addphoto"><b>🔒</b><span>Your own photos</span><small>Make puzzles from your own pictures. Part of the full version.</small><button class="btn" id="photoUnlock">Unlock</button></div></article>`;
+  $('grid').innerHTML=lead+list.map(img=>{
     const sizes=SIZES.map(n=>{
       const {count}=cut(n,img.w,img.h), k=`jig:${img.slug}:${n}`, s=ix[k];
       let sub='pieces',cls='size',bar='';
@@ -487,10 +515,11 @@ function renderGrid(){
       if(!locked&&s&&s.done){sub='Done '+fmtTime(s.best)+(s.moves?' · '+fmtN(s.moves)+' mv':'')+(s.hard?' ↻':'');cls+=' done'}
       else if(!locked&&s&&s.pct!=null){sub='Resume '+s.pct+'%'+(s.hard?' ↻':'');bar=`<span class="bar" style="width:${s.pct}%"></span>`}
       return `<button class="${cls}" data-slug="${img.slug}" data-n="${n}" aria-label="${esc(img.title)}, ${count} pieces${s&&s.done?', completed':s&&s.pct!=null?', '+s.pct+'% done':''}"><span class="n">${fmtN(count)}</span><span class="s">${sub}</span>${bar}</button>`}).join('');
-    return `<article class="box" style="--cat:var(--c-${img.cat})">
-      <div class="art"><img src="thumbs/${img.slug}.jpg" alt="${esc(img.title)} by ${esc(img.artist)}" loading="lazy" width="520" height="390"></div>
+    return `<article class="box" data-slug="${img.slug}" style="--cat:var(--c-${img.cat})">
+      <div class="art"><img src="${thumbOf(img)}" alt="${esc(img.title)} by ${esc(img.artist)}" loading="lazy" width="520" height="390"></div>
       <div class="meta"><h3>${esc(img.title)}</h3>${img.page?`<a class="by" href="${esc(img.page)}" target="_blank" rel="noopener">${esc(img.artist)}, ${esc(img.year)}</a>`:`<span class="by">${esc(img.artist)}</span>`}<span class="chips">${img.isNew?'<span class="new">New scene</span>':''}${LOCKING?(FREE.has(img.slug)?'<span class="free">Free</span>':unlocked()?'':'<span class="lock">Full version</span>'):''}</span></div>
-      <div class="sizes">${sizes}</div></article>`}).join('');
+      <div class="sizes">${sizes}</div>${img.photo?`<button class="rmphoto" data-rm="${img.slug}" title="Remove this photo and its progress">Remove photo</button>`:''}</article>`}).join('');
+  if(cat==='photos'){ const a=$('addPhoto'); if(a) a.onclick=()=>openPhotoDlg(); const u=$('photoUnlock'); if(u) u.onclick=()=>openUnlock({title:'Your own photos'}); }
 }
 $('pins').addEventListener('click',e=>{const b=e.target.closest('.tab');if(!b)return;cat=b.dataset.cat;store.set('jig-cat',cat);renderTabs();renderGrid()});
 $('tabs').addEventListener('keydown',e=>{
@@ -499,8 +528,8 @@ $('tabs').addEventListener('keydown',e=>{
   const i=CATS.findIndex(c=>c.id===cat), j=(i+(e.key==='ArrowRight'?1:-1)+CATS.length)%CATS.length;
   cat=CATS[j].id;store.set('jig-cat',cat);renderTabs();renderGrid();
 });
-$('grid').addEventListener('click',e=>{const b=e.target.closest('.size');if(!b)return;openPuzzle(IMAGES.find(i=>i.slug===b.dataset.slug),+b.dataset.n)});
-$('lede').textContent='Jigsaw puzzles of spooky Halloween scenes, cozy Christmas and holiday pictures, famous paintings, fantasy worlds, fairy tales and landscapes. Pick any picture and choose from 100 to 1,000 pieces.';
+$('grid').addEventListener('click',e=>{const b=e.target.closest('.size');if(!b)return;openPuzzle(findImg(b.dataset.slug),+b.dataset.n)});
+$('lede').textContent='Jigsaw puzzles of spooky Halloween scenes, cozy Christmas and holiday pictures, famous paintings, fantasy worlds, fairy tales and landscapes, or your own photos. Pick any picture and choose from 100 to 1,000 pieces.';
 renderTabs();renderGrid();
 
 /* ---------- cross-device sync (Cloudflare KV behind /api) ---------- */
@@ -515,7 +544,7 @@ async function apiCall(p,opt){
   if(!r.ok) throw new Error('Sync server said '+r.status);
   return r.status===204?true:r.json();
 }
-function syncMark(key){ if(!syncOn()) return; sync.dirty.add(key); clearTimeout(sync.timer); sync.timer=setTimeout(()=>syncPush(),20000); }
+function syncMark(key){ if(!syncOn()||key.startsWith('jig:photo-')) return; sync.dirty.add(key); clearTimeout(sync.timer); sync.timer=setTimeout(()=>syncPush(),20000); }
 function mergeIndex(remote){
   const local=idx(), out=Object.assign({},local), newer=[];
   for(const k in (remote||{})){ const r=remote[k], l=local[k]; if(!l||(r.u||0)>(l.u||0)){out[k]=r;newer.push(k)} }
@@ -542,14 +571,14 @@ async function syncPullIndex(){
     const remote=await apiCall('index');
     const {merged,newer}=mergeIndex(remote);
     // local entries the server doesn't have yet, or has older: queue them
-    for(const k in merged){ const r=remote&&remote[k]; if(!r||(merged[k].u||0)>(r.u||0)) sync.dirty.add(k); }
+    for(const k in merged){ if(k.startsWith('jig:photo-')) continue; const r=remote&&remote[k]; if(!r||(merged[k].u||0)>(r.u||0)) sync.dirty.add(k); }
     // anything newer on the server: our local save is stale
     for(const k of newer){ const e=merged[k]; if(e.pct==null) store.del(k); }
     sync.err=''; renderGrid(); if(sync.dirty.size) await syncPush(); else syncStatus();
   }catch(e){ sync.err=e.message; syncStatus(); }
 }
 async function syncPullSave(key){
-  if(!syncOn()) return;
+  if(!syncOn()||key.startsWith('jig:photo-')) return;
   const e=idx()[key], local=store.get(key);
   if(!e||e.pct==null) return;
   if(local&&(local.u||0)>=(e.u||0)) return;
@@ -608,10 +637,10 @@ async function openPuzzle(img,n){
   if(!canPlay(img)){openUnlock(img);return}
   const gen=++openGen; const stale=()=>gen!==openGen;
   $('gallery').hidden=true; $('play').hidden=false; $('veil').hidden=false; $('win').hidden=true; $('paused').hidden=true; $('pauseBtn').setAttribute('aria-pressed','false'); $('pauseIco').setAttribute('d','M7 5h4v14H7zM13 5h4v14h-4z'); $('veilMsg').textContent='Opening the box…';
-  $('pTitle').textContent=img.title; $('peekImg').src='img/'+img.slug+'.jpg';
+  $('pTitle').textContent=img.title; $('peekImg').src=srcOf(img);
   resize();
   let im;
-  try{ im=await loadImage('img/'+img.slug+'.jpg'); }
+  try{ im=await loadImage(srcOf(img)); }
   catch(err){ if(!stale()) $('veilMsg').textContent='This picture did not load. Go back and try again.'; return; }
   if(stale()) return;
   const W=im.naturalWidth,H=im.naturalHeight,{cols,rows,count}=cut(n,W,H);
@@ -1155,6 +1184,55 @@ f.addEventListener('submit',async e=>{ e.preventDefault();
   }catch{ m.textContent='No connection. Please try again when you are online, or email puzzles@kandyphoenix.com.'; m.className='err'; }
   send.disabled=false;
 });})();
+/* ---------- my photos: stored in IndexedDB on this device ---------- */
+const PHOTO_MAX=2400, PHOTO_MIN=500, THUMB_W=520;
+function pdb(){ return new Promise((res,rej)=>{ const r=indexedDB.open('puzzle-parlor-photos',1); r.onupgradeneeded=()=>r.result.createObjectStore('photos',{keyPath:'id'}); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }); }
+function ptx(mode,fn){ return pdb().then(db=>new Promise((res,rej)=>{ const t=db.transaction('photos',mode), st=t.objectStore('photos'); const q=fn(st); t.oncomplete=()=>{db.close();res(q&&q.result)}; t.onerror=()=>{db.close();rej(t.error)}; })); }
+function photoEntry(rec){ return {slug:'photo-'+rec.id,cat:'photos',title:rec.title,artist:'Your photo',year:'',w:rec.w,h:rec.h,photo:true,url:URL.createObjectURL(rec.full),thumbUrl:URL.createObjectURL(rec.thumb),added:rec.added}; }
+async function loadPhotos(){
+  if(!window.indexedDB) return;
+  try{ const recs=await ptx('readonly',st=>st.getAll())||[]; recs.sort((a,b)=>b.added-a.added); PHOTOS.length=0; for(const r of recs) PHOTOS.push(photoEntry(r)); }
+  catch(e){ console.warn('photos',e); }
+  if(cat==='photos') renderGrid(); renderTabs();
+}
+function toBlob(cv,q){ return new Promise(res=>cv.toBlob(res,'image/jpeg',q)); }
+async function importPhoto(file,title){
+  const bmp=await (window.createImageBitmap?createImageBitmap(file,{imageOrientation:'from-image'}).catch(()=>null):null);
+  let W,H,draw;
+  if(bmp){ W=bmp.width;H=bmp.height; draw=(g,w,h)=>g.drawImage(bmp,0,0,w,h); }
+  else { const url=URL.createObjectURL(file); const im=await loadImage(url); URL.revokeObjectURL(url); W=im.naturalWidth;H=im.naturalHeight; draw=(g,w,h)=>g.drawImage(im,0,0,w,h); }
+  if(Math.min(W,H)<PHOTO_MIN) throw new Error(`That picture is too small (${W}×${H}). Please choose one at least ${PHOTO_MIN} pixels on its short side.`);
+  if(Math.max(W,H)/Math.min(W,H)>2.5) throw new Error('That picture is too long and thin for a jigsaw. Please choose one closer to a 4:3 or 3:2 shape.');
+  const k=Math.min(1,PHOTO_MAX/Math.max(W,H)), w=Math.round(W*k), h=Math.round(H*k);
+  const cv=document.createElement('canvas'); cv.width=w; cv.height=h; const g=cv.getContext('2d'); g.imageSmoothingQuality='high'; draw(g,w,h);
+  const full=await toBlob(cv,.9);
+  const tw=Math.min(THUMB_W,w), th=Math.round(h*tw/w), tc=document.createElement('canvas'); tc.width=tw; tc.height=th; const tg=tc.getContext('2d'); tg.imageSmoothingQuality='high'; tg.drawImage(cv,0,0,tw,th);
+  const thumb=await toBlob(tc,.82);
+  if(bmp&&bmp.close) bmp.close();
+  const rec={id:(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2,8)),title:title||'My photo',w,h,full,thumb,added:Date.now()};
+  await ptx('readwrite',st=>st.put(rec));
+  if(navigator.storage&&navigator.storage.persist) navigator.storage.persist().catch(()=>{});
+  const e=photoEntry(rec); PHOTOS.unshift(e); return e;
+}
+async function removePhoto(slug){
+  const id=slug.slice(6); await ptx('readwrite',st=>st.delete(id));
+  const i=PHOTOS.findIndex(p=>p.slug===slug); if(i>=0){ URL.revokeObjectURL(PHOTOS[i].url); URL.revokeObjectURL(PHOTOS[i].thumbUrl); PHOTOS.splice(i,1); }
+  const ix=idx(); for(const k of Object.keys(ix)) if(k.startsWith('jig:'+slug+':')){ delete ix[k]; store.del(k); } store.set('jig-index',ix);
+  renderTabs(); renderGrid();
+}
+(()=>{const d=$('photoDlg'),file=$('photoFile'),prev=$('photoPrev'),name=$('photoName'),add=$('photoAdd'),m=$('photoMsg'); let chosen=null;
+window.openPhotoDlg=function(){ if(!unlocked()){openUnlock({title:'Your own photos'});return} chosen=null; file.value=''; name.value=''; prev.innerHTML='<span>No picture chosen yet</span>'; add.disabled=true; m.textContent='';m.className=''; d.hidden=false; };
+const close=()=>{ d.hidden=true; };
+$('photoPick').onclick=()=>file.click(); $('photoCancel').onclick=close; d.addEventListener('click',e=>{ if(e.target===d) close(); });
+file.onchange=()=>{ const f=file.files&&file.files[0]; if(!f) return; if(!/^image\//.test(f.type)){ m.textContent='That file is not a picture.'; m.className='err'; return; }
+  chosen=f; const url=URL.createObjectURL(f); prev.innerHTML=''; const im=new Image(); im.onload=()=>URL.revokeObjectURL(url); im.src=url; im.alt=''; prev.appendChild(im); add.disabled=false; m.textContent='';m.className='';
+  if(!name.value) name.value=(f.name||'My photo').replace(/\.[^.]+$/,'').replace(/[-_]+/g,' ').slice(0,60); name.focus(); name.select(); };
+add.onclick=async()=>{ if(!chosen) return; add.disabled=true; m.textContent='Preparing your picture…'; m.className='';
+  try{ const e=await importPhoto(chosen,name.value.trim()||'My photo'); close(); cat='photos'; store.set('jig-cat',cat); renderTabs(); renderGrid(); const first=$('grid').querySelector(`.box[data-slug="${e.slug}"]`); if(first) first.scrollIntoView({behavior:'smooth',block:'center'}); }
+  catch(err){ m.textContent=err.message||'Could not add that picture.'; m.className='err'; add.disabled=false; } };
+$('grid').addEventListener('click',e=>{ const b=e.target.closest('.rmphoto'); if(!b) return; if(!b.classList.contains('armed')){ b.classList.add('armed'); b.textContent='Tap again to remove'; setTimeout(()=>{b.classList.remove('armed');b.textContent='Remove photo'},3500); return; } removePhoto(b.dataset.rm); });
+loadPhotos();
+})();
 $('unlockGo').onclick=redeem; $('unlockClose').onclick=closeUnlock; $('unlockClose2').onclick=closeUnlock; $('unlockRemove').onclick=removeDevice;
 $('unlockInput').addEventListener('keydown',e=>{if(e.key==='Enter')redeem()});
 $('unlock').addEventListener('click',e=>{if(e.target.id==='unlock')closeUnlock()});

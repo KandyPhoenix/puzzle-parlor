@@ -81,6 +81,13 @@ h2{font-family:var(--display);font-weight:400;font-size:clamp(28px,4.2vw,40px);l
 .strip span{position:absolute;left:0;right:0;bottom:0;padding:34px 10px 10px;color:#fff;font-weight:800;font-size:14px;background:linear-gradient(transparent,rgba(0,0,0,.85));text-shadow:0 1px 3px rgba(0,0,0,.6)}
 /* features */
 .feat{padding:60px 0 20px}
+.photos{padding:70px 0 30px;background:linear-gradient(180deg,#fff 0%,#f3eefb 100%)}
+.photos .pgrid{display:grid;grid-template-columns:1.25fr 1fr;gap:36px;align-items:center}
+.photos video{width:100%;border-radius:16px;box-shadow:0 30px 60px -20px rgba(18,21,43,.45);display:block;background:#0f1222}
+.photos ol{margin:0;padding-left:22px;display:grid;gap:12px;color:var(--ink);font-size:17px;line-height:1.5}
+.photos ol b{display:block}
+.photos .note{margin-top:18px;padding:14px 16px;border-radius:12px;background:rgba(183,156,242,.16);color:#3b2a5c;font-size:15px;line-height:1.5}
+@media (max-width:820px){.photos .pgrid{grid-template-columns:1fr}}
 .fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:26px}
 .fcard{background:var(--card);border-radius:16px;padding:22px 22px 20px;box-shadow:0 2px 4px rgba(28,30,38,.05),0 24px 44px -30px rgba(28,30,38,.4);border-top:4px solid var(--c)}
 .fcard svg{width:34px;height:34px;color:var(--c);margin-bottom:10px}
@@ -152,7 +159,7 @@ dialog#contact::backdrop{background:rgba(18,21,43,.72);backdrop-filter:blur(4px)
     <div>
       <div class="brand"><img src="icon-192.png" alt="">Puzzle Parlor</div>
       <h1>Jigsaw puzzles worth <em>getting lost in</em></h1>
-      <p class="lede">Spooky Halloween villages, glowing Christmas workshops, Van Gogh and Monet, dragons and fairy tales. Pieces so sharp you can zoom right in, a pause button, a magnifier, a hard mode you can switch on per puzzle, and no ads, ever.</p>
+      <p class="lede">Spooky Halloween villages, glowing Christmas workshops, Van Gogh and Monet, dragons and fairy tales, and your own photos. Pieces so sharp you can zoom right in, a pause button, a magnifier, a hard mode you can switch on per puzzle, and no ads, ever.</p>
       <div class="cta">
         <a class="btn hot" id="buyBtn" href="#" aria-disabled="true">Unlock everything <span class="tag" id="priceTag">$2.99</span></a>
         <a class="btn glass" href="./">Try the free version</a>
@@ -202,6 +209,25 @@ dialog#contact::backdrop{background:rgba(18,21,43,.72);backdrop-filter:blur(4px)
   </div>
 </section>
 
+<section class="photos" id="photos">
+  <div class="wrap">
+    <span class="kicker">Full version</span>
+    <h2>Your own photos, cut into puzzles</h2>
+    <p class="sub">The grandkids, the dog, last summer's lake. Pick any picture on your tablet or computer and it becomes a jigsaw at any piece count, in about two taps.</p>
+    <div class="pgrid">
+      <video src="shots/photo-demo.mp4" poster="shots/photo-demo-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Adding a photo in Puzzle Parlor: choose the picture, name it, and it appears as a puzzle you can play"></video>
+      <div>
+        <ol>
+          <li><b>Open My photos</b>It is a theme in the gallery, next to Halloween and Christmas.</li>
+          <li><b>Tap Add a photo and choose a picture</b>Give it a name, then Add to my puzzles.</li>
+          <li><b>Play it like any other puzzle</b>100 to 1,000 pieces, magnifier, hard mode, pause. Your progress is saved so you can come back to it.</li>
+        </ol>
+        <div class="note"><b>Where your photos live:</b> on the device you added them to, in the app's own storage. They are never uploaded to us or anyone else. Progress on a photo puzzle is saved on that same device, and you can remove a photo at any time.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section class="feat">
   <div class="wrap">
     <span class="kicker">Everything you need</span>
@@ -238,6 +264,7 @@ dialog#contact::backdrop{background:rgba(18,21,43,.72);backdrop-filter:blur(4px)
           <tr><td>Piece counts 100 to 1,000</td><td>✓</td><td>✓</td></tr>
           <tr><td>Sharp zoom, piece tray, pause</td><td>✓</td><td>✓</td></tr>
           <tr><td>Magnifier and per-puzzle hard mode</td><td>✓</td><td>✓</td></tr>
+          <tr><td>Puzzles from your own photos</td><td>–</td><td>✓</td></tr>
           <tr><td>Offline play and progress sync</td><td>✓</td><td>✓</td></tr>
           <tr><td>No ads, no account, no tracking</td><td>✓</td><td>✓</td></tr>
           <tr><td>Devices</td><td>Any</td><td>3 per code</td></tr>
@@ -277,6 +304,7 @@ dialog#contact::backdrop{background:rgba(18,21,43,.72);backdrop-filter:blur(4px)
     <details><summary>Which devices?</summary><p>Any modern browser: iPad, iPhone, Android tablets and phones, Windows and Mac. Puzzles of 400 pieces and up are happiest on a tablet or computer screen.</p></details>
     <details><summary>Can I move the code to a new device?</summary><p>Yes. Open the Unlock panel on the old device and choose Remove this device from the code, then enter the code on the new one. Three devices can be active at once.</p></details>
     <details><summary>I lost my code.</summary><p>Search your email for "Puzzle Parlor unlock code". If it is gone, <button class="linkbtn" type="button" data-contact="lost">send us a message</button> from the address you paid with and we will resend it.</p></details>
+    <details><summary>Where are my photos stored?</summary><p>On the device where you added them, in the browser's or app's private storage. Nothing is uploaded. That also means a photo puzzle is only on that device: to play the same photo on your laptop too, add it there as well. Removing the photo from the gallery deletes it and its progress.</p></details>
     <details><summary>Refunds?</summary><p>All sales are final. The free version lets you try the app on your own device first, so please play a puzzle before you buy.</p></details>
   </div>
 </section>

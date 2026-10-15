@@ -18,6 +18,7 @@ Features
 • A piece tray along the bottom so you can sort and pick pieces easily
 • Edges-only filter, tidy button, and a full-screen view of the finished picture
 • A movable magnifier in every puzzle, plus a per-puzzle hard mode with rotated pieces
+• Turn your own photos into puzzles (full version); photos stay on your device
 • Pause button and one-tap offline mode
 • Time and move counter for every puzzle
 • Pin up to four puzzles in progress to the top of the gallery
