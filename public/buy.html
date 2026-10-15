@@ -123,6 +123,24 @@ footer a{color:#fff}
 #paid{display:none;background:var(--mint);color:#0b3b2b;font-weight:700;padding:14px 22px;text-align:center}
 @media(max-width:860px){.hero .wrap{grid-template-columns:1fr}.collage{height:360px;margin-top:10px}.caps,.fgrid,.steps{grid-template-columns:1fr}.strip{grid-template-columns:repeat(4,1fr)}.pcard{grid-template-columns:1fr;padding:28px}.device .ph{width:32%;right:0}}
 @media(max-width:520px){.strip{grid-template-columns:repeat(3,1fr)}.hero{padding:36px 0 50px}}
+
+/* contact pop-out */
+dialog#contact{border:0;border-radius:22px;padding:0;max-width:440px;width:calc(100% - 32px);background:var(--card);color:var(--ink);box-shadow:0 30px 80px -20px rgba(0,0,0,.6)}
+dialog#contact::backdrop{background:rgba(18,21,43,.72);backdrop-filter:blur(4px)}
+#contact form{padding:26px 26px 22px;display:grid;gap:12px}
+#contact h3{margin:0;font-family:var(--display);font-size:24px;line-height:1.1}
+#contact .hint{margin:0;color:var(--muted);font-size:14px}
+#contact label{display:grid;gap:5px;font-size:13px;font-weight:700;color:var(--muted)}
+#contact input,#contact textarea{font:inherit;font-size:16px;padding:11px 13px;border:1.5px solid #dcdfe8;border-radius:12px;background:#fff;color:var(--ink);width:100%;box-sizing:border-box}
+#contact input:focus,#contact textarea:focus{outline:0;border-color:var(--gold2);box-shadow:0 0 0 3px rgba(255,140,66,.25)}
+#contact textarea{min-height:120px;resize:vertical}
+#contact .row{display:flex;gap:10px;justify-content:flex-end;align-items:center;margin-top:4px}
+#contact .btn{padding:12px 22px;font-size:16px}
+#contact .btn.quiet{background:transparent;color:var(--muted)}
+#contact .msg{font-size:14px;margin:0;min-height:18px}
+#contact .msg.ok{color:#1b8a5a} #contact .msg.err{color:#c0392b}
+#contact .hp{position:absolute;left:-9999px;opacity:0;height:0;overflow:hidden}
+.linkbtn{background:none;border:0;padding:0;font:inherit;color:inherit;text-decoration:underline;cursor:pointer}
 </style>
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","name":"Puzzle Parlor","url":"https://puzzles.kandyphoenix.com/","applicationCategory":"GameApplication","genre":"Jigsaw puzzle","operatingSystem":"Web browser (iPad, iPhone, Android, Windows, Mac), Android","image":"https://puzzles.kandyphoenix.com/shots/tablet.jpg","description":"Jigsaw puzzle app with 100 to 1,000 piece puzzles of Halloween scenes, Christmas pictures, famous paintings, fantasy, fairy tales and landscapes. Sharp zoom, piece tray, hard mode, offline play, no ads.","offers":{"@type":"Offer","price":"2.99","priceCurrency":"USD","url":"https://puzzles.kandyphoenix.com/buy","availability":"https://schema.org/InStock"}},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Does it work offline?","acceptedAnswer":{"@type":"Answer","text":"Yes. Tap Save for offline once at the top of the gallery and every picture is stored on your device, so puzzles open with no connection. Only entering a code and syncing progress between devices need internet."}},{"@type":"Question","name":"Which devices?","acceptedAnswer":{"@type":"Answer","text":"Any modern browser: iPad, iPhone, Android tablets and phones, Windows and Mac. Puzzles of 400 pieces and up are best on a tablet or computer screen."}},{"@type":"Question","name":"Can I move the code to a new device?","acceptedAnswer":{"@type":"Answer","text":"Yes. Remove the old device from the code in the Unlock panel, then enter the code on the new one. Three devices can be active at once."}},{"@type":"Question","name":"Refunds?","acceptedAnswer":{"@type":"Answer","text":"All sales are final. The free version lets you try the app on your own device first."}}]}]}</script>
 </head>
@@ -258,12 +276,26 @@ footer a{color:#fff}
     <details><summary>Does it work offline?</summary><p>Yes. Tap "Save for offline" once at the top of the gallery and every picture is stored on your device, so puzzles open with no connection at all, on a plane or at the cabin. Entering a code and syncing progress between devices are the only things that need internet.</p></details>
     <details><summary>Which devices?</summary><p>Any modern browser: iPad, iPhone, Android tablets and phones, Windows and Mac. Puzzles of 400 pieces and up are happiest on a tablet or computer screen.</p></details>
     <details><summary>Can I move the code to a new device?</summary><p>Yes. Open the Unlock panel on the old device and choose Remove this device from the code, then enter the code on the new one. Three devices can be active at once.</p></details>
-    <details><summary>I lost my code.</summary><p>Search your email for "Puzzle Parlor unlock code". If it is gone, email <a href="mailto:puzzles@kandyphoenix.com">puzzles@kandyphoenix.com</a> from the address you paid with and we will resend it.</p></details>
+    <details><summary>I lost my code.</summary><p>Search your email for "Puzzle Parlor unlock code". If it is gone, <button class="linkbtn" type="button" data-contact="lost">send us a message</button> from the address you paid with and we will resend it.</p></details>
     <details><summary>Refunds?</summary><p>All sales are final. The free version lets you try the app on your own device first, so please play a puzzle before you buy.</p></details>
   </div>
 </section>
 
-<footer><div class="wrap">Puzzle Parlor · <a href="privacy">Privacy policy</a> · <a href="mailto:puzzles@kandyphoenix.com">puzzles@kandyphoenix.com</a></div></footer>
+<footer><div class="wrap">Puzzle Parlor · <a href="privacy">Privacy policy</a> · <button class="linkbtn" type="button" data-contact="">Contact us</button></div></footer>
+
+<dialog id="contact" aria-labelledby="contactTitle">
+  <form id="contactForm" method="dialog" novalidate>
+    <h3 id="contactTitle">Need a hand?</h3>
+    <p class="hint">Lost a code, a puzzle misbehaving, or a question before you buy. We reply by email.</p>
+    <label>Your email<input type="email" name="email" required autocomplete="email" placeholder="you@example.com"></label>
+    <label>Name (optional)<input type="text" name="name" autocomplete="name"></label>
+    <label>Unlock code, if you have one<input type="text" name="code" placeholder="PP-XXXX-XXXX-XXXX" autocapitalize="characters" autocomplete="off"></label>
+    <label>Message<textarea name="message" required placeholder="What happened, and on which device?"></textarea></label>
+    <div class="hp" aria-hidden="true"><label>Website<input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
+    <p class="msg" id="contactMsg" aria-live="polite"></p>
+    <div class="row"><button type="button" class="btn quiet" id="contactCancel">Cancel</button><button type="submit" class="btn hot" id="contactSend">Send message</button></div>
+  </form>
+</dialog>
 
 <script>
 const CHECKOUT_URL='https://square.link/u/oDBFd9wb';
@@ -272,6 +304,28 @@ document.getElementById('priceLbl').textContent=PRICE; document.getElementById('
 for(const id of ['buyBtn','buyBtn2']){const a=document.getElementById(id); if(CHECKOUT_URL){a.href=CHECKOUT_URL;a.removeAttribute('aria-disabled')}}
 document.getElementById('soon').style.display=CHECKOUT_URL?'none':'block';
 if(/[?&]paid=1/.test(location.search)) document.getElementById('paid').style.display='block';
+
+// contact pop-out
+(()=>{const d=document.getElementById('contact'),f=document.getElementById('contactForm'),m=document.getElementById('contactMsg'),send=document.getElementById('contactSend');
+const PRESET={lost:'I lost my unlock code. The email I paid with is the one above.'};
+function open(kind){ m.textContent='';m.className='msg'; f.reset(); if(PRESET[kind]) f.message.value=PRESET[kind]; d.showModal(); (PRESET[kind]?f.email:f.email).focus(); }
+document.querySelectorAll('[data-contact]').forEach(b=>b.addEventListener('click',()=>open(b.dataset.contact)));
+if(location.hash==='#contact') open('');
+document.getElementById('contactCancel').onclick=()=>d.close();
+d.addEventListener('click',e=>{ if(e.target===d) d.close(); });
+f.addEventListener('submit',async e=>{ e.preventDefault();
+  const email=f.email.value.trim(), message=f.message.value.trim();
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ m.textContent='Please enter the email address we should reply to.'; m.className='msg err'; f.email.focus(); return; }
+  if(message.length<5){ m.textContent='Please tell us a little about the problem.'; m.className='msg err'; f.message.focus(); return; }
+  send.disabled=true; m.textContent='Sending…'; m.className='msg';
+  try{ const r=await fetch('api/contact',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({email,name:f.name.value,code:f.code.value,message,website:f.website.value,page:location.href})});
+    const j=await r.json().catch(()=>({}));
+    if(r.ok&&j.ok){ m.textContent='Sent. We will reply to '+email+'.'; m.className='msg ok'; setTimeout(()=>d.close(),2200); }
+    else if(r.status===429){ m.textContent='Too many messages from this connection. Please try again in an hour.'; m.className='msg err'; }
+    else { m.textContent='Could not send right now. You can also email puzzles@kandyphoenix.com.'; m.className='msg err'; }
+  }catch{ m.textContent='No connection. Please try again, or email puzzles@kandyphoenix.com.'; m.className='msg err'; }
+  send.disabled=false;
+});})();
 </script>
 </body>
 </html>
