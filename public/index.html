@@ -872,6 +872,7 @@ const lctx=$('loupe').getContext('2d');
 function loupeVisible(){ return !!P&&loupeOn }
 function drawLoupe(){
   const w=$('loupeWrap'); if(!loupeVisible()){ w.hidden=true; return } w.hidden=false;
+  if(w.clientHeight>w.clientWidth*1.3) w.style.height=Math.round(w.clientWidth*1.18)+'px'; // belt and braces: never let the box run the length of the table
   const cvs=$('loupe'), d=Math.min(2,window.devicePixelRatio||1), S=Math.round(w.clientWidth*d)||400, Hh=Math.round(w.clientHeight*d)||S;
   if(cvs.width!==S||cvs.height!==Hh){ cvs.width=S; cvs.height=Hh; }
   lctx.setTransform(1,0,0,1,0,0); lctx.clearRect(0,0,S,Hh);
