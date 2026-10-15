@@ -167,7 +167,9 @@ label.hard input{accent-color:var(--brass-text);width:16px;height:16px;margin:0}
 .tb svg{width:18px;height:18px;flex:none}
 .tb.icon{padding:8px}
 .sep{width:1px;align-self:stretch;background:var(--faint);margin-inline:6px}
-@media (max-width:720px){ .tb .lbl{display:none} .tb{padding:8px} .tools{gap:4px;padding-inline:6px} .sep{display:none} }
+@media (max-width:1140px){ .tb{padding:8px 9px;font-size:12px} .tools{gap:4px} .sep{margin-inline:4px} }
+@media (max-width:900px){ .tb .lbl{display:none} .tb{padding:8px} .tools{gap:4px;padding-inline:6px} }
+@media (max-width:720px){ .sep{display:none} }
 #loupeWrap{position:absolute;top:12px;left:12px;touch-action:none;cursor:grab;user-select:none;width:min(260px,48vw);height:calc(min(260px,48vw)*1.18);max-height:60%;max-width:60%;border-radius:10px;background:var(--card);box-shadow:0 12px 30px rgba(35,38,43,.3);border:3px solid #fff;z-index:3;overflow:hidden;display:grid;place-items:center}
 #loupeWrap canvas{width:100%;height:100%;display:block;grid-area:1/1}
 #loupeWrap .lhint{grid-area:1/1;font-size:12px;color:var(--muted);text-align:center;padding:0 16px;display:none}
