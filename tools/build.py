@@ -67,6 +67,7 @@ D={
 'on-fire':("Some Days I'm on Fire","Original art",""),
 'choose-peace':("Today I Choose Peace","Original art",""),
 'silly-cow':("A Little Silliness","Original art",""),
+'zen-garden':("Evening in the Zen Garden","Original art",""),
 'rocky-storm':("A Storm in the Rocky Mountains, Mt. Rosalie","Albert Bierstadt","1866"),
 'poppy-field':("Poppy Field","Claude Monet","1873"),
 'paris-rainy-day':("Paris Street; Rainy Day","Gustave Caillebotte","1877"),
@@ -79,7 +80,7 @@ D={
 }
 meta={m['slug']:m for m in json.load(open('meta.json'))}
 rows=[l.rstrip('\n').split('\t') for l in open('list.tsv') if l.strip()]
-NEWC={'haunted-village':'halloween','monster-ball':'halloween','witch-kitchen':'halloween','midnight-graveyard':'halloween','fairytale-kingdom':'fairytales','gingerbread-house':'fairytales','santa-workshop':'christmas','gingerbread-village':'christmas','sleigh-over-town':'christmas','forest-picnic':'animals','cat-cafe':'animals','dog-park':'animals','grand-prix-street':'sports','tide-pool':'animals','penguin-beach':'animals','stadium-lights':'sports','drag-race':'sports','bookshop-cafe':'christmas','blossom-village':'landscapes','koi-pond':'animals','autumn-village':'holiday','savanna-sunset':'animals','aurora-lake':'landscapes','choose-happiness':'vibes','todays-forecast':'vibes','on-fire':'vibes','choose-peace':'vibes','silly-cow':'vibes'}
+NEWC={'haunted-village':'halloween','monster-ball':'halloween','witch-kitchen':'halloween','midnight-graveyard':'halloween','fairytale-kingdom':'fairytales','gingerbread-house':'fairytales','santa-workshop':'christmas','gingerbread-village':'christmas','sleigh-over-town':'christmas','forest-picnic':'animals','cat-cafe':'animals','dog-park':'animals','grand-prix-street':'sports','tide-pool':'animals','penguin-beach':'animals','stadium-lights':'sports','drag-race':'sports','bookshop-cafe':'christmas','blossom-village':'landscapes','koi-pond':'animals','autumn-village':'holiday','savanna-sunset':'animals','aurora-lake':'landscapes','choose-happiness':'vibes','todays-forecast':'vibes','on-fire':'vibes','choose-peace':'vibes','silly-cow':'vibes','zen-garden':'vibes'}
 NEW=list(NEWC)
 for n in NEW: meta[n]={'lic':'Original','page':''}
 QUEUED=set(l.strip().split('\t')[1] for l in open('queued.txt') if l.strip()) if os.path.exists('queued.txt') else set()
