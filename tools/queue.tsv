@@ -1,7 +1,8 @@
-paintings	rocky-storm	File:Albert Bierstadt - A Storm in the Rocky Mountains, Mt. Rosalie - Google Art Project.jpg
-paintings	poppy-field	File:Claude Monet - Poppy Field - Google Art Project.jpg
-paintings	paris-rainy-day	File:Gustave Caillebotte - Paris Street; Rainy Day - Google Art Project.jpg
-paintings	woman-parasol	File:Claude Monet - Woman with a Parasol - Madame Monet and Her Son - Google Art Project.jpg
-paintings	train-countryside	File:Claude Monet - Train in the Countryside - Google Art Project.jpg
-paintings	breezing-up	File:Winslow Homer - Breezing Up (A Fair Wind) - Google Art Project.jpg
-paintings	fog-warning	File:Winslow Homer - The Fog Warning - Google Art Project.jpg
+# category	slug	title	artist	year	source page   (one puzzle is released per line, top first)
+paintings	poppy-field	Poppy Field	Claude Monet	1873	https://commons.wikimedia.org/wiki/File:Claude_Monet_-_Poppy_Field_-_Google_Art_Project.jpg
+paintings	breezing-up	Breezing Up (A Fair Wind)	Winslow Homer	1873–76	https://commons.wikimedia.org/wiki/File:Winslow_Homer_-_Breezing_Up_(A_Fair_Wind)_-_Google_Art_Project.jpg
+paintings	rocky-storm	A Storm in the Rocky Mountains, Mt. Rosalie	Albert Bierstadt	1866	https://commons.wikimedia.org/wiki/File:Albert_Bierstadt_-_A_Storm_in_the_Rocky_Mountains,_Mt._Rosalie_-_Google_Art_Project.jpg
+paintings	train-countryside	Train in the Countryside	Claude Monet	c. 1870	https://commons.wikimedia.org/wiki/File:Claude_Monet_-_Train_in_the_Countryside_-_Google_Art_Project.jpg
+paintings	paris-rainy-day	Paris Street; Rainy Day	Gustave Caillebotte	1877	https://commons.wikimedia.org/wiki/File:Gustave_Caillebotte_-_Paris_Street;_Rainy_Day_-_Google_Art_Project.jpg
+paintings	fog-warning	The Fog Warning	Winslow Homer	1885	https://commons.wikimedia.org/wiki/File:Winslow_Homer_-_The_Fog_Warning_-_Google_Art_Project.jpg
+paintings	woman-parasol	Woman with a Parasol	Claude Monet	1875	https://commons.wikimedia.org/wiki/File:Claude_Monet_-_Woman_with_a_Parasol_-_Madame_Monet_and_Her_Son_-_Google_Art_Project.jpg
