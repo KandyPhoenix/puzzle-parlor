@@ -178,7 +178,6 @@ label.hard input{accent-color:var(--brass-text);width:16px;height:16px;margin:0}
 #loupeWrap .lbtns button svg{width:20px;height:20px}
 #loupeWrap .lbtns button:hover{border-color:var(--brass)}
 #loupeWrap .lbtns #loupeHide{width:30px;color:var(--muted)}
-#loupeBtn[aria-pressed="true"]{color:var(--brass-text)}
 #peek{position:absolute;right:14px;bottom:14px;width:min(300px,45vw);border-radius:6px;overflow:hidden;box-shadow:0 12px 30px rgba(35,38,43,.3);border:4px solid #fff;background:#fff}
 #peek img{display:block;width:100%;height:auto;cursor:zoom-in}
 #big{position:absolute;inset:0;z-index:5;background:rgba(35,38,43,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:zoom-out;padding:12px}
@@ -212,7 +211,7 @@ label.hard input{accent-color:var(--brass-text);width:16px;height:16px;margin:0}
 .btn{padding:10px 18px;border-radius:5px;border:0;cursor:pointer;font-weight:700;background:var(--brass);color:var(--brass-ink)}
 .btn.ghost{background:var(--chip);color:var(--ink)}
 #confetti{position:absolute;inset:0;pointer-events:none;z-index:4}
-#restart.armed{background:#b7412f;color:#fff}
+#restart.armed,#hardBtn.armed{background:#b7412f;color:#fff}
 #tray{display:flex;align-items:stretch;gap:6px;padding:6px 8px;background:var(--tray);border-top:1px solid var(--faint);box-shadow:0 -6px 16px -10px rgba(35,38,43,.25)}
 .tray-nav{flex:none;width:34px;border:0;border-radius:6px;background:var(--chip);cursor:pointer;display:grid;place-items:center}
 .tray-nav:hover{background:var(--chip-hi)}
@@ -255,7 +254,7 @@ label.hard input{accent-color:var(--brass-text);width:16px;height:16px;margin:0}
         <ul class="menu" id="themeMenu" role="listbox" hidden></ul>
       </div>
       <div class="pins" id="pins"></div>
-      <div class="tools-right"><button id="unlockBtn" hidden><i></i><span>Unlock all puzzles</span></button><button id="offlineBtn" hidden title="Save every picture on this device so puzzles open without internet"><i></i><span>Save for offline</span></button><label class="hard" title="Pieces come out rotated; double-tap or Rotate to turn them"><input type="checkbox" id="hardMode"> Hard mode</label><button id="syncBtn" aria-expanded="false" aria-controls="syncPanel"><i></i><span id="syncLbl">Sync</span></button><button id="helpBtn" title="Lost a code, or something not working? Send us a message"><i></i><span>Help</span></button></div>
+      <div class="tools-right"><button id="unlockBtn" hidden><i></i><span>Unlock all puzzles</span></button><button id="offlineBtn" hidden title="Save every picture on this device so puzzles open without internet"><i></i><span>Save for offline</span></button><button id="syncBtn" aria-expanded="false" aria-controls="syncPanel"><i></i><span id="syncLbl">Sync</span></button><button id="helpBtn" title="Lost a code, or something not working? Send us a message"><i></i><span>Help</span></button></div>
     </nav>
     <section id="syncPanel" hidden>
       <h3>Sync progress across devices</h3>
@@ -336,7 +335,8 @@ label.hard input{accent-color:var(--brass-text);width:16px;height:16px;margin:0}
     <button class="tb" id="edges" aria-pressed="false" title="Show only edge pieces (E)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="1"/><rect x="9" y="9" width="6" height="6" stroke-dasharray="2 2"/></svg><span class="lbl">Edges only</span></button>
     <button class="tb" id="sort" title="Shuffle every tray and loose piece out around the board (S)"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="5" height="5" rx="1"/><rect x="10" y="3" width="5" height="5" rx="1"/><rect x="17" y="3" width="4" height="5" rx="1"/><rect x="3" y="10" width="5" height="5" rx="1"/><rect x="3" y="17" width="5" height="4" rx="1"/><rect x="10" y="17" width="5" height="4" rx="1"/></svg><span class="lbl">Spread out</span></button>
     <button class="tb" id="tidy" title="Tidy loose pieces on the table into neat rows (Y)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="7" height="7" rx="1"/><rect x="14" y="4" width="7" height="7" rx="1"/><rect x="3" y="15" width="7" height="6" rx="1"/><rect x="14" y="15" width="7" height="6" rx="1"/></svg><span class="lbl">Tidy</span></button>
-    <button class="tb" id="loupeBtn" hidden aria-pressed="true" title="Show or hide the magnifier (M)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><span class="lbl">Magnifier</span></button>
+    <button class="tb" id="loupeBtn" aria-pressed="true" title="Show or hide the magnifier (M)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><span class="lbl">Magnifier</span></button>
+    <button class="tb" id="hardBtn" aria-pressed="false" title="Hard mode for this puzzle: pieces come out turned and must be rotated (double-tap or R)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.5 5.5L20 9l-4 4 1 5.5-5-2.7-5 2.7 1-5.5-4-4 5.5-.5z"/></svg><span class="lbl">Hard mode</span></button>
     <button class="tb" id="rotate" hidden title="Rotate the last piece you touched a quarter turn (R)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 11-3-6.7"/><path d="M21 4v5h-5"/></svg><span class="lbl">Rotate</span></button>
     <button class="tb" id="toTray" title="Put loose pieces back in the tray (T)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5"/><rect x="3" y="17" width="18" height="4" rx="1"/></svg><span class="lbl">To tray</span></button>
     <button class="tb" id="ghost" aria-pressed="false" title="Faint picture on the board (G)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="1" opacity=".5"/><path d="M3 16l5-5 4 4 3-3 6 6"/></svg><span class="lbl">Ghost</span></button>
@@ -501,8 +501,6 @@ $('tabs').addEventListener('keydown',e=>{
 });
 $('grid').addEventListener('click',e=>{const b=e.target.closest('.size');if(!b)return;openPuzzle(IMAGES.find(i=>i.slug===b.dataset.slug),+b.dataset.n)});
 $('lede').textContent='Jigsaw puzzles of spooky Halloween scenes, cozy Christmas and holiday pictures, famous paintings, fantasy worlds, fairy tales and landscapes. Pick any picture and choose from 100 to 1,000 pieces.';
-$('hardMode').checked=!!store.get('jig-hard');
-$('hardMode').onchange=()=>store.set('jig-hard',$('hardMode').checked);
 renderTabs();renderGrid();
 
 /* ---------- cross-device sync (Cloudflare KV behind /api) ---------- */
@@ -653,10 +651,10 @@ async function openPuzzle(img,n){
     pieces.push({r,c,x:0,y:0,rot:0,g:0,edge:r===0||c===0||r===rows-1||c===cols-1,cv:pc,hi:null,path,inTray:false});
     if(pieces.length%120===0){ $('veilMsg').textContent=`Cutting ${fmtN(count)} pieces… ${Math.round(pieces.length/count*100)}%`; await new Promise(r=>setTimeout(r,0)); if(stale()) return; }
   }
-  const hard=okSave?!!saved.hard:!!store.get('jig-hard');
+  const hard=okSave?!!saved.hard:(nextHard!=null?nextHard:false); nextHard=null;
   P={img,n,key,W,H,cols,rows,count,pw,ph,s,m,cw,ch,lw,B,seed,im,pieces,hard,lastId:null,moves:0,groups:new Map(),z:[],tray:[],hi:[],elapsed:0,started:performance.now(),won:false};
   HI_MAX=Math.max(12,Math.min(HI_MAX_COUNT,Math.floor(HI_MAX_BYTES/(cw*ch*4))));
-  $('rotate').hidden=!hard; $('loupeBtn').hidden=!hard; loupeOn=store.get('jig-loupe')!==false; $('loupeBtn').setAttribute('aria-pressed',String(loupeOn)); if(hard) requestAnimationFrame(()=>{ const sv=store.get('jig-loupe-pos'); if(sv&&window.__placeLoupe) window.__placeLoupe(sv.x,sv.y); });
+  setHardUI(hard); loupeOn=store.get('jig-loupe')!==false; $('loupeBtn').setAttribute('aria-pressed',String(loupeOn)); requestAnimationFrame(()=>{ const sv=store.get('jig-loupe-pos'); if(sv&&window.__placeLoupe) window.__placeLoupe(sv.x,sv.y); });
   $('pinBtn').setAttribute('aria-pressed',String(!!(idx()[key]||{}).pin));
   if(okSave){
     P.elapsed=saved.t||0; P.moves=saved.mv||0;
@@ -838,7 +836,7 @@ function render(){
 /* ---------- magnifier: the piece (or joined group) you last touched, large, with rotate buttons ---------- */
 let loupeOn=store.get('jig-loupe'); if(loupeOn==null) loupeOn=true;
 const lctx=$('loupe').getContext('2d');
-function loupeVisible(){ return !!P&&P.hard&&loupeOn }
+function loupeVisible(){ return !!P&&loupeOn }
 function drawLoupe(){
   const w=$('loupeWrap'); if(!loupeVisible()){ w.hidden=true; return } w.hidden=false;
   const cvs=$('loupe'), d=Math.min(2,window.devicePixelRatio||1), S=Math.round(w.clientWidth*d)||400, Hh=Math.round(w.clientHeight*d)||S;
@@ -960,9 +958,15 @@ function snap(id){
       if(again) break;
     }
   }
-  if(!g.locked&&!pieces[g.members[0]].rot){
-    const p=pieces[g.members[0]], ex=p.c*pw-p.x, ey=p.r*ph-p.y;
-    if(Math.hypot(ex,ey)<tol){moveGroup(g,ex,ey);g.locked=true;snapped=true}
+  if(!g.locked){
+    // compare the group's centre with where its centre belongs; rotation does not move the centre
+    let cx=0,cy=0,tx=0,ty=0; for(const i of g.members){const p=pieces[i];cx+=p.x+pw/2;cy+=p.y+ph/2;tx+=p.c*pw+pw/2;ty+=p.r*ph+ph/2}
+    const n=g.members.length, ex=(tx-cx)/n, ey=(ty-cy)/n;
+    if(Math.hypot(ex,ey)<tol){
+      const rot=pieces[g.members[0]].rot;
+      if(rot){ const steps=(4-rot)&3, C=[cx/n,cy/n]; for(const i of g.members){const p=pieces[i];const [rx,ry]=rotv(p.x+pw/2-C[0],p.y+ph/2-C[1],steps);p.x=C[0]+rx-pw/2;p.y=C[1]+ry-ph/2;p.rot=0} }
+      const p=pieces[g.members[0]]; moveGroup(g,p.c*pw-p.x,p.r*ph-p.y); g.locked=true; snapped=true;
+    }
   }
   if(g.members.length===P.count&&!g.locked&&!pieces[0].rot){const p=pieces[0];moveGroup(g,-p.x,-p.y);g.locked=true}
   if(g.locked){const k=P.z.indexOf(g.id);if(k>=0)P.z.splice(k,1);P.z.unshift(g.id)}
@@ -1051,6 +1055,17 @@ $('zFit').onclick=fit;
 $('zIn').onclick=()=>zoomAt(cv.clientWidth/2,cv.clientHeight/2,1.35);
 $('zOut').onclick=()=>zoomAt(cv.clientWidth/2,cv.clientHeight/2,1/1.35);
 let armTimer=null;
+let nextHard=null, hardArmTimer=null;
+function setHardUI(on){ $('rotate').hidden=!on; const b=$('hardBtn'); b.setAttribute('aria-pressed',String(!!on)); b.classList.remove('armed'); b.querySelector('.lbl').textContent='Hard mode'; }
+function untouched(){ return !!P&&P.moves===0&&P.pieces.every(p=>p.inTray); }
+$('hardBtn').onclick=()=>{
+  if(!P||P.paused||P.won) return; const b=$('hardBtn'), on=!P.hard;
+  if(untouched()){ // nothing played yet: switch in place, no restart needed
+    P.hard=on; for(const p of P.pieces) p.rot=on?1+Math.floor(Math.random()*3):0; setHardUI(on); buildTray(); draw(); save(); return;
+  }
+  if(!b.classList.contains('armed')){ b.classList.add('armed'); b.querySelector('.lbl').textContent=on?'Tap again: restart in hard mode':'Tap again: restart in normal mode'; clearTimeout(hardArmTimer); hardArmTimer=setTimeout(()=>setHardUI(P&&P.hard),3500); return; }
+  clearTimeout(hardArmTimer); nextHard=on; const{img,n,key}=P; store.del(key); setIdx(key,{done:false,pct:null}); P=null; syncPush(); openPuzzle(img,n);
+};
 $('restart').onclick=()=>{
   const b=$('restart');
   if(!b.classList.contains('armed')){b.classList.add('armed');b.querySelector('.lbl').textContent='Tap again to restart';b.setAttribute('aria-label','Tap again to confirm restart');clearTimeout(armTimer);armTimer=setTimeout(()=>{b.classList.remove('armed');b.querySelector('.lbl').textContent='Restart';b.removeAttribute('aria-label')},3500);return}
@@ -1064,7 +1079,7 @@ document.addEventListener('keydown',e=>{
   if(P.paused&&e.key!=='Escape'){ if(e.key===' '||e.key==='Enter'){ e.preventDefault(); setPaused(false); } return; }
   const k=e.key.toLowerCase();
   if(k==='+'||k==='=') $('zIn').click(); else if(k==='-') $('zOut').click(); else if(k==='0') fit();
-  else if(k==='m'&&P&&P.hard) setLoupe(!loupeOn); else if(k==='e') $('edges').click(); else if(k==='g') $('ghost').click(); else if(k==='p') $('peekBtn').click(); else if(k==='s') $('sort').click(); else if(k==='t') $('toTray').click(); else if(k==='y') $('tidy').click(); else if(k==='l') $('lock').click(); else if(k==='r'&&P.hard) $('rotate').click();
+  else if(k==='m') setLoupe(!loupeOn); else if(k==='e') $('edges').click(); else if(k==='g') $('ghost').click(); else if(k==='p') $('peekBtn').click(); else if(k==='s') $('sort').click(); else if(k==='t') $('toTray').click(); else if(k==='y') $('tidy').click(); else if(k==='l') $('lock').click(); else if(k==='r'&&P.hard) $('rotate').click();
   else if(k==='f'){ if($('big').hidden){$('bigImg').src=$('peekImg').src;$('big').hidden=false} else $('big').hidden=true; }
   else if(k==='escape'){ if(!$('big').hidden) $('big').hidden=true; else if(!$('win').hidden) $('winStay').click(); else if(flags.peek) setFlag('peek',false); }
 });
