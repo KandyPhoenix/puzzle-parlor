@@ -10,3 +10,5 @@ sports	drag-race
 christmas	bookshop-cafe
 landscapes	blossom-village
 animals	koi-pond
+vibes	forest-shrine
+vibes	zen-morning
