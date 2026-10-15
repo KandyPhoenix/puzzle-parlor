@@ -235,8 +235,12 @@ label.hard input{accent-color:var(--brass-text);width:16px;height:16px;margin:0}
 .tray-side{flex:none;display:flex;flex-direction:column;justify-content:center;gap:4px;min-width:74px;text-align:center}
 .tray-side b{font-family:var(--mono);font-size:14px;font-weight:500;font-variant-numeric:tabular-nums}
 .tray-side span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.tray-tools{flex:none;display:flex;flex-direction:column;justify-content:center;gap:6px;padding-left:6px;border-left:1px solid var(--faint)}
+.tray-tools .tb{justify-content:flex-start;white-space:nowrap}
+@media (max-width:720px){.tray-tools{flex-direction:row;align-items:center;padding-left:4px}.tray-tools .tb{padding:8px}.tray-tools .tb .lbl{display:none}}
 #tray.drop{outline:3px dashed var(--brass);outline-offset:-4px}
-.swatches{display:inline-flex;gap:4px;align-items:center;padding-inline:4px}
+.swatches{flex:none;display:grid;grid-template-columns:repeat(3,24px);gap:6px;align-content:center;padding-inline:8px;border-left:1px solid var(--faint)}
+@media (max-width:720px){.swatches{grid-template-columns:repeat(3,18px);gap:4px;padding-inline:4px}.swatches .sw{width:18px;height:18px}}
 .sw{width:24px;height:24px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--faint);cursor:pointer;padding:0}
 .sw[aria-pressed="true"]{box-shadow:0 0 0 2px var(--brass-text)}
 .sw.clear{background-image:linear-gradient(45deg,#cfcfcf 25%,transparent 25%,transparent 75%,#cfcfcf 75%),linear-gradient(45deg,#cfcfcf 25%,transparent 25%,transparent 75%,#cfcfcf 75%)!important;background-size:8px 8px!important;background-position:0 0,4px 4px!important}
@@ -344,6 +348,8 @@ label.hard input{accent-color:var(--brass-text);width:16px;height:16px;margin:0}
     <div id="trayStrip"><span id="trayEmpty" hidden>The tray is empty. Every piece is on the table.</span></div>
     <button class="tray-nav" id="trayR" aria-label="Scroll tray right"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
     <div class="tray-side"><b id="trayCount">0</b><span>in tray</span></div>
+    <span class="swatches" role="group" aria-label="Table colour" id="swatches"></span>
+    <div class="tray-tools"><button class="tb" id="hardBtn" aria-pressed="false" title="Hard mode for this puzzle: pieces come out turned and must be rotated (double-tap or R)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.5 5.5L20 9l-4 4 1 5.5-5-2.7-5 2.7 1-5.5-4-4 5.5-.5z"/></svg><span class="lbl">Hard</span></button><button class="tb" id="restart" title="Start this puzzle over"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 109-9 9 9 0 00-6.4 2.6L3 8"/><path d="M3 3v5h5"/></svg><span class="lbl">Restart</span></button></div>
   </div>
   <div class="tools" role="toolbar" aria-label="Puzzle tools">
     <span class="sep"></span>
@@ -361,10 +367,6 @@ label.hard input{accent-color:var(--brass-text);width:16px;height:16px;margin:0}
     <button class="tb" id="ghost" aria-pressed="false" title="Faint picture on the board (G)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="1" opacity=".5"/><path d="M3 16l5-5 4 4 3-3 6 6"/></svg><span class="lbl">Ghost</span></button>
     <button class="tb" id="peekBtn" aria-pressed="false" title="Show the box picture (P)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg><span class="lbl">Box lid</span></button>
     <span class="sep"></span>
-    <span class="swatches" role="group" aria-label="Table colour" id="swatches"></span>
-    <span class="sep"></span>
-    <button class="tb" id="hardBtn" aria-pressed="false" title="Hard mode for this puzzle: pieces come out turned and must be rotated (double-tap or R)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.5 5.5L20 9l-4 4 1 5.5-5-2.7-5 2.7 1-5.5-4-4 5.5-.5z"/></svg><span class="lbl">Hard</span></button>
-    <button class="tb" id="restart" title="Start this puzzle over"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 109-9 9 9 0 00-6.4 2.6L3 8"/><path d="M3 3v5h5"/></svg><span class="lbl">Restart</span></button>
   </div>
 </section>
 
@@ -1039,7 +1041,7 @@ cv.addEventListener('pointerdown',e=>{
   const touch=e.pointerType==='touch';
   const panGesture=e.button===1||e.button===2||e.shiftKey; // middle/right button or Shift: always pans
   if(panGesture){pan={x:sx,y:sy,cx:cam.x,cy:cam.y,pid:e.pointerId};return}
-  const[wx,wy]=world(sx,sy), id=hitTest(wx,wy,touch?24/cam.z:0);
+  const[wx,wy]=world(sx,sy), id=hitTest(wx,wy,(touch?24:10)/cam.z); // a near miss still grabs the piece, so the table does not pan instead
   const lift=touch?P.ph*.6+36/cam.z:0; // on touch, the piece rides above the fingertip
   const now=performance.now(), dbl=id!=null&&id===lastTap.id&&now-lastTap.t<400&&Math.hypot(sx-lastTap.x,sy-lastTap.y)<24;
   lastTap={t:now,x:sx,y:sy,id};
