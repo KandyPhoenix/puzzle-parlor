@@ -14,3 +14,4 @@ vibes	forest-shrine
 vibes	zen-morning
 vibes	zen-sunset
 vibes	curious-crow
+christmas	gingerbread-village
