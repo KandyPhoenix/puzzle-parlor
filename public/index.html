@@ -109,9 +109,10 @@ button{font:inherit;color:inherit}
 .size.done .s{color:var(--brass-text)}
 label.hard{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--ink);cursor:pointer;padding:9px 14px;border-radius:6px;border:1px solid var(--faint);background:var(--card)}
 label.hard input{accent-color:var(--brass-text);width:16px;height:16px;margin:0}
-#syncBtn,#unlockBtn,#offlineBtn{display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border-radius:6px;border:1px solid var(--faint);background:var(--card);cursor:pointer;font-weight:600;font-size:13px;color:var(--ink)}
+#syncBtn,#unlockBtn,#offlineBtn,#helpBtn{display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border-radius:6px;border:1px solid var(--faint);background:var(--card);cursor:pointer;font-weight:600;font-size:13px;color:var(--ink)}
 #syncBtn i,#unlockBtn i,#offlineBtn i{width:9px;height:9px;border-radius:50%;background:#b9ab9a}
 #syncBtn.on i,#unlockBtn.on i,#offlineBtn.on i{background:#4f9d6b}
+#helpBtn i{display:none}
 #offlineBtn i{background:#b9ab9a}#offlineBtn.busy i{background:var(--brass)}
 #unlockBtn i{background:var(--brass)}
 #unlockBtn.on{color:var(--muted)}
@@ -191,16 +192,19 @@ label.hard input{accent-color:var(--brass-text);width:16px;height:16px;margin:0}
 #paused h2{font-family:var(--display);font-weight:400;font-size:30px;margin:0 0 6px;color:var(--brass-text)}
 #paused .row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:12px}
 #pauseBtn[aria-pressed="true"]{color:var(--brass-text)}
-#unlock{position:fixed;inset:0;display:grid;place-items:center;z-index:40;background:rgba(35,38,43,.45);padding:16px}
-#unlock .card{background:var(--card);border-radius:8px;padding:26px 28px;max-width:460px;width:100%;box-shadow:0 30px 60px rgba(35,38,43,.35)}
-#unlock h2{font-family:var(--display);font-weight:400;font-size:28px;margin:0 0 8px;color:var(--brass-text)}
-#unlock p{margin:0 0 12px;line-height:1.5}
-#unlock label{display:block;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:6px 0 4px}
+#unlock,#help{position:fixed;inset:0;display:grid;place-items:center;z-index:40;background:rgba(35,38,43,.45);padding:16px}
+#unlock .card,#help .card{background:var(--card);border-radius:8px;padding:26px 28px;max-width:460px;width:100%;box-shadow:0 30px 60px rgba(35,38,43,.35)}
+#unlock h2,#help h2{font-family:var(--display);font-weight:400;font-size:28px;margin:0 0 8px;color:var(--brass-text)}
+#unlock p,#help p{margin:0 0 12px;line-height:1.5}
+#unlock label,#help label{display:block;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:6px 0 4px}
 #unlock input{width:100%;box-sizing:border-box;font-family:var(--mono);font-size:18px;letter-spacing:.08em;padding:10px 12px;border-radius:5px;border:1px solid var(--faint);background:var(--card-hi);color:var(--ink);text-transform:uppercase}
-#unlock .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+#unlock .row,#help .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
 #unlock a.btn{text-decoration:none;display:inline-block}
-#unlockMsg{min-height:1.4em;color:var(--brass-text);font-weight:600;margin-top:10px}
-#unlockMsg.err{color:#c8452f}
+#unlockMsg,#helpMsg{min-height:1.4em;color:var(--brass-text);font-weight:600;margin-top:10px}
+#unlockMsg.err,#helpMsg.err{color:#c8452f}
+#help input,#help textarea{width:100%;box-sizing:border-box;font:inherit;font-size:16px;padding:10px 12px;border-radius:5px;border:1px solid var(--faint);background:var(--card-hi);color:var(--ink)}
+#help textarea{min-height:110px;resize:vertical}
+#help .hp{position:absolute;left:-9999px;opacity:0;height:0;overflow:hidden}
 #win .card{background:var(--card);border-radius:8px;padding:26px 28px;max-width:420px;width:100%;text-align:center;box-shadow:0 30px 60px rgba(35,38,43,.35)}
 #win h2{font-family:var(--display);font-weight:400;font-size:34px;margin:0 0 6px;color:var(--brass-text)}
 #win p{margin:0 0 18px;color:var(--muted)}
@@ -251,7 +255,7 @@ label.hard input{accent-color:var(--brass-text);width:16px;height:16px;margin:0}
         <ul class="menu" id="themeMenu" role="listbox" hidden></ul>
       </div>
       <div class="pins" id="pins"></div>
-      <div class="tools-right"><button id="unlockBtn" hidden><i></i><span>Unlock all puzzles</span></button><button id="offlineBtn" hidden title="Save every picture on this device so puzzles open without internet"><i></i><span>Save for offline</span></button><label class="hard" title="Pieces come out rotated; double-tap or Rotate to turn them"><input type="checkbox" id="hardMode"> Hard mode</label><button id="syncBtn" aria-expanded="false" aria-controls="syncPanel"><i></i><span id="syncLbl">Sync</span></button></div>
+      <div class="tools-right"><button id="unlockBtn" hidden><i></i><span>Unlock all puzzles</span></button><button id="offlineBtn" hidden title="Save every picture on this device so puzzles open without internet"><i></i><span>Save for offline</span></button><label class="hard" title="Pieces come out rotated; double-tap or Rotate to turn them"><input type="checkbox" id="hardMode"> Hard mode</label><button id="syncBtn" aria-expanded="false" aria-controls="syncPanel"><i></i><span id="syncLbl">Sync</span></button><button id="helpBtn" title="Lost a code, or something not working? Send us a message"><i></i><span>Help</span></button></div>
     </nav>
     <section id="syncPanel" hidden>
       <h3>Sync progress across devices</h3>
@@ -271,13 +275,25 @@ label.hard input{accent-color:var(--brass-text);width:16px;height:16px;margin:0}
   <div id="unlockForm">
     <label for="unlockInput">Unlock code</label>
     <input id="unlockInput" placeholder="PP-XXXX-XXXX-XXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="24">
-    <div class="row"><button class="btn" id="unlockGo">Unlock</button><a class="btn ghost" id="unlockBuy" href="buy.html" target="_blank" rel="noopener">Get a code</a><button class="btn ghost" id="unlockClose">Not now</button></div>
+    <div class="row"><button class="btn" id="unlockGo">Unlock</button><a class="btn ghost" id="unlockBuy" href="buy.html" target="_blank" rel="noopener">Get a code</a><button class="btn ghost" id="unlockClose">Not now</button><button class="btn ghost" id="unlockHelp">Need help?</button></div>
   </div>
   <div id="unlockDone" hidden>
     <p>This device is unlocked with code <b id="unlockCode" style="font-family:var(--mono)"></b>. Enter the same code on your other devices (up to 3).</p>
-    <div class="row"><button class="btn ghost" id="unlockRemove">Remove this device from the code</button><button class="btn" id="unlockClose2">Close</button></div>
+    <div class="row"><button class="btn ghost" id="unlockRemove">Remove this device from the code</button><button class="btn ghost" id="unlockHelp2">Need help?</button><button class="btn" id="unlockClose2">Close</button></div>
   </div>
   <p id="unlockMsg" aria-live="polite"></p>
+</div></div>
+<div id="help" hidden role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="card">
+  <h2 id="helpTitle">Need a hand?</h2>
+  <p>Lost a code, a puzzle misbehaving, or a question. We reply by email.</p>
+  <form id="helpForm" novalidate>
+    <label for="helpEmail">Your email</label><input id="helpEmail" type="email" autocomplete="email" placeholder="you@example.com">
+    <label for="helpCode">Unlock code, if you have one</label><input id="helpCode" placeholder="PP-XXXX-XXXX-XXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" style="font-family:var(--mono);text-transform:uppercase">
+    <label for="helpText">Message</label><textarea id="helpText" placeholder="What happened, and on which device?"></textarea>
+    <div class="hp" aria-hidden="true"><label for="helpSite">Website</label><input id="helpSite" tabindex="-1" autocomplete="off"></div>
+    <div class="row"><button class="btn" id="helpSend" type="submit">Send message</button><button class="btn ghost" id="helpClose" type="button">Cancel</button></div>
+  </form>
+  <p id="helpMsg" aria-live="polite"></p>
 </div></div>
 
 <section id="play" hidden>
@@ -1105,6 +1121,25 @@ $('offlineBtn').onclick=saveOffline; offlineUI('');
 
 /* ---------- unlock UI wiring ---------- */
 $('unlockBtn').onclick=()=>openUnlock(null);
+(()=>{const d=$('help'),f=$('helpForm'),m=$('helpMsg'),send=$('helpSend');
+function openHelp(){ closeUnlock(); m.textContent='';m.className=''; f.reset(); const L=lic.get(); if(L&&L.code) $('helpCode').value=L.code; d.hidden=false; $('helpEmail').focus(); }
+function closeHelp(){ d.hidden=true; }
+$('helpBtn').onclick=openHelp; $('unlockHelp').onclick=openHelp; $('unlockHelp2').onclick=openHelp; $('helpClose').onclick=closeHelp;
+d.addEventListener('click',e=>{ if(e.target===d) closeHelp(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!d.hidden) closeHelp(); });
+f.addEventListener('submit',async e=>{ e.preventDefault();
+  const email=$('helpEmail').value.trim(), message=$('helpText').value.trim();
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ m.textContent='Please enter the email address we should reply to.'; m.className='err'; $('helpEmail').focus(); return; }
+  if(message.length<5){ m.textContent='Please tell us a little about the problem.'; m.className='err'; $('helpText').focus(); return; }
+  send.disabled=true; m.textContent='Sending…'; m.className='';
+  try{ const r=await fetch(`${API_ROOT}api/contact`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({email,code:$('helpCode').value.trim(),message,website:$('helpSite').value,page:'app '+(window.Capacitor?'android':location.hostname)+' '+(P?('puzzle '+P.img.slug+' '+P.count):'gallery')})});
+    const j=await r.json().catch(()=>({}));
+    if(r.ok&&j.ok){ m.textContent='Sent. We will reply to '+email+'.'; setTimeout(closeHelp,2200); }
+    else if(r.status===429){ m.textContent='Too many messages from this connection. Please try again in an hour.'; m.className='err'; }
+    else { m.textContent='Could not send right now. You can also email puzzles@kandyphoenix.com.'; m.className='err'; }
+  }catch{ m.textContent='No connection. Please try again when you are online, or email puzzles@kandyphoenix.com.'; m.className='err'; }
+  send.disabled=false;
+});})();
 $('unlockGo').onclick=redeem; $('unlockClose').onclick=closeUnlock; $('unlockClose2').onclick=closeUnlock; $('unlockRemove').onclick=removeDevice;
 $('unlockInput').addEventListener('keydown',e=>{if(e.key==='Enter')redeem()});
 $('unlock').addEventListener('click',e=>{if(e.target.id==='unlock')closeUnlock()});
