@@ -16,3 +16,4 @@ vibes	zen-sunset
 vibes	curious-crow
 christmas	gingerbread-village
 christmas	castle-village
+fantasy	treasure-cove
