@@ -11,7 +11,7 @@
   --brass:#5b7fb8; --brass-ink:#ffffff; --brass-text:#3d5f96;
   --bar:rgba(255,255,255,.95); --chip:rgba(35,38,43,.06); --chip-hi:rgba(35,38,43,.11);
   --table:#e2e3e6; --tray:#f7f8fa;
-  --c-halloween:#f07a2a; --c-holiday:#e9c35a; --c-christmas:#d8443c; --c-paintings:#5d9be0; --c-fantasy:#a983ec; --c-landscapes:#6fb880; --c-fairytales:#ec7fb4; --c-animals:#e8a33d; --c-photos:#3aa6a0;
+  --c-halloween:#f07a2a; --c-holiday:#e9c35a; --c-christmas:#d8443c; --c-paintings:#5d9be0; --c-fantasy:#a983ec; --c-landscapes:#6fb880; --c-fairytales:#ec7fb4; --c-animals:#e8a33d; --c-sports:#d9342b; --c-vibes:#f06aa8; --c-photos:#3aa6a0;
   --display:"Alfa Slab One", "Rockwell", "Roboto Slab", Georgia, serif;
   --body:"Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
@@ -355,6 +355,8 @@ const CATS=[
   {id:'fairytales',label:'Fairy tales'},
   {id:'landscapes',label:'Landscapes'},
   {id:'animals',label:'Animals'},
+  {id:'sports',label:'Sports & racing'},
+  {id:'vibes',label:'Good vibes'},
   {id:'photos',label:'My photos'}];
 const IMAGES=/*IMAGES*/[];
 const SIZES=[100,150,200,300,400,500,750,1000];
@@ -439,7 +441,7 @@ function renderTabs(){
   const c=CATS.find(x=>x.id===cat);
   $('themeBtn').style.setProperty('--dot',`var(--c-${c.id})`); $('themeBtn').querySelector('i').style.background=`var(--c-${c.id})`;
   $('themeName').textContent=c.label;
-  $('themeMenu').innerHTML='<li class="hint" role="presentation">Choose a theme · star it to keep a shortcut</li>'+CATS.map(x=>`<li role="option" aria-selected="${x.id===cat}" class="${x.id===cat?'cur':''}"><button class="pick" data-cat="${x.id}" style="--dot:var(--c-${x.id})"><i></i>${x.label}</button><button class="pinb" data-pin="${x.id}" aria-pressed="${pins.includes(x.id)}" aria-label="${pins.includes(x.id)?'Unpin':'Pin'} ${x.label}" title="${pins.includes(x.id)?'Remove shortcut':'Keep as a shortcut'}">${PIN_SVG}</button></li>`).join('');
+  $('themeMenu').innerHTML='<li class="hint" role="presentation">Choose a theme · star it to keep a shortcut</li>'+CATS.filter(x=>x.id==='photos'||countOf(x.id)>0).map(x=>`<li role="option" aria-selected="${x.id===cat}" class="${x.id===cat?'cur':''}"><button class="pick" data-cat="${x.id}" style="--dot:var(--c-${x.id})"><i></i>${x.label}</button><button class="pinb" data-pin="${x.id}" aria-pressed="${pins.includes(x.id)}" aria-label="${pins.includes(x.id)?'Unpin':'Pin'} ${x.label}" title="${pins.includes(x.id)?'Remove shortcut':'Keep as a shortcut'}">${PIN_SVG}</button></li>`).join('');
   $('pins').innerHTML=pins.map(id=>{const x=CATS.find(c=>c.id===id);return `<button class="tab" id="tab-${id}" aria-pressed="${id===cat}" aria-selected="${id===cat}" style="--dot:var(--c-${id})" data-cat="${id}"><i></i>${x.label}</button>`}).join('');
 }
 function openMenu(v){$('themeMenu').hidden=!v;$('themeBtn').setAttribute('aria-expanded',String(v))}
@@ -507,7 +509,7 @@ $('tabs').addEventListener('keydown',e=>{
   cat=CATS[j].id;store.set('jig-cat',cat);renderTabs();renderGrid();
 });
 $('grid').addEventListener('click',e=>{const b=e.target.closest('.size');if(!b)return;openPuzzle(findImg(b.dataset.slug),+b.dataset.n)});
-$('lede').textContent='Jigsaw puzzles of spooky Halloween scenes, cozy Christmas and holiday pictures, famous paintings, fantasy worlds, fairy tales, landscapes, animals, or your own photos. Pick any picture and choose from 100 to 1,000 pieces.';
+$('lede').textContent='Jigsaw puzzles of spooky Halloween scenes, cozy Christmas and holiday pictures, famous paintings, fantasy worlds, fairy tales, landscapes, animals, sports and racing, happy sayings, or your own photos. Pick any picture and choose from 100 to 1,000 pieces.';
 renderTabs();renderGrid();
 
 /* ---------- cross-device sync (Cloudflare KV behind /api) ---------- */

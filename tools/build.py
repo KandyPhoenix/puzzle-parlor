@@ -51,6 +51,22 @@ D={
 'sleigh-over-town':("Christmas Eve Flight","Original art",""),
 'sea-of-fog':("Wanderer above the Sea of Fog","Caspar David Friedrich","c. 1817"),
 'forest-picnic':("The Woodland Picnic","Original art",""),
+'grand-prix-street':("Street Circuit Showdown","Original art",""),
+'tide-pool':("Tide Pool Treasures","Original art",""),
+'penguin-beach':("Penguin Beach Party","Original art",""),
+'stadium-lights':("Under the Stadium Lights","Original art",""),
+'drag-race':("Sunset Drag Race","Original art",""),
+'bookshop-cafe':("The Bookshop Café","Original art",""),
+'blossom-village':("Cherry Blossom Village","Original art",""),
+'koi-pond':("Koi Pond at Dusk","Original art",""),
+'autumn-village':("Autumn in the Village","Original art",""),
+'savanna-sunset':("Waterhole at Sunset","Original art",""),
+'aurora-lake':("Northern Lights over the Lake","Original art",""),
+'choose-happiness':("Choose Happiness","Original art",""),
+'todays-forecast':("Today's Forecast","Original art",""),
+'on-fire':("Some Days I'm on Fire","Original art",""),
+'choose-peace':("Today I Choose Peace","Original art",""),
+'silly-cow':("A Little Silliness","Original art",""),
 'rocky-storm':("A Storm in the Rocky Mountains, Mt. Rosalie","Albert Bierstadt","1866"),
 'poppy-field':("Poppy Field","Claude Monet","1873"),
 'paris-rainy-day':("Paris Street; Rainy Day","Gustave Caillebotte","1877"),
@@ -63,10 +79,15 @@ D={
 }
 meta={m['slug']:m for m in json.load(open('meta.json'))}
 rows=[l.rstrip('\n').split('\t') for l in open('list.tsv') if l.strip()]
-NEWC={'haunted-village':'halloween','monster-ball':'halloween','witch-kitchen':'halloween','midnight-graveyard':'halloween','fairytale-kingdom':'fairytales','gingerbread-house':'fairytales','santa-workshop':'christmas','gingerbread-village':'christmas','sleigh-over-town':'christmas','forest-picnic':'animals','cat-cafe':'animals','dog-park':'animals'}
+NEWC={'haunted-village':'halloween','monster-ball':'halloween','witch-kitchen':'halloween','midnight-graveyard':'halloween','fairytale-kingdom':'fairytales','gingerbread-house':'fairytales','santa-workshop':'christmas','gingerbread-village':'christmas','sleigh-over-town':'christmas','forest-picnic':'animals','cat-cafe':'animals','dog-park':'animals','grand-prix-street':'sports','tide-pool':'animals','penguin-beach':'animals','stadium-lights':'sports','drag-race':'sports','bookshop-cafe':'christmas','blossom-village':'landscapes','koi-pond':'animals','autumn-village':'holiday','savanna-sunset':'animals','aurora-lake':'landscapes','choose-happiness':'vibes','todays-forecast':'vibes','on-fire':'vibes','choose-peace':'vibes','silly-cow':'vibes'}
 NEW=list(NEWC)
 for n in NEW: meta[n]={'lic':'Original','page':''}
-rows=[(NEWC[n],n,'') for n in NEW]+rows
+QUEUED=set(l.strip().split('\t')[1] for l in open('queued.txt') if l.strip()) if os.path.exists('queued.txt') else set()
+NEW=[n for n in NEW if n not in QUEUED]
+missing=[n for n in NEW if not os.path.exists(f'img/{n}.jpg')]
+if missing: print('NOT YET SHARPENED, skipped:',missing)
+rows=rows+[(NEWC[n],n,'') for n in NEW if n not in missing]
+rows.sort(key=lambda r:[c['id'] for c in __import__('json').loads(open('cats.json').read())].index(r[0]) if False else 0)  # stable: keep file order
 os.makedirs('out/img',exist_ok=True); os.makedirs('out/thumbs',exist_ok=True)
 imgs=[]
 for cat,slug,_ in rows:

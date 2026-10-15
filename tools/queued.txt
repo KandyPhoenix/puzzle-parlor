@@ -1,0 +1,12 @@
+vibes	choose-happiness
+vibes	todays-forecast
+vibes	on-fire
+vibes	choose-peace
+vibes	silly-cow
+animals	tide-pool
+animals	penguin-beach
+sports	stadium-lights
+sports	drag-race
+christmas	bookshop-cafe
+landscapes	blossom-village
+animals	koi-pond
