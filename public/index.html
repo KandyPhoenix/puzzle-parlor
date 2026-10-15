@@ -168,7 +168,7 @@ label.hard input{accent-color:var(--brass-text);width:16px;height:16px;margin:0}
 .tb.icon{padding:8px}
 .sep{width:1px;background:var(--faint);margin-inline:4px}
 @media (max-width:720px){ .tb .lbl{display:none} .tb{padding:8px} .tools{gap:4px;padding-inline:6px} .sep{display:none} }
-#loupeWrap{position:absolute;top:12px;left:12px;touch-action:none;cursor:grab;user-select:none;width:min(260px,48vw);aspect-ratio:1/1.18;border-radius:10px;background:var(--card);box-shadow:0 12px 30px rgba(35,38,43,.3);border:3px solid #fff;z-index:3;overflow:hidden;display:grid;place-items:center}
+#loupeWrap{position:absolute;top:12px;left:12px;touch-action:none;cursor:grab;user-select:none;width:min(260px,48vw);height:calc(min(260px,48vw)*1.18);max-height:60%;max-width:60%;border-radius:10px;background:var(--card);box-shadow:0 12px 30px rgba(35,38,43,.3);border:3px solid #fff;z-index:3;overflow:hidden;display:grid;place-items:center}
 #loupeWrap canvas{width:100%;height:100%;display:block;grid-area:1/1}
 #loupeWrap .lhint{grid-area:1/1;font-size:12px;color:var(--muted);text-align:center;padding:0 16px;display:none}
 #loupeWrap.empty .lhint{display:block}
@@ -176,7 +176,7 @@ label.hard input{accent-color:var(--brass-text);width:16px;height:16px;margin:0}
 #loupeWrap.dragging{cursor:grabbing;box-shadow:0 20px 40px rgba(35,38,43,.4)}
 #loupeWrap .lbtns button{width:40px;height:34px;border-radius:7px;border:1px solid var(--faint);background:var(--card);color:var(--ink);cursor:pointer;display:grid;place-items:center;font-weight:700}
 #loupeWrap .lbtns button svg{width:20px;height:20px}
-@media (pointer:coarse){#loupeWrap{width:min(300px,46vw)}#loupeWrap .lbtns button{width:48px;height:42px}#loupeWrap .lbtns #loupeHide{width:38px}}
+@media (pointer:coarse){#loupeWrap{width:min(300px,46vw);height:calc(min(300px,46vw)*1.18)}#loupeWrap .lbtns button{width:48px;height:42px}#loupeWrap .lbtns #loupeHide{width:38px}}
 #loupeWrap .lbtns button:hover{border-color:var(--brass)}
 #loupeWrap .lbtns #loupeHide{width:30px;color:var(--muted)}
 #peek{position:absolute;right:14px;bottom:14px;width:min(300px,45vw);border-radius:6px;overflow:hidden;box-shadow:0 12px 30px rgba(35,38,43,.3);border:4px solid #fff;background:#fff}
