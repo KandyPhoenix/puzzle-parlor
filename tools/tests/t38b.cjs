@@ -1,0 +1,14 @@
+const {chromium}=require('/opt/node-tools/node_modules/playwright');
+(async()=>{const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});const errs=[];const out={};
+const pg=await (await b.newContext({viewport:{width:1100,height:720}})).newPage();pg.on('pageerror',e=>errs.push(e.message));
+await pg.goto('http://127.0.0.1:8768/');await pg.waitForTimeout(400);await pg.click('.box:first-of-type .size:nth-of-type(3)');await pg.waitForTimeout(3000);
+await pg.click('#lock');await pg.click('#sort');await pg.waitForTimeout(400);
+out.flags=await pg.evaluate(()=>({lock:flags.lock,z:cam.z,pw:P.pw*cam.z,n:P.count}));
+const snap=()=>pg.evaluate(()=>({cam:{x:cam.x,y:cam.y},pos:P.pieces.map(p=>p.x+','+p.y).join('|')}));
+const r=await pg.evaluate(()=>{const p=P.pieces.find(q=>!q.inTray&&!P.groups.get(q.g).locked);const rc=cv.getBoundingClientRect();const toS=(x,y)=>[rc.left+(x-cam.x)*cam.z,rc.top+(y-cam.y)*cam.z];const [sx,sy]=toS(p.x+P.pw,p.y+P.ph/2);return {i:P.pieces.indexOf(p),sx:sx+6,sy}});
+const a=await snap();await pg.mouse.move(r.sx,r.sy);await pg.mouse.down();await pg.mouse.move(r.sx+60,r.sy+40,{steps:8});await pg.mouse.up();await pg.waitForTimeout(200);const b2=await snap();
+out.nearMiss={camMoved:a.cam.x!==b2.cam.x||a.cam.y!==b2.cam.y,anyPieceMoved:a.pos!==b2.pos};
+const far=await pg.evaluate(()=>{const rc=cv.getBoundingClientRect();let best=null,bd=0;for(let y=40;y<rc.height-40;y+=20)for(let x=40;x<rc.width-40;x+=20){const [wx,wy]=world(x,y);let d=Infinity;for(const p of P.pieces){if(p.inTray)continue;d=Math.min(d,Math.hypot(wx-(p.x+P.pw/2),wy-(p.y+P.ph/2)))}if(d>bd){bd=d;best=[rc.left+x,rc.top+y]}}return {pt:best,bd}});
+const c=await snap();await pg.mouse.move(far.pt[0],far.pt[1]);await pg.mouse.down();await pg.mouse.move(far.pt[0]+80,far.pt[1]+50,{steps:8});await pg.mouse.up();await pg.waitForTimeout(200);const d=await snap();
+out.far={camMoved:c.cam.x!==d.cam.x||c.cam.y!==d.cam.y,anyPieceMoved:c.pos!==d.pos,clearance:far.bd/ (out.flags.pw/out.flags.z)};
+out.errs=errs;console.log(JSON.stringify(out));await b.close()})();

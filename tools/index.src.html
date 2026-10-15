@@ -1,0 +1,1220 @@
+<meta charset="utf-8">
+<title>Puzzle Parlor: Free Online Jigsaw Puzzles, 100-1,000 Pieces</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Figtree:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: a bright puzzle-parlor shelf of boxes (gallery) that opens onto a light table with a piece tray along the bottom. Single light look by design; the table colour is the player's choice. */
+:root{
+  --wood:#f1f2f4; --wood-2:#e3e5e9; --card:#ffffff; --card-hi:#f5f6f8;
+  --ink:#23262b; --muted:#5f6670; --faint:rgba(35,38,43,.13);
+  --brass:#5b7fb8; --brass-ink:#ffffff; --brass-text:#3d5f96;
+  --bar:rgba(255,255,255,.95); --chip:rgba(35,38,43,.06); --chip-hi:rgba(35,38,43,.11);
+  --table:#e2e3e6; --tray:#f7f8fa;
+  --c-halloween:#f07a2a; --c-holiday:#e9c35a; --c-christmas:#d8443c; --c-paintings:#5d9be0; --c-fantasy:#a983ec; --c-landscapes:#6fb880; --c-fairytales:#ec7fb4; --c-animals:#e8a33d; --c-photos:#3aa6a0;
+  --display:"Alfa Slab One", "Rockwell", "Roboto Slab", Georgia, serif;
+  --body:"Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  color-scheme:light;
+}
+html,body{height:100%;overscroll-behavior:none}
+button,label,.tab{touch-action:manipulation}
+#play{touch-action:none;overscroll-behavior:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+[hidden]{display:none!important}
+body{background:var(--wood);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+
+/* ---------- Gallery ---------- */
+#gallery{min-height:100%;padding-inline:clamp(16px,4vw,48px);padding-block:28px 56px;
+  background:radial-gradient(1200px 500px at 15% -10%, rgba(91,127,184,.10), transparent 60%), var(--wood)}
+.wrap{max-width:1240px;margin-inline:auto}
+.mast{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 32px;padding-bottom:22px;border-bottom:1px solid var(--faint)}
+.mast h1{font-family:var(--display);font-weight:400;font-size:clamp(34px,6vw,58px);line-height:1;letter-spacing:.01em;margin:0;color:var(--ink);text-wrap:balance}
+.mast h1 span{color:var(--brass-text)}
+.mast p{margin:0;max-width:52ch;color:var(--muted)}
+.tabs{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-block:22px 26px}
+.picker{position:relative}
+.tab-cur{background:var(--ink);color:var(--wood);border-color:var(--ink);padding-right:12px}
+.tab-cur svg{width:16px;height:16px;opacity:.8}
+.menu{position:absolute;top:calc(100% + 6px);left:0;z-index:20;list-style:none;margin:0;padding:6px;min-width:260px;background:var(--card);border:1px solid var(--faint);border-radius:6px;box-shadow:0 14px 34px -12px rgba(35,38,43,.35)}
+.menu li{display:flex;align-items:center;gap:8px;border-radius:7px}
+.menu li:hover,.menu li.cur{background:var(--chip)}
+.menu .pick{flex:1;display:flex;align-items:center;gap:9px;padding:9px 10px;border:0;background:transparent;cursor:pointer;font-weight:600;font-size:14px;text-align:left}
+.menu .pick i{width:10px;height:10px;border-radius:50%;background:var(--dot);flex:none}
+.menu .pick b{font-family:var(--mono);font-weight:500;font-size:12px;opacity:.6;margin-left:auto}
+.menu .pinb{border:0;background:transparent;cursor:pointer;padding:8px;border-radius:6px;color:var(--muted);display:grid;place-items:center}
+.menu .pinb svg{width:16px;height:16px}
+.menu .pinb[aria-pressed="true"]{color:var(--brass-text)}
+.menu .pinb:hover{background:var(--chip-hi)}
+.menu .hint{padding:6px 10px 4px;font-size:11px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+.pins{display:flex;flex-wrap:wrap;gap:8px}
+.tools-right{display:flex;flex-wrap:wrap;gap:8px;margin-left:auto}
+@media (max-width:720px){.tools-right{margin-left:0}}
+.pins .tab{padding-left:12px}
+.pins .tab svg{width:13px;height:13px;opacity:.55}
+.tab{display:inline-flex;align-items:center;gap:9px;padding:9px 14px;border-radius:6px;border:1px solid var(--faint);background:transparent;cursor:pointer;font-weight:600;font-size:14px;color:var(--muted)}
+.tab i{width:10px;height:10px;border-radius:50%;background:var(--dot)}
+.tab b{font-family:var(--mono);font-weight:500;font-size:12px;opacity:.7}
+.tab[aria-selected="true"]{background:var(--ink);color:var(--wood);border-color:var(--ink)}
+.tab:hover:not([aria-selected="true"]){border-color:var(--muted);color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:22px}
+.box{background:var(--card);border-radius:6px;overflow:hidden;display:flex;flex-direction:column;
+  box-shadow:0 1px 2px rgba(35,38,43,.06), 0 12px 26px -16px rgba(35,38,43,.35)}
+.box .art{position:relative;aspect-ratio:4/3;max-width:100%;background:var(--wood-2);overflow:hidden;border-bottom:3px solid var(--cat)}
+.box .art img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s ease}
+.box:hover .art img{transform:scale(1.04)}
+.box .meta{padding:14px 16px 4px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.box h3{margin:0;font-size:16px;font-weight:700;line-height:1.3;text-wrap:balance}
+.box .by{color:var(--muted);font-size:13px}
+.box .chips{display:flex;gap:6px;flex-wrap:wrap}
+.box .lock,.box .free{align-self:flex-start;margin-top:4px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:3px}
+.box .lock{color:var(--muted);background:var(--chip)}
+.box .free{color:var(--brass-ink);background:var(--brass)}
+.size.locked{opacity:.6}
+.size.locked .s{color:var(--muted)}
+.box .new{align-self:flex-start;margin-top:4px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--brass-ink);background:var(--brass);padding:2px 7px;border-radius:3px}
+.sizes{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;padding:12px 14px 14px;margin-top:auto}
+.size{display:flex;flex-direction:column;align-items:center;gap:1px;padding:8px 4px 7px;border-radius:5px;border:1px solid var(--faint);background:var(--card-hi);cursor:pointer;position:relative;overflow:hidden}
+.size:hover{border-color:var(--brass)}
+.size .n{font-family:var(--mono);font-size:14px;font-weight:500;font-variant-numeric:tabular-nums}
+.size .s{font-size:10px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+.size .bar{position:absolute;left:0;bottom:0;height:3px;background:var(--brass)}
+.size.done{border-color:var(--brass)}
+.size.done .s{color:var(--brass-text)}
+label.hard{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--ink);cursor:pointer;padding:9px 14px;border-radius:6px;border:1px solid var(--faint);background:var(--card)}
+label.hard input{accent-color:var(--brass-text);width:16px;height:16px;margin:0}
+#syncBtn,#unlockBtn,#offlineBtn,#helpBtn{display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border-radius:6px;border:1px solid var(--faint);background:var(--card);cursor:pointer;font-weight:600;font-size:13px;color:var(--ink)}
+#syncBtn i,#unlockBtn i,#offlineBtn i{width:9px;height:9px;border-radius:50%;background:#b9ab9a}
+#syncBtn.on i,#unlockBtn.on i,#offlineBtn.on i{background:#4f9d6b}
+#helpBtn i{display:none}
+#offlineBtn i{background:#b9ab9a}#offlineBtn.busy i{background:var(--brass)}
+#unlockBtn i{background:var(--brass)}
+#unlockBtn.on{color:var(--muted)}
+#syncBtn.err i{background:#c8452f}
+#syncPanel{margin-block:-8px 22px;padding:18px 20px;border-radius:6px;background:var(--card);box-shadow:0 1px 2px rgba(35,38,43,.06),0 12px 26px -16px rgba(35,38,43,.35);max-width:620px}
+#syncPanel h3{margin:0 0 6px;font-size:17px}
+#syncPanel p{margin:0 0 12px;color:var(--muted);font-size:14px;max-width:62ch}
+#syncPanel label{display:block;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+#syncInput{font:inherit;font-family:var(--mono);font-size:16px;padding:9px 12px;border-radius:6px;border:1px solid var(--faint);background:var(--card-hi);color:var(--ink);width:100%;max-width:320px}
+#syncPanel .row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+#syncMsg{margin-top:10px!important;min-height:1.4em}
+#pinned{margin-block:22px 4px}
+#pinned h2{margin:0 0 10px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.pinrow{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.pcard{position:relative;display:flex;gap:12px;align-items:center;padding:8px;background:var(--card);border-radius:6px;cursor:pointer;text-align:left;border:1px solid var(--faint);box-shadow:0 1px 2px rgba(35,38,43,.06), 0 12px 26px -16px rgba(35,38,43,.35);min-width:0}
+.pcard:hover{border-color:var(--brass)}
+.pcard img{width:84px;height:63px;object-fit:cover;border-radius:4px;flex:none;border-bottom:3px solid var(--cat)}
+.pcard .pinfo{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;padding-right:26px}
+.pcard h3{margin:0;font-size:14px;font-weight:700;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pcard .pm{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.pcard .pbar{height:4px;border-radius:2px;background:var(--chip);overflow:hidden}
+.pcard .pbar i{display:block;height:100%;background:var(--brass)}
+.pcard .pbar.done i{background:#4f9d6b}
+.unpin{position:absolute;top:4px;right:4px;width:26px;height:26px;border:0;border-radius:4px;background:transparent;color:var(--muted);cursor:pointer;font-size:18px;line-height:1;display:grid;place-items:center}
+.unpin:hover{background:var(--chip-hi);color:var(--ink)}
+#pinBtn[aria-pressed="true"]{background:var(--brass);color:var(--brass-ink)}
+#pinBtn svg{width:18px;height:18px}
+.credit{margin-top:40px;color:var(--muted);font-size:13px;max-width:75ch}
+.credit a{color:var(--muted)}
+
+/* ---------- Play ---------- */
+#play{position:fixed;inset:0;display:flex;flex-direction:column;background:var(--table)}
+.bar{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--bar);border-bottom:1px solid var(--faint);flex-wrap:wrap;
+  padding-top:calc(8px + env(safe-area-inset-top,0px))}
+.bar .ttl{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.2}
+.bar .ttl strong{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:15px}
+.bar .ttl span{color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat{font-family:var(--mono);font-size:14px;font-variant-numeric:tabular-nums;padding:4px 10px;border-radius:4px;background:var(--chip)}
+.stat em{font-style:normal;color:var(--brass-text)}
+#table{position:relative;flex:1;min-height:0;overflow:hidden;
+  background:
+    radial-gradient(ellipse at 50% 40%, rgba(255,255,255,.35), transparent 70%),
+    repeating-linear-gradient(45deg, rgba(0,0,0,.025) 0 2px, transparent 2px 5px),
+    var(--table)}
+#cv{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:grab;display:block}
+#cv.grabbing{cursor:none}
+.tools{display:flex;justify-content:center;align-items:center;gap:6px;flex-wrap:wrap;padding:8px 10px;background:var(--bar);border-top:1px solid var(--faint);
+  padding-bottom:calc(8px + env(safe-area-inset-bottom,0px))}
+.tb{display:inline-flex;align-items:center;gap:7px;padding:8px 12px;border-radius:5px;border:1px solid transparent;background:var(--chip);cursor:pointer;font-size:13px;font-weight:600}
+.tb:hover{background:var(--chip-hi)}
+.tb[aria-pressed="true"]{background:var(--brass);color:var(--brass-ink)}
+.tb svg{width:18px;height:18px;flex:none}
+.tb.icon{padding:8px}
+.sep{width:1px;align-self:stretch;background:var(--faint);margin-inline:6px}
+@media (max-width:1140px){ .tb{padding:8px 9px;font-size:12px} .tools{gap:4px} .sep{margin-inline:4px} }
+@media (max-width:900px){ .tb .lbl{display:none} .tb{padding:8px} .tools{gap:4px;padding-inline:6px} }
+@media (max-width:720px){ .sep{display:none} }
+#loupeWrap{position:absolute;top:12px;left:12px;touch-action:none;cursor:grab;user-select:none;width:min(260px,48vw);height:calc(min(260px,48vw)*1.18);max-height:60%;max-width:60%;border-radius:10px;background:var(--card);box-shadow:0 12px 30px rgba(35,38,43,.3);border:3px solid #fff;z-index:3;overflow:hidden;display:grid;place-items:center}
+#loupeWrap canvas{width:100%;height:100%;display:block;grid-area:1/1}
+#loupeWrap .lhint{grid-area:1/1;font-size:12px;color:var(--muted);text-align:center;padding:0 16px;display:none}
+#loupeWrap.empty .lhint{display:block}
+#loupeWrap .lbtns{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:center;gap:6px;padding:6px;background:linear-gradient(transparent,rgba(241,242,244,.95) 40%)}
+#loupeWrap.dragging{cursor:grabbing;box-shadow:0 20px 40px rgba(35,38,43,.4)}
+#loupeWrap .lbtns button{width:40px;height:34px;border-radius:7px;border:1px solid var(--faint);background:var(--card);color:var(--ink);cursor:pointer;display:grid;place-items:center;font-weight:700}
+#loupeWrap .lbtns button svg{width:20px;height:20px}
+@media (pointer:coarse){#loupeWrap{width:min(300px,46vw);height:calc(min(300px,46vw)*1.18)}#loupeWrap .lbtns button{width:48px;height:42px}#loupeWrap .lbtns #loupeHide{width:38px}}
+#loupeWrap .lbtns button:hover{border-color:var(--brass)}
+#loupeWrap .lbtns #loupeHide{width:30px;color:var(--muted)}
+#peek{position:absolute;right:14px;bottom:14px;width:min(300px,45vw);border-radius:6px;overflow:hidden;box-shadow:0 12px 30px rgba(35,38,43,.3);border:4px solid #fff;background:#fff}
+#peek img{display:block;width:100%;height:auto;cursor:zoom-in}
+#big{position:absolute;inset:0;z-index:5;background:rgba(35,38,43,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:zoom-out;padding:12px}
+#big img{max-width:100%;max-height:calc(100% - 30px);object-fit:contain;border:3px solid #fff;box-shadow:0 20px 50px rgba(0,0,0,.5)}
+#big span{color:#f1f2f4;font-size:13px}
+#veil{position:absolute;inset:0;display:grid;place-items:center;background:rgba(241,242,244,.9);z-index:3}
+#veil p{font-family:var(--display);font-size:22px;margin:0}
+#win{position:absolute;inset:0;display:grid;place-items:center;z-index:4;background:rgba(35,38,43,.35);padding:16px}
+#paused{position:fixed;inset:0;display:grid;place-items:center;z-index:5;background:var(--table);padding:16px}
+#paused .card{background:var(--card);border-radius:8px;padding:26px 28px;max-width:380px;width:100%;text-align:center;box-shadow:0 30px 60px rgba(35,38,43,.35)}
+#paused h2{font-family:var(--display);font-weight:400;font-size:30px;margin:0 0 6px;color:var(--brass-text)}
+#paused .row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:12px}
+#pauseBtn[aria-pressed="true"]{color:var(--brass-text)}
+#unlock,#help,#photoDlg{position:fixed;inset:0;display:grid;place-items:center;z-index:40;background:rgba(35,38,43,.45);padding:16px}
+.addbox{justify-content:center;min-height:300px;border:2px dashed var(--faint);background:var(--card-hi)}
+.addphoto{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;height:100%;min-height:300px;padding:24px;border:0;background:none;color:var(--ink);cursor:pointer;font:inherit;text-align:center}
+.addphoto b{font-size:44px;line-height:1;color:var(--brass-text)}.addphoto span{font-weight:700;font-size:17px}.addphoto small{color:var(--muted);max-width:260px;line-height:1.4}.addphoto .btn{margin-top:6px}
+.addbox.locked .addphoto{cursor:default}
+.rmphoto{margin:0 14px 12px;align-self:flex-start;background:none;border:0;color:var(--muted);font:inherit;font-size:12px;text-decoration:underline;cursor:pointer;padding:0}.rmphoto.armed{color:#b7412f;font-weight:700}
+#photoDlg .prev{width:100%;aspect-ratio:4/3;background:var(--card-hi);border:1px solid var(--faint);border-radius:6px;display:grid;place-items:center;overflow:hidden;margin:6px 0 10px}
+#photoDlg .prev img{max-width:100%;max-height:100%;display:block}#photoDlg .prev span{color:var(--muted);padding:20px;text-align:center}
+#photoDlg input[type=text]{width:100%;box-sizing:border-box;font:inherit;font-size:16px;padding:10px 12px;border-radius:5px;border:1px solid var(--faint);background:var(--card-hi);color:var(--ink)}
+#photoDlg input[type=file]{display:none}
+#unlock .card,#help .card,#photoDlg .card{background:var(--card);border-radius:8px;padding:26px 28px;max-width:460px;width:100%;box-shadow:0 30px 60px rgba(35,38,43,.35)}
+#unlock h2,#help h2,#photoDlg h2{font-family:var(--display);font-weight:400;font-size:28px;margin:0 0 8px;color:var(--brass-text)}
+#unlock p,#help p,#photoDlg p{margin:0 0 12px;line-height:1.5}
+#unlock label,#help label,#photoDlg label{display:block;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:6px 0 4px}
+#unlock input{width:100%;box-sizing:border-box;font-family:var(--mono);font-size:18px;letter-spacing:.08em;padding:10px 12px;border-radius:5px;border:1px solid var(--faint);background:var(--card-hi);color:var(--ink);text-transform:uppercase}
+#unlock .row,#help .row,#photoDlg .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+#unlock a.btn{text-decoration:none;display:inline-block}
+#unlockMsg,#helpMsg,#photoMsg{min-height:1.4em;color:var(--brass-text);font-weight:600;margin-top:10px}
+#unlockMsg.err,#helpMsg.err,#photoMsg.err{color:#c8452f}
+#help input,#help textarea{width:100%;box-sizing:border-box;font:inherit;font-size:16px;padding:10px 12px;border-radius:5px;border:1px solid var(--faint);background:var(--card-hi);color:var(--ink)}
+#help textarea{min-height:110px;resize:vertical}
+#help .hp{position:absolute;left:-9999px;opacity:0;height:0;overflow:hidden}
+#win .card{background:var(--card);border-radius:8px;padding:26px 28px;max-width:420px;width:100%;text-align:center;box-shadow:0 30px 60px rgba(35,38,43,.35)}
+#win h2{font-family:var(--display);font-weight:400;font-size:34px;margin:0 0 6px;color:var(--brass-text)}
+#win p{margin:0 0 18px;color:var(--muted)}
+#win .row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.btn{padding:10px 18px;border-radius:5px;border:0;cursor:pointer;font-weight:700;background:var(--brass);color:var(--brass-ink)}
+.btn.ghost{background:var(--chip);color:var(--ink)}
+#confetti{position:absolute;inset:0;pointer-events:none;z-index:4}
+#restart.armed,#hardBtn.armed{background:#b7412f;color:#fff}
+#tray{display:flex;align-items:stretch;gap:6px;padding:6px 8px;background:var(--tray);border-top:1px solid var(--faint);box-shadow:0 -6px 16px -10px rgba(35,38,43,.25)}
+.tray-nav{flex:none;width:34px;border:0;border-radius:6px;background:var(--chip);cursor:pointer;display:grid;place-items:center}
+.tray-nav:hover{background:var(--chip-hi)}
+.tray-nav svg{width:18px;height:18px}
+#trayStrip{flex:1;min-width:0;display:flex;align-items:center;gap:4px;overflow-x:auto;overflow-y:hidden;scroll-behavior:smooth;touch-action:pan-x;height:96px;padding-block:4px;scrollbar-width:thin;overscroll-behavior-x:contain}
+#trayStrip.edges .tp:not(.edge){display:none}
+.tp{flex:none;height:86px;padding:0;border:0;background:transparent;cursor:grab;border-radius:6px;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.tp:hover{background:var(--chip)}
+.tp canvas{height:86px;min-width:40px;display:block;pointer-events:none}
+.tp.lifted{opacity:.2}
+#trayEmpty{color:var(--muted);font-size:14px;padding-inline:12px;white-space:nowrap}
+.tray-side{flex:none;display:flex;flex-direction:column;justify-content:center;gap:4px;min-width:74px;text-align:center}
+.tray-side b{font-family:var(--mono);font-size:14px;font-weight:500;font-variant-numeric:tabular-nums}
+.tray-side span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.tray-tools{flex:none;display:flex;flex-direction:column;justify-content:center;gap:6px;padding-left:6px;border-left:1px solid var(--faint)}
+.tray-tools .tb{justify-content:flex-start;white-space:nowrap}
+@media (max-width:720px){.tray-tools{flex-direction:row;align-items:center;padding-left:4px}.tray-tools .tb{padding:8px}.tray-tools .tb .lbl{display:none}}
+#tray.drop{outline:3px dashed var(--brass);outline-offset:-4px}
+.swatches{flex:none;display:grid;grid-template-columns:repeat(3,24px);gap:6px;align-content:center;padding-inline:8px;border-left:1px solid var(--faint)}
+@media (max-width:720px){.swatches{grid-template-columns:repeat(3,18px);gap:4px;padding-inline:4px}.swatches .sw{width:18px;height:18px}}
+.sw{width:24px;height:24px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--faint);cursor:pointer;padding:0}
+.sw[aria-pressed="true"]{box-shadow:0 0 0 2px var(--brass-text)}
+.sw.clear{background-image:linear-gradient(45deg,#cfcfcf 25%,transparent 25%,transparent 75%,#cfcfcf 75%),linear-gradient(45deg,#cfcfcf 25%,transparent 25%,transparent 75%,#cfcfcf 75%)!important;background-size:8px 8px!important;background-position:0 0,4px 4px!important}
+@media (max-width:720px){ #trayStrip{height:78px} .tp,.tp canvas{height:70px} .tray-nav{display:none} .tray-side{min-width:54px} .sw{width:20px;height:20px} }
+@media (prefers-reduced-motion:reduce){ .box .art img{transition:none} }
+</style>
+
+<main id="gallery">
+  <div class="wrap">
+    <header class="mast">
+      <h1>Puzzle <span>Parlor</span></h1>
+      <p id="lede">Jigsaw puzzles of spooky Halloween scenes, cozy Christmas and holiday pictures, famous paintings, fantasy worlds, fairy tales and landscapes. Pick any picture and choose from 100 to 1,000 pieces.</p>
+    </header>
+    <section id="pinned" hidden aria-label="Pinned puzzles">
+      <h2>Pinned</h2>
+      <div class="pinrow" id="pinrow"></div>
+    </section>
+    <nav class="tabs" id="tabs" aria-label="Puzzle themes">
+      <div class="picker">
+        <button class="tab tab-cur" id="themeBtn" aria-haspopup="listbox" aria-expanded="false" aria-controls="themeMenu"><i></i><span id="themeName"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+        <ul class="menu" id="themeMenu" role="listbox" hidden></ul>
+      </div>
+      <div class="pins" id="pins"></div>
+      <div class="tools-right"><button id="unlockBtn" hidden><i></i><span>Unlock all puzzles</span></button><button id="offlineBtn" hidden title="Save every picture on this device so puzzles open without internet"><i></i><span>Save for offline</span></button><button id="syncBtn" aria-expanded="false" aria-controls="syncPanel"><i></i><span id="syncLbl">Sync</span></button><button id="helpBtn" title="Lost a code, or something not working? Send us a message"><i></i><span>Help</span></button></div>
+    </nav>
+    <section id="syncPanel" hidden>
+      <h3>Sync progress across devices</h3>
+      <p>Use the same sync code on your iPad, phone and computer and your saved puzzles follow you. Anyone with the code can see your progress, so treat it like a password.</p>
+      <label for="syncInput">Sync code</label>
+      <input id="syncInput" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="e.g. maple-river-42">
+      <div class="row"><button class="btn" id="syncSave">Save and sync</button><button class="btn ghost" id="syncNew">Make a new code</button><button class="btn ghost" id="syncOff">Turn off</button></div>
+      <p id="syncMsg"></p>
+    </section>
+    <section class="grid" id="grid" aria-live="polite"></section>
+    <p class="credit">The "New scene" pictures are original illustrations made for this app. Everything else is public-domain art from Wikimedia Commons; tap an artist line to see its Commons page. Piece counts are rounded to fit each picture's shape, so a "1,000" puzzle may have a few more or fewer.</p>
+  </div>
+</main>
+<div id="unlock" hidden role="dialog" aria-modal="true" aria-labelledby="unlockTitle"><div class="card">
+  <h2 id="unlockTitle">Unlock every puzzle</h2>
+  <p id="unlockLead">The free version includes a selection of puzzles at every piece count. An unlock code opens every picture, and lets you turn your own photos into puzzles, on up to 3 of your devices.</p>
+  <div id="unlockForm">
+    <label for="unlockInput">Unlock code</label>
+    <input id="unlockInput" placeholder="PP-XXXX-XXXX-XXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="24">
+    <div class="row"><button class="btn" id="unlockGo">Unlock</button><a class="btn ghost" id="unlockBuy" href="buy.html" target="_blank" rel="noopener">Get a code</a><button class="btn ghost" id="unlockClose">Not now</button><button class="btn ghost" id="unlockHelp">Need help?</button></div>
+  </div>
+  <div id="unlockDone" hidden>
+    <p>This device is unlocked with code <b id="unlockCode" style="font-family:var(--mono)"></b>. Enter the same code on your other devices (up to 3).</p>
+    <div class="row"><button class="btn ghost" id="unlockRemove">Remove this device from the code</button><button class="btn ghost" id="unlockHelp2">Need help?</button><button class="btn" id="unlockClose2">Close</button></div>
+  </div>
+  <p id="unlockMsg" aria-live="polite"></p>
+</div></div>
+<div id="help" hidden role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="card">
+  <h2 id="helpTitle">Need a hand?</h2>
+  <p>Lost a code, a puzzle misbehaving, or a question. We reply by email.</p>
+  <form id="helpForm" novalidate>
+    <label for="helpEmail">Your email</label><input id="helpEmail" type="email" autocomplete="email" placeholder="you@example.com">
+    <label for="helpCode">Unlock code, if you have one</label><input id="helpCode" placeholder="PP-XXXX-XXXX-XXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" style="font-family:var(--mono);text-transform:uppercase">
+    <label for="helpText">Message</label><textarea id="helpText" placeholder="What happened, and on which device?"></textarea>
+    <div class="hp" aria-hidden="true"><label for="helpSite">Website</label><input id="helpSite" tabindex="-1" autocomplete="off"></div>
+    <div class="row"><button class="btn" id="helpSend" type="submit">Send message</button><button class="btn ghost" id="helpClose" type="button">Cancel</button></div>
+  </form>
+  <p id="helpMsg" aria-live="polite"></p>
+</div></div>
+<div id="photoDlg" hidden role="dialog" aria-modal="true" aria-labelledby="photoTitle"><div class="card">
+  <h2 id="photoTitle">Add a photo</h2>
+  <p>Pick a picture from this device. It is resized and saved on this device only, never uploaded anywhere.</p>
+  <input type="file" id="photoFile" accept="image/*">
+  <div class="row" style="margin-top:0"><button class="btn ghost" id="photoPick" type="button">Choose a picture</button></div>
+  <div class="prev" id="photoPrev"><span>No picture chosen yet</span></div>
+  <label for="photoName">Name this puzzle</label><input type="text" id="photoName" maxlength="60" placeholder="Grandma's garden">
+  <div class="row"><button class="btn" id="photoAdd" disabled>Add to my puzzles</button><button class="btn ghost" id="photoCancel">Cancel</button></div>
+  <p id="photoMsg" aria-live="polite"></p>
+</div></div>
+
+<section id="play" hidden>
+  <div class="bar">
+    <button class="tb" id="back" aria-label="Back to all puzzles"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg><span class="lbl">Puzzles</span></button>
+    <div class="ttl"><strong id="pTitle"></strong><span id="pSub"></span></div>
+    <button class="tb icon" id="pinBtn" aria-pressed="false" aria-label="Pin this puzzle to the top of the gallery" title="Pin to the top of the gallery"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16 3l5 5-4 1-3 3 1 5-2 2-4-4-5 5-1-1 5-5-4-4 2-2 5 1 3-3z"/></svg></button>
+    <div class="stat" id="pProg" title="Pieces joined"><em>0%</em></div>
+    <div class="stat" id="pMoves" title="Moves (pieces placed)">0 moves</div>
+    <div class="stat" id="pTime" title="Time spent">0:00</div>
+    <button class="tb icon" id="pauseBtn" aria-pressed="false" aria-label="Pause the timer" title="Pause the timer"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path id="pauseIco" d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg></button>
+  </div>
+  <div id="table">
+    <canvas id="cv" aria-label="Puzzle table. Drag pieces to move them; double-tap a piece to bring it to the centre of the board; drag the empty table to pan; scroll or pinch to zoom."></canvas>
+    <div id="peek" hidden><img id="peekImg" alt="Finished picture for reference. Tap to enlarge."></div>
+    <div id="loupeWrap" hidden aria-label="Magnified view of the piece in hand"><canvas id="loupe"></canvas><span class="lhint">Tap a piece to magnify it</span>
+      <div class="lbtns"><button id="loupeCCW" title="Rotate anticlockwise"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg></button><button id="loupeCW" title="Rotate clockwise (R)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/></svg></button><button id="loupeHide" title="Hide the magnifier">✕</button></div></div>
+    <div id="big" hidden><img id="bigImg" alt="Finished picture, full screen"><span>Tap anywhere to close</span></div>
+    <div id="veil"><p id="veilMsg">Cutting pieces…</p></div>
+    <canvas id="confetti" hidden></canvas>
+    <div id="paused" hidden><div class="card"><h2>Paused</h2><p>The timer is stopped and the pieces are hidden until you resume.</p><div class="row"><button class="btn" id="resumeBtn">Resume</button><button class="btn ghost" id="pausedBack">Back to puzzles</button></div></div></div>
+    <div id="win" hidden><div class="card">
+      <h2>Finished!</h2>
+      <p id="winMsg"></p>
+      <div class="row"><button class="btn" id="winBack">More puzzles</button><button class="btn ghost" id="winStay">Admire it</button></div>
+    </div></div>
+  </div>
+  <div id="tray" aria-label="Piece tray">
+    <button class="tray-nav" id="trayL" aria-label="Scroll tray left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <div id="trayStrip"><span id="trayEmpty" hidden>The tray is empty. Every piece is on the table.</span></div>
+    <button class="tray-nav" id="trayR" aria-label="Scroll tray right"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
+    <div class="tray-side"><b id="trayCount">0</b><span>in tray</span></div>
+    <span class="swatches" role="group" aria-label="Table colour" id="swatches"></span>
+    <div class="tray-tools"><button class="tb" id="hardBtn" aria-pressed="false" title="Hard mode for this puzzle: pieces come out turned and must be rotated (double-tap or R)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.5 5.5L20 9l-4 4 1 5.5-5-2.7-5 2.7 1-5.5-4-4 5.5-.5z"/></svg><span class="lbl">Hard</span></button><button class="tb" id="restart" title="Start this puzzle over"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 109-9 9 9 0 00-6.4 2.6L3 8"/><path d="M3 3v5h5"/></svg><span class="lbl">Restart</span></button></div>
+  </div>
+  <div class="tools" role="toolbar" aria-label="Puzzle tools">
+    <button class="tb icon" id="sound" aria-label="Snap sound" aria-pressed="true" title="Snap sound"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 9a4 4 0 010 6"/></svg></button>
+    <button class="tb icon" id="lock" aria-label="Lock the table" aria-pressed="true" title="Lock: dragging empty table does nothing. Move the table with two fingers, or Shift-drag / right-drag with a mouse (L)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg></button>
+    <button class="tb" id="zFit" title="Fit everything (0)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span class="lbl">Fit</span></button>
+    <button class="tb icon" id="zOut" aria-label="Zoom out" title="Zoom out (−)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M8 11h6M20 20l-4-4"/></svg></button>
+    <button class="tb icon" id="zIn" aria-label="Zoom in" title="Zoom in (+)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M8 11h6M11 8v6M20 20l-4-4"/></svg></button>
+    <button class="tb" id="rotate" hidden title="Rotate the last piece you touched a quarter turn (R)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 11-3-6.7"/><path d="M21 4v5h-5"/></svg><span class="lbl">Rotate</span></button>
+    <button class="tb" id="loupeBtn" aria-pressed="true" title="Show or hide the magnifier (M)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><span class="lbl">Magnifier</span></button>
+    <span class="sep"></span>
+    <button class="tb" id="edges" aria-pressed="false" title="Show only edge pieces (E)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="1"/><rect x="9" y="9" width="6" height="6" stroke-dasharray="2 2"/></svg><span class="lbl">Edges</span></button>
+    <button class="tb" id="sort" title="Shuffle every tray and loose piece out around the board (S)"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="5" height="5" rx="1"/><rect x="10" y="3" width="5" height="5" rx="1"/><rect x="17" y="3" width="4" height="5" rx="1"/><rect x="3" y="10" width="5" height="5" rx="1"/><rect x="3" y="17" width="5" height="4" rx="1"/><rect x="10" y="17" width="5" height="4" rx="1"/></svg><span class="lbl">Spread</span></button>
+    <button class="tb" id="tidy" title="Tidy loose pieces on the table into neat rows (Y)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="7" height="7" rx="1"/><rect x="14" y="4" width="7" height="7" rx="1"/><rect x="3" y="15" width="7" height="6" rx="1"/><rect x="14" y="15" width="7" height="6" rx="1"/></svg><span class="lbl">Tidy</span></button>
+    <button class="tb" id="toTray" title="Put loose pieces back in the tray (T)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5"/><rect x="3" y="17" width="18" height="4" rx="1"/></svg><span class="lbl">To tray</span></button>
+    <span class="sep"></span>
+    <button class="tb" id="ghost" aria-pressed="false" title="Faint picture on the board (G)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="1" opacity=".5"/><path d="M3 16l5-5 4 4 3-3 6 6"/></svg><span class="lbl">Ghost</span></button>
+    <button class="tb" id="peekBtn" aria-pressed="false" title="Show the box picture (P)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg><span class="lbl">Box lid</span></button>
+  </div>
+</section>
+
+<script>
+const CATS=[
+  {id:'halloween',label:'Halloween'},
+  {id:'holiday',label:'Holidays'},
+  {id:'christmas',label:'Christmas'},
+  {id:'paintings',label:'Famous paintings'},
+  {id:'fantasy',label:'Fantasy'},
+  {id:'fairytales',label:'Fairy tales'},
+  {id:'landscapes',label:'Landscapes'},
+  {id:'animals',label:'Animals'},
+  {id:'photos',label:'My photos'}];
+const IMAGES=/*IMAGES*/[];
+const SIZES=[100,150,200,300,400,500,750,1000];
+const PHOTOS=[]; // the player's own pictures, loaded from this device's IndexedDB
+const findImg=slug=>IMAGES.find(i=>i.slug===slug)||PHOTOS.find(i=>i.slug===slug);
+const srcOf=img=>img.photo?img.url:'img/'+img.slug+'.jpg';
+const thumbOf=img=>img.photo?img.thumbUrl:'thumbs/'+img.slug+'.jpg';
+const $=id=>document.getElementById(id);
+
+/* ---------- storage (best effort) ---------- */
+const store={
+  get(k){try{const v=localStorage.getItem(k);return v?JSON.parse(v):null}catch(e){return null}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},
+  del(k){try{localStorage.removeItem(k)}catch(e){}}
+};
+const idx=()=>store.get('jig-index')||{};
+function setIdx(key,val,ts){const i=idx(); i[key]=Object.assign(i[key]||{},val==null?{done:false,best:null,pct:null}:val,{u:ts||Date.now()}); store.set('jig-index',i); syncMark(key)}
+
+/* ---------- unlock codes (web version only; store builds are paid upfront and fully open) ---------- */
+const PAID_BUILD=!!window.Capacitor;
+const FORCE_LOCK=/[?&]lock=1/.test(location.search), WEB_SALES=!PAID_BUILD&&/\.pages\.dev$|kandyphoenix\.com$/.test(location.hostname);
+// Locking is on only when the server has an admin key configured (so codes can exist). The answer is cached between visits.
+let LOCKING=FORCE_LOCK||(WEB_SALES&&!!store.get('jig-lockcfg'));
+async function refreshLockConfig(){
+  if(!WEB_SALES||FORCE_LOCK) return;
+  try{ const r=await fetch(`${API_ROOT}api/license/status`,{cache:'no-store'}); const j=await r.json(); if(typeof j.locking==='boolean'&&j.locking!==!!store.get('jig-lockcfg')){ store.set('jig-lockcfg',j.locking); LOCKING=j.locking; renderGrid(); lockUI(); } }catch(e){}
+}
+const FREE_PER_CAT=2, FREE=new Set();
+{const seen={}; for(const i of IMAGES){seen[i.cat]=(seen[i.cat]||0)+1; if(seen[i.cat]<=FREE_PER_CAT) FREE.add(i.slug);}}
+const lic={get(){return store.get('jig-lic')},set(v){v?store.set('jig-lic',v):store.del('jig-lic')}};
+function deviceId(){let d=store.get('jig-dev');if(!d){d=crypto.randomUUID?crypto.randomUUID():Math.random().toString(36).slice(2)+Date.now().toString(36);store.set('jig-dev',d)}return d}
+const unlocked=()=>!LOCKING||!!(lic.get()&&lic.get().ok);
+const canPlay=img=>unlocked()||FREE.has(img.slug);
+async function licCall(action,body){
+  const r=await fetch(`${API_ROOT}api/license/${action}`,{method:'POST',cache:'no-store',headers:{'content-type':'application/json'},body:JSON.stringify(body)});
+  let j=null; try{j=await r.json()}catch(e){} return {status:r.status,body:j||{}};
+}
+function lockUI(){
+  const b=$('unlockBtn'); b.hidden=!LOCKING; b.classList.toggle('on',unlocked()); b.querySelector('span').textContent=unlocked()?'Unlocked':'Unlock all puzzles';
+}
+function openUnlock(img){
+  const d=$('unlock'), on=unlocked(); d.hidden=false; const m=$('unlockMsg'); m.textContent=''; m.className='';
+  $('unlockTitle').textContent=on?'Every puzzle is unlocked':img?`"${img.title}" is in the full version`:'Unlock every puzzle';
+  $('unlockLead').hidden=on; $('unlockForm').hidden=on; $('unlockDone').hidden=!on;
+  if(on) $('unlockCode').textContent=lic.get().code; else setTimeout(()=>$('unlockInput').focus(),50);
+}
+function closeUnlock(){ $('unlock').hidden=true; }
+async function redeem(){
+  const code=$('unlockInput').value.trim(), m=$('unlockMsg'); if(!code){m.className='err';m.textContent='Type the code from your purchase email.';return}
+  m.className=''; m.textContent='Checking…'; $('unlockGo').disabled=true;
+  try{
+    const r=await licCall('activate',{code,device:deviceId(),name:(navigator.platform||'').slice(0,40)});
+    if(r.body.ok){ lic.set({code:r.body.code,ok:true,at:Date.now(),v:Date.now()}); m.textContent=`Unlocked on ${r.body.devices} of ${r.body.max} devices. Enjoy!`; renderGrid(); lockUI(); setTimeout(closeUnlock,1400); }
+    else { m.className='err'; m.textContent=r.body.message||'That code did not work.'; }
+  }catch(e){ m.className='err'; m.textContent='Could not reach the server. Check your connection and try again.'; }
+  $('unlockGo').disabled=false;
+}
+async function removeDevice(){
+  const l=lic.get(); if(!l) return; const m=$('unlockMsg'); m.textContent='Removing…';
+  try{ const r=await licCall('deactivate',{code:l.code,device:deviceId()}); if(!(r.body.ok||r.status===404)){ m.className='err'; m.textContent='Could not remove this device right now. Try again in a moment.'; return; } }
+  catch(e){ m.className='err'; m.textContent='Could not reach the server. Check your connection and try again.'; return; }
+  lic.set(null); renderGrid(); lockUI(); closeUnlock();
+}
+async function recheckLicense(){
+  const l=lic.get(); if(!LOCKING||!l||!l.ok||Date.now()-(l.v||0)<7*864e5||navigator.onLine===false) return;
+  try{ const r=await licCall('activate',{code:l.code,device:deviceId()});
+    if(r.body.ok){l.v=Date.now();lic.set(l)} else if(['unknown','revoked','device_limit'].includes(r.body.error)){lic.set(null);renderGrid();lockUI()} }catch(e){}
+}
+
+
+function cut(n,w,h){const a=w/h;let cols=Math.max(2,Math.round(Math.sqrt(n*a)));let rows=Math.max(2,Math.round(n/cols));return{cols,rows,count:cols*rows}}
+function fmtTime(ms){const s=Math.floor(ms/1000),h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;return h?`${h}:${String(m).padStart(2,'0')}:${String(x).padStart(2,'0')}`:`${m}:${String(x).padStart(2,'0')}`}
+const fmtN=n=>n.toLocaleString('en-US');
+
+/* ---------- gallery ---------- */
+let cat=store.get('jig-cat')||'halloween';
+if(!CATS.some(c=>c.id===cat)) cat='halloween';
+let pins=store.get('jig-pins')||[]; pins=pins.filter(p=>CATS.some(c=>c.id===p));
+const PIN_SVG='<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16 3l5 5-4 1-3 3 1 5-2 2-4-4-5 5-1-1 5-5-4-4 2-2 5 1 3-3z"/></svg>';
+const countOf=id=>id==='photos'?PHOTOS.length:IMAGES.filter(i=>i.cat===id).length;
+function renderTabs(){
+  const c=CATS.find(x=>x.id===cat);
+  $('themeBtn').style.setProperty('--dot',`var(--c-${c.id})`); $('themeBtn').querySelector('i').style.background=`var(--c-${c.id})`;
+  $('themeName').textContent=c.label;
+  $('themeMenu').innerHTML='<li class="hint" role="presentation">Choose a theme · star it to keep a shortcut</li>'+CATS.map(x=>`<li role="option" aria-selected="${x.id===cat}" class="${x.id===cat?'cur':''}"><button class="pick" data-cat="${x.id}" style="--dot:var(--c-${x.id})"><i></i>${x.label}</button><button class="pinb" data-pin="${x.id}" aria-pressed="${pins.includes(x.id)}" aria-label="${pins.includes(x.id)?'Unpin':'Pin'} ${x.label}" title="${pins.includes(x.id)?'Remove shortcut':'Keep as a shortcut'}">${PIN_SVG}</button></li>`).join('');
+  $('pins').innerHTML=pins.map(id=>{const x=CATS.find(c=>c.id===id);return `<button class="tab" id="tab-${id}" aria-pressed="${id===cat}" aria-selected="${id===cat}" style="--dot:var(--c-${id})" data-cat="${id}"><i></i>${x.label}</button>`}).join('');
+}
+function openMenu(v){$('themeMenu').hidden=!v;$('themeBtn').setAttribute('aria-expanded',String(v))}
+$('themeBtn').onclick=e=>{e.stopPropagation();openMenu($('themeMenu').hidden)};
+document.addEventListener('click',e=>{if(!e.target.closest('.picker'))openMenu(false)});
+$('themeMenu').addEventListener('click',e=>{
+  const pk=e.target.closest('.pick'), pb=e.target.closest('.pinb'); e.stopPropagation();
+  if(pk){cat=pk.dataset.cat;store.set('jig-cat',cat);renderTabs();renderGrid();openMenu(false)}
+  else if(pb){const id=pb.dataset.pin;pins=pins.includes(id)?pins.filter(p=>p!==id):[...pins,id];store.set('jig-pins',pins);renderTabs()}
+});
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+const PIN_MAX=4;
+function pinnedKeys(){const ix=idx();return Object.keys(ix).filter(k=>ix[k].pin).sort((a,b)=>(ix[b].pt||0)-(ix[a].pt||0))}
+function parseKey(k){const m=/^jig:(.+):(\d+)$/.exec(k);return m?{slug:m[1],n:+m[2]}:null}
+function renderPinned(){
+  const ix=idx(), keys=pinnedKeys();
+  $('pinned').hidden=keys.length===0;
+  $('pinrow').innerHTML=keys.map(k=>{
+    const q=parseKey(k), img=q&&findImg(q.slug); if(!img) return '';
+    const {count}=cut(q.n,img.w,img.h), e=ix[k];
+    const done=!!e.done, p=done?100:(e.pct||0);
+    const status=done?'Finished'+(e.best?' in '+fmtTime(e.best):''):(e.pct!=null?p+'% done':'Not started');
+    return `<article class="pcard" role="button" tabindex="0" data-slug="${q.slug}" data-n="${q.n}" style="--cat:var(--c-${img.cat})" aria-label="${esc(img.title)}, ${count} pieces, ${status}">
+      <img src="${thumbOf(img)}" alt="" width="84" height="63">
+      <div class="pinfo"><h3>${esc(img.title)}</h3><span class="pm">${fmtN(count)} pieces${e.hard?' ↻':''} · ${status}</span><div class="pbar${done?' done':''}"><i style="width:${p}%"></i></div></div>
+      <button class="unpin" data-unpin="${k}" aria-label="Unpin ${esc(img.title)}" title="Unpin">×</button></article>`}).join('');
+}
+function setPin(key,on){
+  if(on){const keys=pinnedKeys(); for(const k of keys.slice(PIN_MAX-1)) setIdx(k,{pin:false}); setIdx(key,{pin:true,pt:Date.now()})}
+  else setIdx(key,{pin:false});
+  renderPinned(); if(P&&P.key===key) $('pinBtn').setAttribute('aria-pressed',String(on));
+}
+$('pinrow').addEventListener('click',e=>{
+  const u=e.target.closest('.unpin'); if(u){e.stopPropagation();setPin(u.dataset.unpin,false);return}
+  const c=e.target.closest('.pcard'); if(c) openPuzzle(findImg(c.dataset.slug),+c.dataset.n);
+});
+$('pinrow').addEventListener('keydown',e=>{const c=e.target.closest('.pcard');if(c&&(e.key==='Enter'||e.key===' ')){e.preventDefault();openPuzzle(findImg(c.dataset.slug),+c.dataset.n)}});
+$('pinBtn').onclick=()=>{if(!P)return;const on=$('pinBtn').getAttribute('aria-pressed')!=='true';setPin(P.key,on);syncPush()};
+function renderGrid(){
+  renderPinned();
+  const ix=idx();
+  const list=cat==='photos'?PHOTOS:IMAGES.filter(i=>i.cat===cat);
+  const lead=cat!=='photos'?'':unlocked()
+    ?`<article class="box addbox"><button class="addphoto" id="addPhoto"><b>+</b><span>Add a photo</span><small>Turn any picture on this device into a puzzle. It stays on this device only.</small></button></article>`
+    :`<article class="box addbox locked"><div class="addphoto"><b>🔒</b><span>Your own photos</span><small>Make puzzles from your own pictures. Part of the full version.</small><button class="btn" id="photoUnlock">Unlock</button></div></article>`;
+  $('grid').innerHTML=lead+list.map(img=>{
+    const sizes=SIZES.map(n=>{
+      const {count}=cut(n,img.w,img.h), k=`jig:${img.slug}:${n}`, s=ix[k];
+      let sub='pieces',cls='size',bar='';
+      const locked=!canPlay(img); if(locked){cls+=' locked';sub='locked'}
+      if(!locked&&s&&s.done){sub='Done '+fmtTime(s.best)+(s.moves?' · '+fmtN(s.moves)+' mv':'')+(s.hard?' ↻':'');cls+=' done'}
+      else if(!locked&&s&&s.pct!=null){sub='Resume '+s.pct+'%'+(s.hard?' ↻':'');bar=`<span class="bar" style="width:${s.pct}%"></span>`}
+      return `<button class="${cls}" data-slug="${img.slug}" data-n="${n}" aria-label="${esc(img.title)}, ${count} pieces${s&&s.done?', completed':s&&s.pct!=null?', '+s.pct+'% done':''}"><span class="n">${fmtN(count)}</span><span class="s">${sub}</span>${bar}</button>`}).join('');
+    return `<article class="box" data-slug="${img.slug}" style="--cat:var(--c-${img.cat})">
+      <div class="art"><img src="${thumbOf(img)}" alt="${esc(img.title)} by ${esc(img.artist)}" loading="lazy" width="520" height="390"></div>
+      <div class="meta"><h3>${esc(img.title)}</h3>${img.page?`<a class="by" href="${esc(img.page)}" target="_blank" rel="noopener">${esc(img.artist)}, ${esc(img.year)}</a>`:`<span class="by">${esc(img.artist)}</span>`}<span class="chips">${img.isNew?'<span class="new">New scene</span>':''}${LOCKING?(FREE.has(img.slug)?'<span class="free">Free</span>':unlocked()?'':'<span class="lock">Full version</span>'):''}</span></div>
+      <div class="sizes">${sizes}</div>${img.photo?`<button class="rmphoto" data-rm="${img.slug}" title="Remove this photo and its progress">Remove photo</button>`:''}</article>`}).join('');
+  if(cat==='photos'){ const a=$('addPhoto'); if(a) a.onclick=()=>openPhotoDlg(); const u=$('photoUnlock'); if(u) u.onclick=()=>openUnlock({title:'Your own photos'}); }
+}
+$('pins').addEventListener('click',e=>{const b=e.target.closest('.tab');if(!b)return;cat=b.dataset.cat;store.set('jig-cat',cat);renderTabs();renderGrid()});
+$('tabs').addEventListener('keydown',e=>{
+  if(e.key==='Escape'){openMenu(false);return}
+  if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;
+  const i=CATS.findIndex(c=>c.id===cat), j=(i+(e.key==='ArrowRight'?1:-1)+CATS.length)%CATS.length;
+  cat=CATS[j].id;store.set('jig-cat',cat);renderTabs();renderGrid();
+});
+$('grid').addEventListener('click',e=>{const b=e.target.closest('.size');if(!b)return;openPuzzle(findImg(b.dataset.slug),+b.dataset.n)});
+$('lede').textContent='Jigsaw puzzles of spooky Halloween scenes, cozy Christmas and holiday pictures, famous paintings, fantasy worlds, fairy tales, landscapes, animals, or your own photos. Pick any picture and choose from 100 to 1,000 pieces.';
+renderTabs();renderGrid();
+
+/* ---------- cross-device sync (Cloudflare KV behind /api) ---------- */
+const SYNC_WORDS=['apple','brook','candle','dragon','ember','forest','garden','harbor','island','jasper','kettle','lantern','meadow','nectar','orchid','pepper','quartz','river','saddle','timber','velvet','willow','maple','copper','silver','marble','pebble','sunny','frost','clover'];
+const sync={code:store.get('jig-sync')||'',dirty:new Set(),timer:null,last:store.get('jig-sync-last')||0,err:'',busy:false};
+const syncOn=()=>!!sync.code;
+const API_ROOT=(window.Capacitor||location.protocol==='file:')?'https://puzzle-parlor-app.pages.dev/':'';
+const apiUrl=p=>`${API_ROOT}api/p/${encodeURIComponent(sync.code)}/${encodeURIComponent(p)}`;
+async function apiCall(p,opt){
+  const r=await fetch(apiUrl(p),Object.assign({cache:'no-store'},opt||{}));
+  if(r.status===404) return null;
+  if(!r.ok) throw new Error('Sync server said '+r.status);
+  return r.status===204?true:r.json();
+}
+function syncMark(key){ if(!syncOn()||key.startsWith('jig:photo-')) return; sync.dirty.add(key); clearTimeout(sync.timer); sync.timer=setTimeout(()=>syncPush(),20000); }
+function mergeIndex(remote){
+  const local=idx(), out=Object.assign({},local), newer=[];
+  for(const k in (remote||{})){ const r=remote[k], l=local[k]; if(!l||(r.u||0)>(l.u||0)){out[k]=r;newer.push(k)} }
+  store.set('jig-index',out); return {merged:out,newer};
+}
+async function syncPush(keepalive){
+  if(!syncOn()||sync.busy&&!keepalive) return;
+  clearTimeout(sync.timer);
+  const keys=[...sync.dirty]; sync.dirty.clear(); sync.busy=true;
+  try{
+    for(const k of keys){
+      const v=store.get(k);
+      if(v) await apiCall(k,{method:'PUT',body:JSON.stringify(v),headers:{'content-type':'application/json'},keepalive:!!keepalive});
+      else await apiCall(k,{method:'DELETE',keepalive:!!keepalive});
+    }
+    await apiCall('index',{method:'PUT',body:JSON.stringify(idx()),headers:{'content-type':'application/json'},keepalive:!!keepalive});
+    sync.last=Date.now(); store.set('jig-sync-last',sync.last); sync.err='';
+  }catch(e){ for(const k of keys) sync.dirty.add(k); sync.err=e.message; }
+  sync.busy=false; syncStatus();
+}
+async function syncPullIndex(){
+  if(!syncOn()) return;
+  try{
+    const remote=await apiCall('index');
+    const {merged,newer}=mergeIndex(remote);
+    // local entries the server doesn't have yet, or has older: queue them
+    for(const k in merged){ if(k.startsWith('jig:photo-')) continue; const r=remote&&remote[k]; if(!r||(merged[k].u||0)>(r.u||0)) sync.dirty.add(k); }
+    // anything newer on the server: our local save is stale
+    for(const k of newer){ const e=merged[k]; if(e.pct==null) store.del(k); }
+    sync.err=''; renderGrid(); if(sync.dirty.size) await syncPush(); else syncStatus();
+  }catch(e){ sync.err=e.message; syncStatus(); }
+}
+async function syncPullSave(key){
+  if(!syncOn()||key.startsWith('jig:photo-')) return;
+  const e=idx()[key], local=store.get(key);
+  if(!e||e.pct==null) return;
+  if(local&&(local.u||0)>=(e.u||0)) return;
+  try{ const r=await apiCall(key); if(r&&(!local||(r.u||0)>(local.u||0))) store.set(key,r); }catch(err){ sync.err=err.message; syncStatus(); }
+}
+function syncStatus(){
+  const b=$('syncBtn'), l=$('syncLbl'); b.classList.toggle('on',syncOn()&&!sync.err); b.classList.toggle('err',syncOn()&&!!sync.err);
+  if(!syncOn()) l.textContent='Sync devices';
+  else if(sync.err) l.textContent='Sync problem';
+  else l.textContent='Synced · '+sync.code;
+  const m=$('syncMsg');
+  if(!syncOn()) m.textContent='Sync is off. Progress stays in this browser only.';
+  else if(sync.err) m.textContent='Could not reach the sync server ('+sync.err+'). Your progress is still saved on this device; it will sync when the server is reachable. Sync only works on the Cloudflare-hosted copy of the app.';
+  else m.textContent='On. Last synced '+(sync.last?new Date(sync.last).toLocaleString():'never')+'. Enter the same code on another device to see your puzzles there.';
+}
+function newCode(){const w=()=>SYNC_WORDS[Math.floor(Math.random()*SYNC_WORDS.length)];return `${w()}-${w()}-${10+Math.floor(Math.random()*90)}`}
+$('syncBtn').onclick=()=>{const p=$('syncPanel');p.hidden=!p.hidden;$('syncBtn').setAttribute('aria-expanded',String(!p.hidden));if(!p.hidden){$('syncInput').value=sync.code||'';syncStatus()}};
+$('syncNew').onclick=()=>{$('syncInput').value=newCode();$('syncInput').focus()};
+$('syncSave').onclick=async()=>{
+  const v=$('syncInput').value.trim().toLowerCase().replace(/\s+/g,'-');
+  if(!/^[a-z0-9-]{6,40}$/.test(v)){$('syncMsg').textContent='Codes are 6 to 40 letters, numbers or dashes.';return}
+  sync.code=v; store.set('jig-sync',v); $('syncInput').value=v; $('syncMsg').textContent='Connecting…';
+  await syncPullIndex();
+};
+$('syncOff').onclick=()=>{sync.code='';store.del('jig-sync');sync.dirty.clear();sync.err='';syncStatus()};
+$('syncInput').addEventListener('keydown',e=>{if(e.key==='Enter')$('syncSave').click()});
+syncStatus(); if(syncOn()) syncPullIndex();
+
+/* ---------- puzzle engine ---------- */
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function loadImage(src){return new Promise((res,rej)=>{const im=new Image();im.onload=()=>res(im);im.onerror=()=>rej(new Error('Could not load '+src));im.src=src})}
+const cv=$('cv'), ctx=cv.getContext('2d');
+const hitCtx=document.createElement('canvas').getContext('2d');
+const TABLES=[{id:'gray',name:'Light gray',c:'#e2e3e6'},{id:'clear',name:'Clear (no board tint)',c:'#f4f5f7',clear:true},{id:'sky',name:'Sky',c:'#d5e0ea'},{id:'sage',name:'Sage',c:'#d3dcd3'},{id:'lavender',name:'Lavender',c:'#e4dcf0'},{id:'slate',name:'Slate',c:'#4a4f57',dark:true}];
+let tableId=store.get('jig-table')||'gray'; if(!TABLES.some(t=>t.id===tableId)) tableId='gray';
+const curTable=()=>TABLES.find(t=>t.id===tableId);
+function applyTable(){document.documentElement.style.setProperty('--table',curTable().c);$('swatches').innerHTML=TABLES.map(t=>`<button class="sw${t.clear?' clear':''}" style="background:${t.c}" aria-label="${t.name} table" title="${t.name} table" aria-pressed="${t.id===tableId}" data-t="${t.id}"></button>`).join('');draw()}
+$('swatches').addEventListener('click',e=>{const b=e.target.closest('.sw');if(!b)return;tableId=b.dataset.t;store.set('jig-table',tableId);applyTable()});
+let P=null, cam={x:0,y:0,z:1}, needDraw=false, flags={edges:false,ghost:false,peek:false,sound:store.get('jig-sound')!==false,lock:store.get('jig-lock')!==false};
+
+const T=0.1, J=0.045;
+function edgeParams(rng){const r=()=>(rng()*2-1)*J;return{f:rng()<.5?1:-1,a:r(),b:r(),c:r(),d:r(),e:r()}}
+function edgePoints(sx,sy,ux,uy,L,s,p){
+  const nx=-uy, ny=ux; // normal
+  const pt=(l,w)=>[sx+ux*l*L+nx*w*s*p.f, sy+uy*l*L+ny*w*s*p.f];
+  const {a,b,c,d,e}=p;
+  return [pt(0,0),pt(.2,a),pt(.5+b+d,-T+c),pt(.5-T+b,T+c),pt(.5-2*T+b-d,3*T+c),pt(.5+2*T+b-d,3*T+c),pt(.5+T+b,T+c),pt(.5+b+d,-T+c),pt(.8,e),pt(1,0)];
+}
+function addEdge(path,pts,rev,ox,oy){
+  const q=rev?pts.slice().reverse():pts;
+  for(let k=1;k<10;k+=3) path.bezierCurveTo(q[k][0]-ox,q[k][1]-oy,q[k+1][0]-ox,q[k+1][1]-oy,q[k+2][0]-ox,q[k+2][1]-oy);
+}
+
+let openGen=0;
+async function openPuzzle(img,n){
+  if(!canPlay(img)){openUnlock(img);return}
+  const gen=++openGen; const stale=()=>gen!==openGen;
+  $('gallery').hidden=true; $('play').hidden=false; $('veil').hidden=false; $('win').hidden=true; $('paused').hidden=true; $('pauseBtn').setAttribute('aria-pressed','false'); $('pauseIco').setAttribute('d','M7 5h4v14H7zM13 5h4v14h-4z'); $('veilMsg').textContent='Opening the box…';
+  $('pTitle').textContent=img.title; $('peekImg').src=srcOf(img);
+  resize();
+  let im;
+  try{ im=await loadImage(srcOf(img)); }
+  catch(err){ if(!stale()) $('veilMsg').textContent='This picture did not load. Go back and try again.'; return; }
+  if(stale()) return;
+  const W=im.naturalWidth,H=im.naturalHeight,{cols,rows,count}=cut(n,W,H);
+  const key=`jig:${img.slug}:${n}`;
+  await syncPullSave(key); if(stale()) return;
+  const saved=store.get(key);
+  const okSave=saved&&saved.cols===cols&&saved.rows===rows&&saved.p&&saved.p.length===count*2;
+  const seed=okSave?saved.seed:(Math.random()*4294967296>>>0);
+  $('pSub').textContent=`${[img.artist,img.year].filter(Boolean).join(', ')} · ${fmtN(count)} pieces`;
+  $('veilMsg').textContent=`Cutting ${fmtN(count)} pieces…`;
+  await new Promise(r=>setTimeout(r,30)); if(stale()) return;
+  const pw=W/cols, ph=H/rows, s=Math.min(pw,ph), m=Math.ceil(s*.42), rng=mulberry32(seed);
+  const hE=[],vE=[];
+  for(let r=0;r<=rows;r++){hE[r]=[];for(let c=0;c<cols;c++) hE[r][c]=(r>0&&r<rows)?edgePoints(c*pw,r*ph,1,0,pw,s,edgeParams(rng)):null}
+  for(let r=0;r<rows;r++){vE[r]=[];for(let c=0;c<=cols;c++) vE[r][c]=(c>0&&c<cols)?edgePoints(c*pw,r*ph,0,1,ph,s,edgeParams(rng)):null}
+  // vE uses normal (-1,0) via (-uy,ux) -> fine, shape is shared by both neighbours
+  const pieces=[], cw=Math.ceil(pw+2*m), ch=Math.ceil(ph+2*m);
+  const lw=Math.max(1,s/40);
+  // overview cache: just enough pixels for the zoomed-out view on this screen (keeps memory small on phones).
+  // Zoomed in, pieces are rebuilt on demand at the picture's native resolution (see hiCanvas).
+  const dpr=window.devicePixelRatio||1, zf=Math.min(cv.clientWidth/W,cv.clientHeight/H); // board filling the screen
+  const B=Math.min(1,Math.max(0.35,zf*dpr*1.25));
+  for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
+    const ox=c*pw, oy=r*ph, path=new Path2D();
+    path.moveTo(0,0);
+    if(hE[r][c]) addEdge(path,hE[r][c],false,ox,oy); else path.lineTo(pw,0);
+    if(vE[r][c+1]) addEdge(path,vE[r][c+1],false,ox,oy); else path.lineTo(pw,ph);
+    if(hE[r+1][c]) addEdge(path,hE[r+1][c],true,ox,oy); else path.lineTo(0,ph);
+    if(vE[r][c]) addEdge(path,vE[r][c],true,ox,oy); else path.lineTo(0,0);
+    path.closePath();
+    const pc=document.createElement('canvas'); pc.width=Math.ceil(cw*B); pc.height=Math.ceil(ch*B);
+    const g=pc.getContext('2d'); g.scale(B,B); g.translate(m,m);
+    // picture only, plus a hairline outline so pieces read as separate (no bevel/shadow: they smear when zoomed)
+    g.save(); g.clip(path); g.drawImage(im,-ox,-oy);
+    g.lineWidth=lw*.7; g.lineJoin='round'; g.strokeStyle='rgba(0,0,0,.45)'; g.stroke(path);
+    g.restore();
+    pieces.push({r,c,x:0,y:0,rot:0,g:0,edge:r===0||c===0||r===rows-1||c===cols-1,cv:pc,hi:null,path,inTray:false});
+    if(pieces.length%120===0){ $('veilMsg').textContent=`Cutting ${fmtN(count)} pieces… ${Math.round(pieces.length/count*100)}%`; await new Promise(r=>setTimeout(r,0)); if(stale()) return; }
+  }
+  const hard=okSave?!!saved.hard:(nextHard!=null?nextHard:false); nextHard=null;
+  P={img,n,key,W,H,cols,rows,count,pw,ph,s,m,cw,ch,lw,B,seed,im,pieces,hard,lastId:null,moves:0,groups:new Map(),z:[],tray:[],hi:[],elapsed:0,started:performance.now(),won:false};
+  HI_MAX=Math.max(12,Math.min(HI_MAX_COUNT,Math.floor(HI_MAX_BYTES/(cw*ch*4))));
+  setHardUI(hard); loupeOn=store.get('jig-loupe')!==false; $('loupeBtn').setAttribute('aria-pressed',String(loupeOn)); requestAnimationFrame(()=>{ const sv=store.get('jig-loupe-pos'); if(sv&&window.__placeLoupe) window.__placeLoupe(sv.x,sv.y); });
+  $('pinBtn').setAttribute('aria-pressed',String(!!(idx()[key]||{}).pin));
+  if(okSave){
+    P.elapsed=saved.t||0; P.moves=saved.mv||0;
+    pieces.forEach((p,i)=>{p.x=saved.p[i*2];p.y=saved.p[i*2+1];p.g=saved.g[i];p.rot=(saved.ro&&saved.ro[i])||0});
+    const lockedSet=new Set(saved.L||[]);
+    pieces.forEach((p,i)=>{let g=P.groups.get(p.g);if(!g){g={id:p.g,members:[],locked:lockedSet.has(p.g)};P.groups.set(p.g,g)}g.members.push(i)});
+    const order=(saved.z||[]).filter(id=>P.groups.has(id));
+    for(const id of P.groups.keys()) if(!order.includes(id)) order.push(id);
+    P.z=order.filter(id=>P.groups.get(id).locked).concat(order.filter(id=>!P.groups.get(id).locked));
+    P.tray=(saved.tr||[]).filter(i=>P.groups.get(pieces[i].g).members.length===1);
+    for(const i of P.tray) pieces[i].inTray=true;
+  } else {
+    pieces.forEach((p,i)=>{p.g=i;P.groups.set(i,{id:i,members:[i],locked:false});P.z.push(i)});
+    const order=pieces.map((_,i)=>i); for(let i=order.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[order[i],order[j]]=[order[j],order[i]]}
+    P.tray=order; for(const i of order) pieces[i].inTray=true;
+    if(hard) for(const p of pieces) p.rot=1+Math.floor(Math.random()*3); // every piece starts turned
+  }
+  buildTray();
+  setFlag('edges',false); strip.classList.remove('edges'); setFlag('ghost',false); setFlag('peek',false); setFlag('sound',flags.sound); setFlag('lock',flags.lock);
+  $('restart').classList.remove('armed'); $('restart').querySelector('.lbl').textContent='Restart';
+  $('veil').hidden=true;
+  applyTable(); updateProgress(); fit(); draw();
+  if(isWon()) { P.won=true; }
+}
+
+/* place loose single pieces in rings around the board */
+function layoutLoose(order,jitter){
+  const {W,H,pw,ph,pieces}=P, sp=Math.max(pw,ph)*1.55, n=order.length;
+  const tall=cv.clientHeight>cv.clientWidth;
+  let R=2, slots=[];
+  while(true){
+    slots=[];
+    const I=Math.ceil(W/2/sp)+R, Jn=Math.ceil(H/2/sp)+R;
+    for(let i=-I;i<=I;i++)for(let j=-Jn;j<=Jn;j++){
+      const cx=W/2+i*sp, cy=H/2+j*sp;
+      const dx=Math.max(0,-cx,cx-W), dy=Math.max(0,-cy,cy-H);
+      if(dx<sp*.85&&dy<sp*.85) continue;
+      const d=tall?Math.hypot(dx*1.5,dy):Math.hypot(dx,dy*1.5);
+      slots.push([cx,cy,d+Math.random()*sp*.3]);
+    }
+    if(slots.length>=n) break; R++;
+  }
+  slots.sort((a,b)=>a[2]-b[2]);
+  order.forEach((idx,k)=>{const p=pieces[idx];const jx=jitter?(Math.random()-.5)*sp*.22:0,jy=jitter?(Math.random()-.5)*sp*.22:0;p.x=slots[k][0]-pw/2+jx;p.y=slots[k][1]-ph/2+jy});
+}
+function spreadOut(){
+  const loose=[];
+  for(const g of P.groups.values()) if(!g.locked&&g.members.length===1) loose.push(g.members[0]);
+  for(const i of loose) P.pieces[i].inTray=false; P.tray=[]; buildTray();
+  for(let i=loose.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[loose[i],loose[j]]=[loose[j],loose[i]]}
+  layoutLoose(loose,true); save(); fit();
+}
+function tidy(){
+  const loose=[];
+  for(const g of P.groups.values()) if(!g.locked&&g.members.length===1&&!P.pieces[g.members[0]].inTray) loose.push(g.members[0]);
+  // keep rough left-to-right, top-to-bottom order so pieces don't jump across the table
+  loose.sort((a,b)=>(P.pieces[a].y-P.pieces[b].y)*4+(P.pieces[a].x-P.pieces[b].x));
+  layoutLoose(loose,false); save(); draw();
+}
+function collectToTray(){
+  const back=[];
+  for(const g of P.groups.values()){if(g.locked||g.members.length!==1)continue;const i=g.members[0];if(!P.pieces[i].inTray){back.push(i);P.pieces[i].inTray=true}}
+  // shuffle everything going into the tray (Edges only still filters the tray when switched on)
+  P.tray=back.concat(P.tray); for(let i=P.tray.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[P.tray[i],P.tray[j]]=[P.tray[j],P.tray[i]]}
+  buildTray(); save(); fit();
+}
+
+/* ---------- piece tray ---------- */
+const strip=$('trayStrip'); let trayDrag=null;
+const trayIO=new IntersectionObserver(es=>{for(const e of es){const b=e.target;if(!b.isConnected)continue;if(e.isIntersecting)paintThumb(b);else{const c=b.firstChild;if(c&&c.width){c.width=c.height=0;b.dataset.k=''}}}},{root:$('trayStrip'),rootMargin:'0px 500px'});
+function paintThumb(b){
+  if(!P) return; const i=+b.dataset.i, p=P.pieces[i], c=b.firstChild, d=window.devicePixelRatio||1;
+  const hCss=parseFloat(getComputedStyle(c).height)||86, k=hCss*d/P.ch;
+  if(b.dataset.k===String(k)&&c.width) return; b.dataset.k=k;
+  c.width=Math.ceil(P.cw*k); c.height=Math.ceil(P.ch*k); c.style.width=(P.cw*k/d)+'px';
+  const g=c.getContext('2d'); g.imageSmoothingQuality='high'; g.scale(k,k);
+  if(p.rot){g.translate(P.cw/2,P.ch/2);g.rotate(p.rot*Math.PI/2);g.translate(-P.cw/2,-P.ch/2)}
+  g.translate(P.m,P.m); drawLive(g,p,0,0);
+}
+function trayItem(i){const b=document.createElement('button');b.className='tp'+(P.pieces[i].edge?' edge':'');b.dataset.i=i;b.setAttribute('aria-label',(P.pieces[i].edge?'Edge piece':'Piece')+'. Drag onto the table, or tap to place it.');const c=document.createElement('canvas');c.width=c.height=0;b.appendChild(c);trayIO.observe(b);return b}
+function buildTray(){
+  strip.querySelectorAll('.tp').forEach(n=>n.remove());
+  const f=document.createDocumentFragment(); for(const i of P.tray) f.appendChild(trayItem(i)); strip.appendChild(f); trayInfo();
+}
+function trayInfo(){$('trayCount').textContent=fmtN(P.tray.length);$('trayEmpty').hidden=P.tray.length>0}
+function overTray(cy){const r=$('tray').getBoundingClientRect();return cy>=r.top-4}
+function trayInsertIndex(cx){const items=[...strip.querySelectorAll('.tp:not(.lifted)')];for(let k=0;k<items.length;k++){const r=items[k].getBoundingClientRect();if(cx<r.left+r.width/2)return P.tray.indexOf(+items[k].dataset.i)}return P.tray.length}
+function returnToTray(i,cx){
+  const p=P.pieces[i]; p.inTray=true;
+  const k=P.tray.indexOf(i); if(k>=0) P.tray.splice(k,1);
+  const at=cx==null?0:Math.max(0,trayInsertIndex(cx)); P.tray.splice(at,0,i);
+  const node=strip.querySelector(`.tp[data-i="${i}"]`)||trayItem(i); node.classList.remove('lifted');
+  const next=P.tray[at+1]!=null?strip.querySelector(`.tp[data-i="${P.tray[at+1]}"]`):null;
+  strip.insertBefore(node,next||null); trayInfo(); draw(); save();
+}
+function takeFromTray(i,wx,wy){
+  const p=P.pieces[i]; p.inTray=false; const k=P.tray.indexOf(i); if(k>=0)P.tray.splice(k,1);
+  p.x=wx-P.pw/2; p.y=wy-P.ph/2; toTop(p.g); P.lastId=p.g; trayInfo();
+}
+function placeNear(i){
+  // keyboard / tap: drop the piece just outside the board, inside the current view
+  const z=cam.z, vx0=cam.x, vy0=cam.y, vx1=vx0+cv.clientWidth/z, vy1=vy0+cv.clientHeight/z;
+  let x=Math.min(vx1-P.pw,Math.max(vx0+P.pw,P.W+P.pw*1.2+Math.random()*P.pw*3)), y=Math.min(vy1-P.ph,Math.max(vy0+P.ph,P.H*Math.random()));
+  if(x>vx1-P.pw) x=vx0+P.pw+Math.random()*(vx1-vx0-2*P.pw);
+  takeFromTray(i,x,y); countMove(); const n=strip.querySelector(`.tp[data-i="${i}"]`); if(n)n.remove(); draw(); save();
+}
+strip.addEventListener('pointerdown',e=>{
+  const b=e.target.closest('.tp'); if(!b||!P||P.paused) return; ensureAudio();
+  trayDrag={i:+b.dataset.i,node:b,x0:e.clientX,y0:e.clientY,pid:e.pointerId,type:e.pointerType,started:false};
+  if(e.pointerType==='mouse') e.preventDefault();
+});
+window.addEventListener('pointermove',e=>{
+  if(!trayDrag||e.pointerId!==trayDrag.pid) return;
+  const dx=e.clientX-trayDrag.x0, dy=e.clientY-trayDrag.y0;
+  if(!trayDrag.started){
+    const go=trayDrag.type==='mouse'?Math.hypot(dx,dy)>5:(dy<-10&&Math.abs(dy)>Math.abs(dx));
+    if(!go) return;
+    trayDrag.started=true; trayDrag.node.classList.add('lifted'); cv.classList.add('grabbing');
+  }
+  e.preventDefault();
+  const r=cv.getBoundingClientRect(), [wx,wy0]=world(e.clientX-r.left,e.clientY-r.top), p=P.pieces[trayDrag.i];
+  const wy=trayDrag.type==='touch'?wy0-(P.ph*.6+36/cam.z):wy0;
+  if(p.inTray) takeFromTray(trayDrag.i,wx,wy); else {p.x=wx-P.pw/2;p.y=wy-P.ph/2}
+  $('tray').classList.toggle('drop',overTray(e.clientY)); draw();
+},{passive:false});
+function trayUp(e){
+  if(!trayDrag||e.pointerId!==trayDrag.pid) return;
+  const t=trayDrag; trayDrag=null; $('tray').classList.remove('drop'); cv.classList.remove('grabbing');
+  if(!t.started){ if(e.type==='pointerup'&&Math.hypot(e.clientX-t.x0,e.clientY-t.y0)<8) placeNear(t.i); return; }
+  if(e.type==='pointercancel'||overTray(e.clientY)){ returnToTray(t.i,e.clientX); return; }
+  t.node.remove(); countMove(); snap(P.pieces[t.i].g); updateProgress(); draw(); save();
+  if(!P.won&&isWon()) celebrate();
+}
+window.addEventListener('pointerup',trayUp); window.addEventListener('pointercancel',trayUp);
+strip.addEventListener('keydown',e=>{const b=e.target.closest('.tp');if(b&&(e.key==='Enter'||e.key===' ')){e.preventDefault();placeNear(+b.dataset.i)}});
+strip.addEventListener('wheel',e=>{if(Math.abs(e.deltaY)>Math.abs(e.deltaX)){strip.scrollLeft+=e.deltaY;e.preventDefault()}},{passive:false});
+strip.addEventListener('contextmenu',e=>{if(e.target.closest('.tp'))e.preventDefault()});
+$('trayL').onclick=()=>strip.scrollBy({left:-strip.clientWidth*.8});
+$('trayR').onclick=()=>strip.scrollBy({left:strip.clientWidth*.8});
+
+/* ---------- camera ---------- */
+function resize(){const r=$('table').getBoundingClientRect(),d=window.devicePixelRatio||1;cv.width=Math.max(1,Math.round(r.width*d));cv.height=Math.max(1,Math.round(r.height*d));draw()}
+function bounds(){let x0=0,y0=0,x1=P.W,y1=P.H;for(const p of P.pieces){if(p.inTray)continue;if(p.x<x0)x0=p.x;if(p.y<y0)y0=p.y;if(p.x+P.pw>x1)x1=p.x+P.pw;if(p.y+P.ph>y1)y1=p.y+P.ph}return[x0-P.m,y0-P.m,x1+P.m,y1+P.m]}
+function fitZ(){const[x0,y0,x1,y1]=bounds();return Math.min(cv.clientWidth/(x1-x0),cv.clientHeight/(y1-y0))*.96}
+function fit(){if(!P)return;const[x0,y0,x1,y1]=bounds();cam.z=fitZ();cam.x=(x0+x1)/2-cv.clientWidth/2/cam.z;cam.y=(y0+y1)/2-cv.clientHeight/2/cam.z;draw()}
+// zoom stops where the picture's own pixels would start to blur (about 2.5 screen pixels per picture pixel)
+function maxZ(){return Math.max(fitZ()*2.5,2.5/(window.devicePixelRatio||1))}
+function zoomAt(sx,sy,f){if(!P)return;const wx=sx/cam.z+cam.x,wy=sy/cam.z+cam.y;cam.z=Math.min(maxZ(),Math.max(fitZ()*.35,cam.z*f));cam.x=wx-sx/cam.z;cam.y=wy-sy/cam.z;draw()}
+window.addEventListener('resize',()=>{if(!$('play').hidden)resize()});
+
+/* ---------- drawing ---------- */
+function draw(){if(!needDraw){needDraw=true;requestAnimationFrame(render)}}
+function hiddenGroup(g){if(g.members.length===1&&P.pieces[g.members[0]].inTray)return true;return flags.edges&&!g.locked&&g.members.length===1&&!P.pieces[g.members[0]].edge}
+function render(){
+  needDraw=false; if(!P) return;
+  const d=window.devicePixelRatio||1, z=cam.z;
+  ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,cv.width,cv.height);
+  ctx.setTransform(d*z,0,0,d*z,-cam.x*z*d,-cam.y*z*d);
+  ctx.imageSmoothingEnabled=true; ctx.imageSmoothingQuality='high';
+  // board
+  const dk=curTable().dark;
+  if(!curTable().clear){ctx.fillStyle=dk?'rgba(0,0,0,.28)':'rgba(255,255,255,.55)'; ctx.fillRect(0,0,P.W,P.H);}
+  if(flags.ghost){ctx.globalAlpha=dk?.22:.3;ctx.drawImage(P.im,0,0);ctx.globalAlpha=1}
+  ctx.setLineDash([8/z,6/z]); ctx.lineWidth=1.5/z; ctx.strokeStyle=dk?'rgba(255,255,255,.35)':'rgba(42,33,25,.35)'; ctx.strokeRect(0,0,P.W,P.H); ctx.setLineDash([]);
+  const vx0=cam.x,vy0=cam.y,vx1=cam.x+cv.clientWidth/z,vy1=cam.y+cv.clientHeight/z,{m,pw,ph,cw,ch}=P;
+  const vis=[], R=Math.hypot(pw,ph)/2+m;
+  for(const id of P.z){
+    const g=P.groups.get(id); if(hiddenGroup(g)) continue;
+    for(const i of g.members){const p=P.pieces[i], cx=p.x+pw/2, cy=p.y+ph/2;
+      if(cx+R<vx0||cx-R>vx1||cy+R<vy0||cy-R>vy1) continue;
+      vis.push(p);
+    }
+  }
+  // zoomed in past the overview cache: use native-resolution pieces (unless so many are on screen that the cache would thrash)
+  const hi=z*d>P.B*1.15&&vis.length<=HI_MAX;
+  for(const p of vis) drawPiece(ctx,p,hi?hiCanvas(p):p.cv);
+  drawLoupe();
+}
+/* ---------- magnifier: the piece (or joined group) you last touched, large, with rotate buttons ---------- */
+let loupeOn=store.get('jig-loupe'); if(loupeOn==null) loupeOn=true;
+const lctx=$('loupe').getContext('2d');
+function loupeVisible(){ return !!P&&loupeOn }
+function drawLoupe(){
+  const w=$('loupeWrap'); if(!loupeVisible()){ w.hidden=true; return } w.hidden=false;
+  if(w.clientHeight>w.clientWidth*1.3) w.style.height=Math.round(w.clientWidth*1.18)+'px'; // belt and braces: never let the box run the length of the table
+  const cvs=$('loupe'), d=Math.min(2,window.devicePixelRatio||1), S=Math.round(w.clientWidth*d)||400, Hh=Math.round(w.clientHeight*d)||S;
+  if(cvs.width!==S||cvs.height!==Hh){ cvs.width=S; cvs.height=Hh; }
+  lctx.setTransform(1,0,0,1,0,0); lctx.clearRect(0,0,S,Hh);
+  const g=P.lastId!=null&&P.groups.get(P.lastId); if(!g||g.locked){ w.classList.add('empty'); return } w.classList.remove('empty');
+  const ps=g.members.map(i=>P.pieces[i]), {pw,ph,cw,ch}=P; let cx=0,cy=0; for(const p of ps){cx+=p.x+pw/2;cy+=p.y+ph/2} cx/=ps.length; cy/=ps.length;
+  let ext=0; for(const p of ps) ext=Math.max(ext,Math.hypot(p.x+pw/2-cx,p.y+ph/2-cy)+Math.max(cw,ch)/2);
+  const bh=Math.round(50*d), A=Hh-bh; // keep the piece clear of the button strip
+  const z=Math.min(S,A)*0.88/(ext*2); lctx.setTransform(z,0,0,z,S/2-cx*z,A/2-cy*z); lctx.imageSmoothingQuality='high';
+  for(const p of ps) drawPiece(lctx,p,hiCanvas(p));
+}
+/* the magnifier can be dragged anywhere on the table; its spot is remembered */
+(function(){
+  const w=$('loupeWrap'), tbl=$('table'); let dg=null;
+  function place(x,y){ const r=tbl.getBoundingClientRect(); x=Math.max(4,Math.min(r.width-w.offsetWidth-4,x)); y=Math.max(4,Math.min(r.height-w.offsetHeight-4,y)); w.style.left=x+'px'; w.style.top=y+'px'; return [x,y]; }
+  window.__placeLoupe=place;
+  w.addEventListener('pointerdown',e=>{ if(e.target.closest('button')) return; dg={id:e.pointerId,dx:e.clientX-w.offsetLeft,dy:e.clientY-w.offsetTop}; w.setPointerCapture(e.pointerId); w.classList.add('dragging'); e.preventDefault(); e.stopPropagation(); });
+  w.addEventListener('pointermove',e=>{ if(!dg||e.pointerId!==dg.id) return; place(e.clientX-dg.dx,e.clientY-dg.dy); e.preventDefault(); });
+  const end=e=>{ if(!dg||e.pointerId!==dg.id) return; const [x,y]=place(e.clientX-dg.dx,e.clientY-dg.dy); store.set('jig-loupe-pos',{x,y}); dg=null; w.classList.remove('dragging'); };
+  w.addEventListener('pointerup',end); w.addEventListener('pointercancel',end);
+  window.addEventListener('resize',()=>{ const sv=store.get('jig-loupe-pos'); if(sv&&!w.hidden) place(sv.x,sv.y); });
+})();
+function setLoupe(on,remember){ loupeOn=!!on; if(remember!==false) store.set('jig-loupe',loupeOn); $('loupeBtn').setAttribute('aria-pressed',String(loupeOn)); draw(); }
+$('loupeBtn').onclick=()=>setLoupe(!loupeOn); $('loupeHide').onclick=()=>setLoupe(false,false);
+$('loupeCW').onclick=()=>{ if(P&&P.lastId!=null&&P.groups.has(P.lastId)) rotateGroup(P.lastId) };
+$('loupeCCW').onclick=()=>{ if(P&&P.lastId!=null&&P.groups.has(P.lastId)) rotateGroup(P.lastId,3) };
+function drawPiece(ctx,p,src){
+  const {m,pw,ph,cw,ch}=P;
+  if(!p.rot){ctx.drawImage(src,p.x-m,p.y-m,cw,ch);return}
+  ctx.save(); ctx.translate(p.x+pw/2,p.y+ph/2); ctx.rotate(p.rot*Math.PI/2); ctx.drawImage(src,-pw/2-m,-ph/2-m,cw,ch); ctx.restore();
+}
+// rotate a vector by quarter turns (canvas y points down, so rot=1 is clockwise on screen)
+function rotv(x,y,rot){rot&=3;return rot===0?[x,y]:rot===1?[-y,x]:rot===2?[-x,-y]:[y,-x]}
+// Native-resolution piece, built on first use; at most HI_MAX kept (oldest dropped) so memory stays bounded.
+const HI_MAX_COUNT=420, HI_MAX_BYTES=96*1024*1024; let HI_MAX=HI_MAX_COUNT;
+function hiCanvas(p){
+  if(p.hi) return p.hi;
+  const c=document.createElement('canvas'); c.width=P.cw; c.height=P.ch;
+  const g=c.getContext('2d'); g.imageSmoothingQuality='high'; g.translate(P.m,P.m); drawLive(g,p,0,0);
+  p.hi=c; P.hi.push(p);
+  if(P.hi.length>HI_MAX){const old=P.hi.shift(); old.hi=null}
+  return c;
+}
+function drawLive(g,p,x,y){
+  const {lw,pw,ph}=P;
+  g.save(); g.translate(x,y);
+  g.save(); g.clip(p.path); g.drawImage(P.im,-p.c*pw,-p.r*ph);
+  g.lineWidth=lw*.7; g.lineJoin='round'; g.strokeStyle='rgba(0,0,0,.45)'; g.stroke(p.path);
+  g.restore(); g.restore();
+}
+
+/* ---------- hit test & groups ---------- */
+function hitTest(wx,wy,tol){
+  const {m,pw,ph}=P;
+  for(let k=P.z.length-1;k>=0;k--){
+    const g=P.groups.get(P.z[k]); if(g.locked||hiddenGroup(g)) continue;
+    for(const i of g.members){const p=P.pieces[i];
+      if(p.rot){ const cx=p.x+pw/2, cy=p.y+ph/2; if(Math.hypot(wx-cx,wy-cy)>Math.hypot(pw,ph)/2+m) continue;
+        const [lx,ly]=rotv(wx-cx,wy-cy,-p.rot); if(hitCtx.isPointInPath(p.path,lx+pw/2,ly+ph/2)) return g.id; continue; }
+      if(wx<p.x-m||wx>p.x+pw+m||wy<p.y-m||wy>p.y+ph+m) continue;
+      if(hitCtx.isPointInPath(p.path,wx-p.x,wy-p.y)) return g.id;
+    }
+  }
+  if(!tol) return null;
+  // fingers are wide: fall back to the nearest loose piece within tol (world units)
+  let best=null,bd=Infinity;
+  for(const g of P.groups.values()){ if(g.locked||hiddenGroup(g)) continue;
+    for(const i of g.members){const p=P.pieces[i];
+      const dx=Math.max(p.x-wx,0,wx-(p.x+pw)), dy=Math.max(p.y-wy,0,wy-(p.y+ph)), d=Math.hypot(dx,dy);
+      if(d<tol&&d<bd){bd=d;best=g.id}
+    }
+  }
+  return best;
+}
+function centreGroup(id){
+  const g=P.groups.get(id); if(!g||g.locked) return;
+  let x0=Infinity,y0=Infinity,x1=-Infinity,y1=-Infinity;
+  for(const i of g.members){const p=P.pieces[i];x0=Math.min(x0,p.x);y0=Math.min(y0,p.y);x1=Math.max(x1,p.x+P.pw);y1=Math.max(y1,p.y+P.ph)}
+  const jx=(Math.random()-.5)*P.pw, jy=(Math.random()-.5)*P.ph;
+  moveGroup(g,P.W/2-(x0+x1)/2+jx,P.H/2-(y0+y1)/2+jy); toTop(id); draw(); save();
+}
+function rotateGroup(id,steps){
+  steps=((steps||1)%4+4)%4; if(!steps) return;
+  const g=P.groups.get(id); if(!g||g.locked||P.paused||g.members.some(i=>P.pieces[i].inTray)) return;
+  let sx=0,sy=0; for(const i of g.members){sx+=P.pieces[i].x+P.pw/2;sy+=P.pieces[i].y+P.ph/2}
+  const C=[sx/g.members.length,sy/g.members.length];
+  for(const i of g.members){const p=P.pieces[i];const [rx,ry]=rotv(p.x+P.pw/2-C[0],p.y+P.ph/2-C[1],steps);p.x=C[0]+rx-P.pw/2;p.y=C[1]+ry-P.ph/2;p.rot=(p.rot+steps)&3}
+  toTop(id); countMove(); snap(id); updateProgress(); draw(); save(); if(!P.won&&isWon()) celebrate();
+}
+let lastTap={t:0,x:0,y:0,id:null};
+function toTop(id){const k=P.z.indexOf(id);if(k>=0)P.z.splice(k,1);P.z.push(id)}
+function moveGroup(g,dx,dy){for(const i of g.members){P.pieces[i].x+=dx;P.pieces[i].y+=dy}}
+function merge(into,from){
+  if(P.lastId===from.id) P.lastId=into.id;
+  for(const i of from.members){P.pieces[i].g=into.id;into.members.push(i)}
+  into.locked=into.locked||from.locked;
+  P.groups.delete(from.id); const k=P.z.indexOf(from.id); if(k>=0)P.z.splice(k,1);
+}
+function snap(id){
+  let g=P.groups.get(id), snapped=false;
+  const tol=P.s*.24, {pieces,cols,rows,pw,ph}=P;
+  let again=true;
+  while(again){
+    again=false;
+    for(const i of g.members){const p=pieces[i];
+      for(const[dr,dc]of[[-1,0],[1,0],[0,-1],[0,1]]){
+        const r=p.r+dr,c=p.c+dc; if(r<0||c<0||r>=rows||c>=cols) continue;
+        const q=pieces[r*cols+c]; if(q.g===g.id||q.rot!==p.rot||q.inTray) continue;
+        const [ox,oy]=rotv(dc*pw,dr*ph,p.rot);
+        const ex=(q.x-p.x)-ox, ey=(q.y-p.y)-oy;
+        if(Math.hypot(ex,ey)<tol){
+          const other=P.groups.get(q.g);
+          moveGroup(g,ex,ey);
+          if(other.locked){merge(other,g);g=other}else merge(g,other);
+          snapped=true; again=true; break;
+        }
+      }
+      if(again) break;
+    }
+  }
+  if(!g.locked){
+    // compare the group's centre with where its centre belongs; rotation does not move the centre
+    let cx=0,cy=0,tx=0,ty=0; for(const i of g.members){const p=pieces[i];cx+=p.x+pw/2;cy+=p.y+ph/2;tx+=p.c*pw+pw/2;ty+=p.r*ph+ph/2}
+    const n=g.members.length, ex=(tx-cx)/n, ey=(ty-cy)/n;
+    if(Math.hypot(ex,ey)<tol){
+      const rot=pieces[g.members[0]].rot;
+      if(rot){ const steps=(4-rot)&3, C=[cx/n,cy/n]; for(const i of g.members){const p=pieces[i];const [rx,ry]=rotv(p.x+pw/2-C[0],p.y+ph/2-C[1],steps);p.x=C[0]+rx-pw/2;p.y=C[1]+ry-ph/2;p.rot=0} }
+      const p=pieces[g.members[0]]; moveGroup(g,p.c*pw-p.x,p.r*ph-p.y); g.locked=true; snapped=true;
+    }
+  }
+  if(g.members.length===P.count&&!g.locked&&!pieces[0].rot){const p=pieces[0];moveGroup(g,-p.x,-p.y);g.locked=true}
+  if(g.locked){const k=P.z.indexOf(g.id);if(k>=0)P.z.splice(k,1);P.z.unshift(g.id)}
+  if(snapped) clack();
+  return snapped;
+}
+function isWon(){for(const g of P.groups.values()) if(!g.locked) return false; return true}
+function pct(){let k=0;for(const g of P.groups.values()) if(g.locked) k+=g.members.length; return Math.round(k/P.count*100)} // pieces locked in their correct place
+function countMove(){P.moves++;$('pMoves').textContent=fmtN(P.moves)+(P.moves===1?' move':' moves')}
+function updateProgress(){
+  $('pMoves').textContent=fmtN(P.moves)+(P.moves===1?' move':' moves');
+  const v=isWon()?100:Math.min(99,pct());
+  $('pProg').innerHTML=`<em>${v}%</em>`; $('pProg').title=`${fmtN(P.count-P.groups.size)} of ${fmtN(P.count-1)} joins made`;
+}
+
+/* ---------- sound ---------- */
+let ac=null, noiseBuf=null;
+function ensureAudio(){if(ac||!flags.sound)return;try{ac=new(window.AudioContext||window.webkitAudioContext)();const len=Math.floor(ac.sampleRate*.04);noiseBuf=ac.createBuffer(1,len,ac.sampleRate);const d=noiseBuf.getChannelData(0);for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,4)}catch(e){ac=null}}
+function clack(){if(!flags.sound||!ac)return;try{const s=ac.createBufferSource();s.buffer=noiseBuf;const f=ac.createBiquadFilter();f.type='bandpass';f.frequency.value=1800+Math.random()*500;f.Q.value=1.4;const g=ac.createGain();g.gain.value=.55;s.connect(f).connect(g).connect(ac.destination);s.start()}catch(e){}}
+
+/* ---------- pointer input ---------- */
+const ptrs=new Map(); let drag=null, pan=null, pinch=null;
+function local(e){const r=cv.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top]}
+function world(sx,sy){return[sx/cam.z+cam.x,sy/cam.z+cam.y]}
+function startPinch(){const[a,b]=[...ptrs.values()];const mx=(a.x+b.x)/2,my=(a.y+b.y)/2;return{d0:Math.hypot(a.x-b.x,a.y-b.y)||1,z0:cam.z,w:world(mx,my)}}
+function endDrag(cx,cy){
+  if(!drag) return; const id=drag.id, d=drag; drag=null; cv.classList.remove('grabbing'); $('tray').classList.remove('drop');
+  const g=P.groups.get(id);
+  if(g&&d.lift&&!d.moved){ moveGroup(g,0,d.lift); draw(); return; } // a tap, not a drag: put it back, no move counted
+  if(g&&cy!=null&&overTray(cy)&&g.members.length===1&&!g.locked){returnToTray(g.members[0],cx);return}
+  countMove(); if(P.groups.has(id)) snap(id);
+  updateProgress(); draw(); save();
+  if(!P.won&&isWon()) celebrate();
+}
+cv.addEventListener('pointerdown',e=>{
+  if(!P||P.paused) return; ensureAudio(); if(ac&&ac.state==='suspended') ac.resume();
+  try{cv.setPointerCapture(e.pointerId)}catch(_){}
+  const[sx,sy]=local(e); ptrs.set(e.pointerId,{x:sx,y:sy});
+  if(ptrs.size===2){ if(drag) endDrag(); pan=null; pinch=startPinch(); return; }
+  if(ptrs.size>2) return;
+  const touch=e.pointerType==='touch';
+  const panGesture=e.button===1||e.button===2||e.shiftKey; // middle/right button or Shift: always pans
+  if(panGesture){pan={x:sx,y:sy,cx:cam.x,cy:cam.y,pid:e.pointerId};return}
+  const[wx,wy]=world(sx,sy), id=hitTest(wx,wy,(touch?36:10)/cam.z); // a near miss still grabs the piece, so the table does not pan instead
+  const lift=touch?P.ph*.6+36/cam.z:0; // on touch, the piece rides above the fingertip
+  const now=performance.now(), dbl=id!=null&&id===lastTap.id&&now-lastTap.t<400&&Math.hypot(sx-lastTap.x,sy-lastTap.y)<24;
+  lastTap={t:now,x:sx,y:sy,id};
+  if(dbl){lastTap.id=null;if(P.hard)rotateGroup(id);else centreGroup(id);return}
+  if(id!=null){P.lastId=id;drag={id,x:wx,y:wy,pid:e.pointerId,lift,sx,sy,moved:false};toTop(id);if(lift)moveGroup(P.groups.get(id),0,-lift);cv.classList.add('grabbing');draw()}
+  else if(!flags.lock) pan={x:sx,y:sy,cx:cam.x,cy:cam.y,pid:e.pointerId};
+});
+cv.addEventListener('pointermove',e=>{
+  if(!P||!ptrs.has(e.pointerId)) return;
+  const[sx,sy]=local(e); ptrs.set(e.pointerId,{x:sx,y:sy});
+  if(pinch&&ptrs.size>=2){
+    const[a,b]=[...ptrs.values()], d=Math.hypot(a.x-b.x,a.y-b.y), mx=(a.x+b.x)/2,my=(a.y+b.y)/2;
+    cam.z=Math.min(maxZ(),Math.max(fitZ()*.35,pinch.z0*d/pinch.d0)); cam.x=pinch.w[0]-mx/cam.z; cam.y=pinch.w[1]-my/cam.z; draw(); return;
+  }
+  if(drag&&drag.pid===e.pointerId){const[wx,wy]=world(sx,sy);const g=P.groups.get(drag.id);if(!drag.moved&&Math.hypot(sx-drag.sx,sy-drag.sy)>6)drag.moved=true;moveGroup(g,wx-drag.x,wy-drag.y);drag.x=wx;drag.y=wy;$('tray').classList.toggle('drop',g.members.length===1&&overTray(e.clientY));draw()}
+  else if(pan&&pan.pid===e.pointerId){cam.x=pan.cx-(sx-pan.x)/cam.z;cam.y=pan.cy-(sy-pan.y)/cam.z;draw()}
+});
+function up(e){
+  if(!ptrs.has(e.pointerId)) return; ptrs.delete(e.pointerId);
+  if(drag&&drag.pid===e.pointerId) endDrag(e.clientX,e.clientY);
+  if(pan&&pan.pid===e.pointerId) pan=null;
+  if(pinch&&ptrs.size<2){pinch=null; if(ptrs.size===1&&!flags.lock){const[[pid,p]]=[...ptrs.entries()];pan={x:p.x,y:p.y,cx:cam.x,cy:cam.y,pid}}}
+}
+cv.addEventListener('pointerup',up); cv.addEventListener('pointercancel',up); cv.addEventListener('lostpointercapture',up);
+cv.addEventListener('contextmenu',e=>e.preventDefault());
+cv.addEventListener('wheel',e=>{e.preventDefault();const[sx,sy]=local(e);const dy=e.deltaMode===1?e.deltaY*16:e.deltaY;zoomAt(sx,sy,Math.exp(-dy*.0016))},{passive:false});
+
+/* ---------- toolbar ---------- */
+function setFlag(name,v){flags[name]=v;const b=$(name==='peek'?'peekBtn':name);if(b)b.setAttribute('aria-pressed',String(v));if(name==='peek')$('peek').hidden=!v;if(name==='sound')store.set('jig-sound',v);if(name==='lock')store.set('jig-lock',v);draw()}
+$('edges').onclick=()=>{setFlag('edges',!flags.edges);strip.classList.toggle('edges',flags.edges)};
+$('toTray').onclick=()=>{if(P)collectToTray()};
+$('tidy').onclick=()=>{if(P)tidy()};
+$('rotate').onclick=()=>{if(P&&P.lastId!=null&&P.groups.has(P.lastId))rotateGroup(P.lastId)};
+$('ghost').onclick=()=>setFlag('ghost',!flags.ghost);
+$('peekBtn').onclick=()=>setFlag('peek',!flags.peek);
+$('peek').onclick=()=>{$('bigImg').src=$('peekImg').src;$('big').hidden=false};
+$('big').onclick=()=>{$('big').hidden=true};
+$('sound').onclick=()=>{setFlag('sound',!flags.sound);if(flags.sound){ensureAudio();clack()}};
+$('lock').onclick=()=>setFlag('lock',!flags.lock);
+$('sort').onclick=()=>{if(P)spreadOut()};
+$('zFit').onclick=fit;
+$('zIn').onclick=()=>zoomAt(cv.clientWidth/2,cv.clientHeight/2,1.35);
+$('zOut').onclick=()=>zoomAt(cv.clientWidth/2,cv.clientHeight/2,1/1.35);
+let armTimer=null;
+let nextHard=null, hardArmTimer=null;
+function setHardUI(on){ $('rotate').hidden=!on; const b=$('hardBtn'); b.setAttribute('aria-pressed',String(!!on)); b.classList.remove('armed'); b.querySelector('.lbl').textContent='Hard'; }
+function untouched(){ return !!P&&P.moves===0&&P.pieces.every(p=>p.inTray); }
+$('hardBtn').onclick=()=>{
+  if(!P||P.paused||P.won) return; const b=$('hardBtn'), on=!P.hard;
+  if(untouched()){ // nothing played yet: switch in place, no restart needed
+    P.hard=on; for(const p of P.pieces) p.rot=on?1+Math.floor(Math.random()*3):0; setHardUI(on); buildTray(); draw(); save(); return;
+  }
+  if(!b.classList.contains('armed')){ b.classList.add('armed'); b.querySelector('.lbl').textContent=on?'Tap again: restart in hard mode':'Tap again: restart in normal mode'; clearTimeout(hardArmTimer); hardArmTimer=setTimeout(()=>setHardUI(P&&P.hard),3500); return; }
+  clearTimeout(hardArmTimer); nextHard=on; const{img,n,key}=P; store.del(key); setIdx(key,{done:false,pct:null}); P=null; syncPush(); openPuzzle(img,n);
+};
+$('restart').onclick=()=>{
+  const b=$('restart');
+  if(!b.classList.contains('armed')){b.classList.add('armed');b.querySelector('.lbl').textContent='Tap again to restart';b.setAttribute('aria-label','Tap again to confirm restart');clearTimeout(armTimer);armTimer=setTimeout(()=>{b.classList.remove('armed');b.querySelector('.lbl').textContent='Restart';b.removeAttribute('aria-label')},3500);return}
+  clearTimeout(armTimer); const{img,n,key}=P; store.del(key); setIdx(key,{done:false,pct:null}); P=null; syncPush(); openPuzzle(img,n);
+};
+$('back').onclick=leave; $('winBack').onclick=leave;
+$('winStay').onclick=()=>{$('win').hidden=true;$('confetti').hidden=true};
+function leave(){ openGen++; if(P){tick();save()} syncPush(); P=null; ptrs.clear(); drag=pan=pinch=trayDrag=null; strip.querySelectorAll('.tp').forEach(n=>n.remove()); $('play').hidden=true; $('gallery').hidden=false; renderGrid(); }
+document.addEventListener('keydown',e=>{
+  if($('play').hidden||!P||e.target.closest('input,textarea')) return;
+  if(P.paused&&e.key!=='Escape'){ if(e.key===' '||e.key==='Enter'){ e.preventDefault(); setPaused(false); } return; }
+  const k=e.key.toLowerCase();
+  if(k==='+'||k==='=') $('zIn').click(); else if(k==='-') $('zOut').click(); else if(k==='0') fit();
+  else if(k==='m') setLoupe(!loupeOn); else if(k==='e') $('edges').click(); else if(k==='g') $('ghost').click(); else if(k==='p') $('peekBtn').click(); else if(k==='s') $('sort').click(); else if(k==='t') $('toTray').click(); else if(k==='y') $('tidy').click(); else if(k==='l') $('lock').click(); else if(k==='r'&&P.hard) $('rotate').click();
+  else if(k==='f'){ if($('big').hidden){$('bigImg').src=$('peekImg').src;$('big').hidden=false} else $('big').hidden=true; }
+  else if(k==='escape'){ if(!$('big').hidden) $('big').hidden=true; else if(!$('win').hidden) $('winStay').click(); else if(flags.peek) setFlag('peek',false); }
+});
+
+/* ---------- timer & saving ---------- */
+function tick(){if(!P||P.won)return;const now=performance.now();if(document.visibilityState==='visible'&&!P.paused)P.elapsed+=now-P.started;P.started=now;$('pTime').textContent=fmtTime(P.elapsed)}
+function setPaused(on){ if(!P||P.won)return; tick(); P.paused=!!on; P.started=performance.now(); $('paused').hidden=!on; const b=$('pauseBtn'); b.setAttribute('aria-pressed',String(!!on)); b.setAttribute('aria-label',on?'Resume the timer':'Pause the timer'); b.title=b.getAttribute('aria-label'); $('pauseIco').setAttribute('d',on?'M8 5l11 7-11 7z':'M7 5h4v14H7zM13 5h4v14h-4z'); if(!on) draw(); }
+$('pauseBtn').onclick=e=>{setPaused(!(P&&P.paused)); e.currentTarget.blur();}; $('resumeBtn').onclick=()=>setPaused(false); $('pausedBack').onclick=()=>{setPaused(false);leave()};
+setInterval(tick,1000);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){if(P){tick();save()}syncPush(true)}else if(P)P.started=performance.now()});
+function save(){
+  if(!P) return;
+  if(P.won) return;
+  tick();
+  const p=new Array(P.count*2);P.pieces.forEach((q,i)=>{p[i*2]=Math.round(q.x*10)/10;p[i*2+1]=Math.round(q.y*10)/10});
+  const L=[];for(const g of P.groups.values())if(g.locked)L.push(g.id);
+  const ts=Date.now();
+  store.set(P.key,{v:1,u:ts,seed:P.seed,hard:P.hard,cols:P.cols,rows:P.rows,t:Math.round(P.elapsed),mv:P.moves,p,g:P.pieces.map(q=>q.g),L,z:P.z,tr:P.tray,ro:P.hard?P.pieces.map(q=>q.rot):undefined});
+  setIdx(P.key,{pct:pct(),hard:P.hard},ts);
+}
+
+/* ---------- finish ---------- */
+function celebrate(){
+  tick(); P.won=true;
+  const prev=idx()[P.key], best=prev&&prev.best?Math.min(prev.best,P.elapsed):P.elapsed;
+  const prevMv=prev&&prev.moves, bestMv=prevMv?Math.min(prevMv,P.moves):P.moves;
+  store.del(P.key); setIdx(P.key,{done:true,best:Math.round(best),moves:bestMv,pct:null,hard:P.hard}); syncPush();
+  $('pProg').innerHTML='<em>100%</em>';
+  $('winMsg').textContent=`${P.img.title}, ${fmtN(P.count)} pieces${P.hard?' (hard mode)':''}: ${fmtTime(P.elapsed)} and ${fmtN(P.moves)} moves.`;
+  $('win').hidden=false; fit();
+  if(!matchMedia('(prefers-reduced-motion: reduce)').matches) confetti();
+}
+function confetti(){
+  const c=$('confetti'),d=window.devicePixelRatio||1,w=c.parentElement.clientWidth,h=c.parentElement.clientHeight;c.hidden=false;c.width=w*d;c.height=h*d;
+  const g=c.getContext('2d');g.scale(d,d);
+  const cols=['#5b7fb8','#f1f2f4','#d8443c','#5d9be0','#a983ec','#e4ad4f'];
+  const bits=Array.from({length:160},()=>({x:Math.random()*w,y:-20-Math.random()*h*.5,vx:(Math.random()-.5)*2,vy:2+Math.random()*3,r:Math.random()*6.28,vr:(Math.random()-.5)*.3,s:5+Math.random()*7,c:cols[Math.random()*cols.length|0]}));
+  let t=0;(function f(){t++;g.clearRect(0,0,w,h);for(const b of bits){b.x+=b.vx;b.y+=b.vy;b.r+=b.vr;g.save();g.translate(b.x,b.y);g.rotate(b.r);g.fillStyle=b.c;g.fillRect(-b.s/2,-b.s/4,b.s,b.s/2);g.restore()}if(t<260&&!c.hidden)requestAnimationFrame(f);else{g.clearRect(0,0,w,h);c.hidden=true}})();
+}
+
+/* ---------- offline: cache every picture on demand ---------- */
+const OFFLINE_OK=('caches' in window)&&('serviceWorker' in navigator)&&!window.Capacitor&&location.protocol==='https:';
+function offlineUI(state){ const b=$('offlineBtn'); b.hidden=!OFFLINE_OK; const done=store.get('jig-offline')===IMAGES.length; b.classList.toggle('on',done&&!state); b.classList.toggle('busy',!!state); b.querySelector('span').textContent=state||(done?'Saved for offline':'Save for offline'); }
+async function saveOffline(){
+  if(!OFFLINE_OK) return; const b=$('offlineBtn'); if(b.classList.contains('busy')) return;
+  const urls=[]; for(const i of IMAGES){ urls.push('img/'+i.slug+'.jpg','thumbs/'+i.slug+'.jpg'); }
+  try{
+    const c=await caches.open('puzzle-parlor-media'); let n=0;
+    for(let k=0;k<urls.length;k+=6){ await Promise.all(urls.slice(k,k+6).map(async u=>{ if(!(await c.match(u))){ const r=await fetch(u,{cache:'no-store'}); if(r.ok) await c.put(u,r); } })); n=Math.min(urls.length,k+6); offlineUI(`Saving… ${Math.round(n/urls.length*100)}%`); }
+    store.set('jig-offline',IMAGES.length); offlineUI('');
+  }catch(e){ offlineUI(''); alert('Could not save everything for offline use. Check your connection and try again.'); }
+}
+$('offlineBtn').onclick=saveOffline; offlineUI('');
+
+/* ---------- unlock UI wiring ---------- */
+$('unlockBtn').onclick=()=>openUnlock(null);
+(()=>{const d=$('help'),f=$('helpForm'),m=$('helpMsg'),send=$('helpSend');
+function openHelp(){ closeUnlock(); m.textContent='';m.className=''; f.reset(); const L=lic.get(); if(L&&L.code) $('helpCode').value=L.code; d.hidden=false; $('helpEmail').focus(); }
+function closeHelp(){ d.hidden=true; }
+$('helpBtn').onclick=openHelp; $('unlockHelp').onclick=openHelp; $('unlockHelp2').onclick=openHelp; $('helpClose').onclick=closeHelp;
+d.addEventListener('click',e=>{ if(e.target===d) closeHelp(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!d.hidden) closeHelp(); });
+f.addEventListener('submit',async e=>{ e.preventDefault();
+  const email=$('helpEmail').value.trim(), message=$('helpText').value.trim();
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ m.textContent='Please enter the email address we should reply to.'; m.className='err'; $('helpEmail').focus(); return; }
+  if(message.length<5){ m.textContent='Please tell us a little about the problem.'; m.className='err'; $('helpText').focus(); return; }
+  send.disabled=true; m.textContent='Sending…'; m.className='';
+  try{ const r=await fetch(`${API_ROOT}api/contact`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({email,code:$('helpCode').value.trim(),message,website:$('helpSite').value,page:'app '+(window.Capacitor?'android':location.hostname)+' '+(P?('puzzle '+P.img.slug+' '+P.count):'gallery')})});
+    const j=await r.json().catch(()=>({}));
+    if(r.ok&&j.ok){ m.textContent='Sent. We will reply to '+email+'.'; setTimeout(closeHelp,2200); }
+    else if(r.status===429){ m.textContent='Too many messages from this connection. Please try again in an hour.'; m.className='err'; }
+    else { m.textContent='Could not send right now. You can also email puzzles@kandyphoenix.com.'; m.className='err'; }
+  }catch{ m.textContent='No connection. Please try again when you are online, or email puzzles@kandyphoenix.com.'; m.className='err'; }
+  send.disabled=false;
+});})();
+/* ---------- my photos: stored in IndexedDB on this device ---------- */
+const PHOTO_MAX=2400, PHOTO_MIN=500, THUMB_W=520;
+function pdb(){ return new Promise((res,rej)=>{ const r=indexedDB.open('puzzle-parlor-photos',1); r.onupgradeneeded=()=>r.result.createObjectStore('photos',{keyPath:'id'}); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }); }
+function ptx(mode,fn){ return pdb().then(db=>new Promise((res,rej)=>{ const t=db.transaction('photos',mode), st=t.objectStore('photos'); const q=fn(st); t.oncomplete=()=>{db.close();res(q&&q.result)}; t.onerror=()=>{db.close();rej(t.error)}; })); }
+function photoEntry(rec){ return {slug:'photo-'+rec.id,cat:'photos',title:rec.title,artist:'Your photo',year:'',w:rec.w,h:rec.h,photo:true,url:URL.createObjectURL(rec.full),thumbUrl:URL.createObjectURL(rec.thumb),added:rec.added}; }
+async function loadPhotos(){
+  if(!window.indexedDB) return;
+  try{ const recs=await ptx('readonly',st=>st.getAll())||[]; recs.sort((a,b)=>b.added-a.added); PHOTOS.length=0; for(const r of recs) PHOTOS.push(photoEntry(r)); }
+  catch(e){ console.warn('photos',e); }
+  if(cat==='photos') renderGrid(); renderTabs();
+}
+function toBlob(cv,q){ return new Promise(res=>cv.toBlob(res,'image/jpeg',q)); }
+async function importPhoto(file,title){
+  const bmp=await (window.createImageBitmap?createImageBitmap(file,{imageOrientation:'from-image'}).catch(()=>null):null);
+  let W,H,draw;
+  if(bmp){ W=bmp.width;H=bmp.height; draw=(g,w,h)=>g.drawImage(bmp,0,0,w,h); }
+  else { const url=URL.createObjectURL(file); const im=await loadImage(url); URL.revokeObjectURL(url); W=im.naturalWidth;H=im.naturalHeight; draw=(g,w,h)=>g.drawImage(im,0,0,w,h); }
+  if(Math.min(W,H)<PHOTO_MIN) throw new Error(`That picture is too small (${W}×${H}). Please choose one at least ${PHOTO_MIN} pixels on its short side.`);
+  if(Math.max(W,H)/Math.min(W,H)>2.5) throw new Error('That picture is too long and thin for a jigsaw. Please choose one closer to a 4:3 or 3:2 shape.');
+  const k=Math.min(1,PHOTO_MAX/Math.max(W,H)), w=Math.round(W*k), h=Math.round(H*k);
+  const cv=document.createElement('canvas'); cv.width=w; cv.height=h; const g=cv.getContext('2d'); g.imageSmoothingQuality='high'; draw(g,w,h);
+  const full=await toBlob(cv,.9);
+  const tw=Math.min(THUMB_W,w), th=Math.round(h*tw/w), tc=document.createElement('canvas'); tc.width=tw; tc.height=th; const tg=tc.getContext('2d'); tg.imageSmoothingQuality='high'; tg.drawImage(cv,0,0,tw,th);
+  const thumb=await toBlob(tc,.82);
+  if(bmp&&bmp.close) bmp.close();
+  const rec={id:(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2,8)),title:title||'My photo',w,h,full,thumb,added:Date.now()};
+  await ptx('readwrite',st=>st.put(rec));
+  if(navigator.storage&&navigator.storage.persist) navigator.storage.persist().catch(()=>{});
+  const e=photoEntry(rec); PHOTOS.unshift(e); return e;
+}
+async function removePhoto(slug){
+  const id=slug.slice(6); await ptx('readwrite',st=>st.delete(id));
+  const i=PHOTOS.findIndex(p=>p.slug===slug); if(i>=0){ URL.revokeObjectURL(PHOTOS[i].url); URL.revokeObjectURL(PHOTOS[i].thumbUrl); PHOTOS.splice(i,1); }
+  const ix=idx(); for(const k of Object.keys(ix)) if(k.startsWith('jig:'+slug+':')){ delete ix[k]; store.del(k); } store.set('jig-index',ix);
+  renderTabs(); renderGrid();
+}
+(()=>{const d=$('photoDlg'),file=$('photoFile'),prev=$('photoPrev'),name=$('photoName'),add=$('photoAdd'),m=$('photoMsg'); let chosen=null;
+window.openPhotoDlg=function(){ if(!unlocked()){openUnlock({title:'Your own photos'});return} chosen=null; file.value=''; name.value=''; prev.innerHTML='<span>No picture chosen yet</span>'; add.disabled=true; m.textContent='';m.className=''; d.hidden=false; };
+const close=()=>{ d.hidden=true; };
+$('photoPick').onclick=()=>file.click(); $('photoCancel').onclick=close; d.addEventListener('click',e=>{ if(e.target===d) close(); });
+file.onchange=()=>{ const f=file.files&&file.files[0]; if(!f) return; if(!/^image\//.test(f.type)){ m.textContent='That file is not a picture.'; m.className='err'; return; }
+  chosen=f; const url=URL.createObjectURL(f); prev.innerHTML=''; const im=new Image(); im.onload=()=>URL.revokeObjectURL(url); im.src=url; im.alt=''; prev.appendChild(im); add.disabled=false; m.textContent='';m.className='';
+  if(!name.value) name.value=(f.name||'My photo').replace(/\.[^.]+$/,'').replace(/[-_]+/g,' ').slice(0,60); name.focus(); name.select(); };
+add.onclick=async()=>{ if(!chosen) return; add.disabled=true; m.textContent='Preparing your picture…'; m.className='';
+  try{ const e=await importPhoto(chosen,name.value.trim()||'My photo'); close(); cat='photos'; store.set('jig-cat',cat); renderTabs(); renderGrid(); const first=$('grid').querySelector(`.box[data-slug="${e.slug}"]`); if(first) first.scrollIntoView({behavior:'smooth',block:'center'}); }
+  catch(err){ m.textContent=err.message||'Could not add that picture.'; m.className='err'; add.disabled=false; } };
+$('grid').addEventListener('click',e=>{ const b=e.target.closest('.rmphoto'); if(!b) return; if(!b.classList.contains('armed')){ b.classList.add('armed'); b.textContent='Tap again to remove'; setTimeout(()=>{b.classList.remove('armed');b.textContent='Remove photo'},3500); return; } removePhoto(b.dataset.rm); });
+loadPhotos();
+})();
+$('unlockGo').onclick=redeem; $('unlockClose').onclick=closeUnlock; $('unlockClose2').onclick=closeUnlock; $('unlockRemove').onclick=removeDevice;
+$('unlockInput').addEventListener('keydown',e=>{if(e.key==='Enter')redeem()});
+$('unlock').addEventListener('click',e=>{if(e.target.id==='unlock')closeUnlock()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('unlock').hidden)closeUnlock()});
+lockUI(); refreshLockConfig().then(recheckLicense);
+</script>
