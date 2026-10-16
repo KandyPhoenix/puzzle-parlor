@@ -6,7 +6,6 @@ vibes	silly-cow
 animals	tide-pool
 animals	penguin-beach
 sports	stadium-lights
-sports	drag-race
 christmas	bookshop-cafe
 landscapes	blossom-village
 animals	koi-pond
@@ -28,6 +27,4 @@ vibes	carnival-lights
 vibes	candy-factory
 sports	elk-hunt
 sports	alpine-trail
-sports	hunter-and-dog
 animals	safari-waterhole
-sports	regatta

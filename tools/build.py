@@ -56,6 +56,8 @@ D={
 'penguin-beach':("Penguin Beach Party","Original art",""),
 'stadium-lights':("Under the Stadium Lights","Original art",""),
 'drag-race':("Sunset Drag Race","Original art",""),
+'hunter-and-dog':("The Hunter and His Dog","Original art",""),
+'regatta':("Regatta Day","Original art",""),
 'bookshop-cafe':("The Bookshop Café","Original art",""),
 'blossom-village':("Cherry Blossom Village","Original art",""),
 'koi-pond':("Koi Pond at Dusk","Original art",""),
@@ -80,7 +82,7 @@ D={
 }
 meta={m['slug']:m for m in json.load(open('meta.json'))}
 rows=[l.rstrip('\n').split('\t') for l in open('list.tsv') if l.strip()]
-NEWC={'haunted-village':'halloween','monster-ball':'halloween','witch-kitchen':'halloween','midnight-graveyard':'halloween','fairytale-kingdom':'fairytales','gingerbread-house':'fairytales','santa-workshop':'christmas','gingerbread-village':'christmas','sleigh-over-town':'christmas','forest-picnic':'animals','cat-cafe':'animals','dog-park':'animals','grand-prix-street':'sports','tide-pool':'animals','penguin-beach':'animals','stadium-lights':'sports','drag-race':'sports','bookshop-cafe':'christmas','blossom-village':'landscapes','koi-pond':'animals','autumn-village':'holiday','savanna-sunset':'animals','aurora-lake':'landscapes','choose-happiness':'vibes','todays-forecast':'vibes','on-fire':'vibes','choose-peace':'vibes','silly-cow':'vibes','zen-garden':'vibes'}
+NEWC={'haunted-village':'halloween','monster-ball':'halloween','witch-kitchen':'halloween','midnight-graveyard':'halloween','fairytale-kingdom':'fairytales','gingerbread-house':'fairytales','santa-workshop':'christmas','gingerbread-village':'christmas','sleigh-over-town':'christmas','forest-picnic':'animals','cat-cafe':'animals','dog-park':'animals','grand-prix-street':'sports','tide-pool':'animals','penguin-beach':'animals','stadium-lights':'sports','drag-race':'sports','bookshop-cafe':'christmas','blossom-village':'landscapes','koi-pond':'animals','autumn-village':'holiday','savanna-sunset':'animals','aurora-lake':'landscapes','choose-happiness':'vibes','todays-forecast':'vibes','on-fire':'vibes','choose-peace':'vibes','silly-cow':'vibes','zen-garden':'vibes','hunter-and-dog':'sports','regatta':'sports'}
 NEW=list(NEWC)
 for n in NEW: meta[n]={'lic':'Original','page':''}
 QUEUED=set(l.strip().split('\t')[1] for l in open('queued.txt') if l.strip()) if os.path.exists('queued.txt') else set()
