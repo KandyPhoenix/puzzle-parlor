@@ -37,3 +37,4 @@ fantasy	wreck-divers
 vibes	poker-dogs
 fantasy	dino-valley
 landscapes	lost-temple
+fantasy	temple-chamber
