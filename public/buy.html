@@ -76,11 +76,11 @@ h2{font-family:var(--display);font-weight:400;font-size:clamp(28px,4.2vw,40px);l
 .themes{padding:70px 0 20px}
 .mood2{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start}
 .mood2 .strip{grid-template-columns:repeat(3,1fr)}
-.brain{position:relative;border-radius:22px;padding:30px 28px 26px;background:linear-gradient(160deg,#fff7e6 0%,#fff 55%,#f3ecff 100%);border:2px solid rgba(242,177,52,.55);box-shadow:0 2px 4px rgba(28,30,38,.05),0 24px 44px -30px rgba(28,30,38,.4);overflow:hidden}
-.brain::after{content:"🧠";position:absolute;right:18px;top:14px;font-size:44px;opacity:.9}
-.brain h2{font-size:28px;margin:0 0 14px;padding-right:50px}
+.brain{padding:0}
+.brain h2{font-size:30px;margin:0 0 14px}
 .brain p{color:var(--ink);font-size:16px;line-height:1.55;margin:0 0 14px}
 .brain p:last-child{margin-bottom:0}
+.brain p.fine{font-size:13px;color:var(--muted)}
 .brain a{color:var(--gold2);font-weight:700}
 @media(max-width:900px){.mood2{grid-template-columns:1fr}}
 
@@ -225,10 +225,12 @@ dialog#contact::backdrop{background:rgba(18,21,43,.72);backdrop-filter:blur(4px)
     </div>
     </div>
     <aside class="brain" id="brain">
-      <span class="kicker">Good For A Busy Mind</span>
-      <h2>A Hobby That Keeps Your Mind Working</h2>
-      <p>Jigsaws ask a lot of you in a quiet way: matching colours and shapes, holding the whole picture in your head, and spotting the small differences between pieces that look the same. Researchers are increasingly interested in mentally stimulating hobbies as part of healthy ageing. A 2026 University of Southampton trial of more than 11,000 adults aged 60 to 85, published in The Lancet Primary Care, found that pointing people towards brain-stimulating activities, puzzles among them, made a measurable difference to cognitive impairment after a year. <a href="https://www.southampton.ac.uk/news/2026/09/proof-that-puzzles-can-reverse-cognitive-impairment.page" target="_blank" rel="noopener">Read the university&rsquo;s summary</a>.</p>
-      <p>We make no medical claims, and Puzzle Parlor is not a treatment for anything. It is a jigsaw table that is easy on the eyes and kind to your time: pieces you can make large, a magnifier for the fiddly bits, no clock unless you want one, no ads, and nothing lost if you walk away for a week. Many people play a little most days, and that is the whole idea.</p>
+      <span class="kicker">Built For Brain Health</span>
+      <h2>Exercise For Your Mind, Every Day</h2>
+      <p>A jigsaw is a full workout for the brain. Every piece asks you to compare colours, read shapes, hold the whole picture in your memory and plan where to look next, all at once. That is exactly the kind of mentally demanding, enjoyable activity that researchers now link to sharper thinking in later life.</p>
+      <p>The evidence is building. In 2026 the University of Southampton published a trial in The Lancet Primary Care of more than 11,000 adults aged 60 to 85 who already had some cognitive impairment. Those who were steered towards brain-stimulating activities such as puzzles were measurably more likely to have no cognitive impairment a year later than those who were not. <a href="https://www.southampton.ac.uk/news/2026/09/proof-that-puzzles-can-reverse-cognitive-impairment.page" target="_blank" rel="noopener">Read the university&rsquo;s summary of the findings</a>.</p>
+      <p>Puzzle Parlor is designed to make that daily habit easy to keep: pieces you can make large, a magnifier for the fine detail, no ads, no clock unless you want one, and progress that waits for you. Twenty minutes a day is a habit most people can keep, and the full library means there is always a fresh picture to come back to.</p>
+      <p class="fine">Puzzle Parlor is a game, not a medical treatment. Talk to a doctor about any concerns about memory or thinking.</p>
     </aside>
   </div>
 </section>
