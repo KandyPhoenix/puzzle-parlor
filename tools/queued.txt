@@ -29,3 +29,4 @@ sports	elk-hunt
 sports	alpine-trail
 animals	safari-waterhole
 fantasy	rooftop-heroes
+fantasy	heroes-at-night
