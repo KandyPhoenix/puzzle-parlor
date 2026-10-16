@@ -21,3 +21,4 @@ fantasy	pirate-deck
 fairytales	wandering-bookshop
 fantasy	cloud-village
 fantasy	captains-cabin
+fantasy	smugglers-cove
