@@ -29,3 +29,4 @@ vibes	candy-factory
 sports	elk-hunt
 sports	alpine-trail
 sports	hunter-and-dog
+animals	safari-waterhole
