@@ -11,7 +11,7 @@ Relaxing jigsaw puzzles, 100 to 1,000 pieces, with sharp zoom and cross-device s
 
 Puzzle Parlor is a calm, beautifully made jigsaw puzzle app for phones and tablets.
 
-Choose from Halloween scenes, cozy Christmas and holiday pictures, classic paintings, fantasy worlds, fairy tales and landscapes. Every puzzle can be played at 100, 150, 200, 300, 400, 500, 750 or 1,000 pieces, so it suits a quick phone session or a long tablet evening.
+Choose from Halloween scenes, cozy Christmas and holiday pictures, classic paintings, action and adventure scenes, fairy tales, landscapes, animals and sports. Every puzzle can be played at 100, 150, 200, 300, 400, 500, 750 or 1,000 pieces, so it suits a quick phone session or a long tablet evening.
 
 Features
 • Full-resolution pieces that stay sharp however far you zoom in
