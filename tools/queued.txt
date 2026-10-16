@@ -31,3 +31,4 @@ animals	safari-waterhole
 fantasy	rooftop-heroes
 fantasy	heroes-at-night
 fantasy	firehouse-heroes
+fantasy	mountain-rescue
