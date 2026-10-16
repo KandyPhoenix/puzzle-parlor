@@ -28,3 +28,4 @@ vibes	candy-factory
 sports	elk-hunt
 sports	alpine-trail
 animals	safari-waterhole
+fantasy	rooftop-heroes
