@@ -23,4 +23,5 @@ fantasy	cloud-village
 fantasy	captains-cabin
 fantasy	smugglers-cove
 fantasy	sunken-treasure
-vibes	county-fair
+vibes	crooked-town
+vibes	carnival-lights
