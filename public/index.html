@@ -421,7 +421,8 @@ const EGGS={
   'carnival-lights':{fin:'fireworks'},
   'monster-ball':{hot:{x:.0,y:.70,w:.15,h:.14,msg:'Someone spiked the punch! The brew is bubbling…',color:'120,255,120'},fin:'party'},
   'witch-kitchen':{hot:{x:.41,y:.52,w:.23,h:.26,msg:'The cauldron is bubbling. Something is cooking…',color:'140,255,120'},fin:'brew',glow:{x:.52,y:.62}},
-  'haunted-village':{hot:{x:.52,y:.03,w:.22,h:.28,msg:'The lights are on in the haunted house. Somebody is home…',color:'255,170,60'},fin:'haunt',glow:{x:.62,y:.2}}
+  'haunted-village':{hot:{x:.52,y:.03,w:.22,h:.28,msg:'The lights are on in the haunted house. Somebody is home…',color:'255,170,60'},fin:'haunt',glow:{x:.62,y:.2},
+    fx:{pumpkins:[[.05,.83,.07],[.07,.9,.07],[.04,.96,.06],[.28,.67,.05],[.63,.7,.06],[.67,.77,.05],[.71,.71,.05],[.94,.51,.05],[.6,.52,.03]],lamps:[[.16,.84],[.33,.55],[.84,.55],[.97,.4],[.93,.62]],windows:[[.2,.49],[.18,.58],[.35,.5],[.42,.47],[.49,.52]],house:{x:.52,y:.05,w:.22,h:.25,win:[[.575,.22],[.62,.17],[.665,.22],[.6,.27],[.64,.27]]},cauldron:{x:.78,y:.83},moon:{x:.37,y:.16,r:.11}}}
 };
 const FREE_PER_CAT=2, FREE=new Set();
 {const seen={}; for(const i of IMAGES){seen[i.cat]=(seen[i.cat]||0)+1; if(seen[i.cat]<=FREE_PER_CAT) FREE.add(i.slug);}}
@@ -1083,8 +1084,8 @@ function drawEggFx(z){
   ctx.restore(); draw();
 }
 // a soft, translucent ghost: smooth bezier body, wavy hem that ripples, glow, gentle eyes
-function drawGhost(g,x,y,s,a,ph){
-  g.save(); g.translate(x,y); g.globalAlpha=a*.55; g.shadowColor='rgba(200,230,255,.7)'; g.shadowBlur=s*.5;
+function drawGhost(g,x,y,s,a,ph,tilt){
+  g.save(); g.translate(x,y); if(tilt) g.rotate(tilt); g.globalAlpha=a*.55; g.shadowColor='rgba(200,230,255,.7)'; g.shadowBlur=s*.5;
   const w=s*.34, hm=s*1.55, k=Math.sin(ph*2)*s*.08, k2=Math.cos(ph*1.4)*s*.07;
   g.beginPath(); g.moveTo(-w,0);
   g.bezierCurveTo(-w,-s*.8,-w*.5,-s,0,-s); g.bezierCurveTo(w*.5,-s,w,-s*.8,w,0);
@@ -1108,8 +1109,8 @@ function eggFinish(kind,e){
   const c=$('confetti'),d=window.devicePixelRatio||1,w=c.parentElement.clientWidth,h=c.parentElement.clientHeight;c.hidden=false;c.width=w*d;c.height=h*d;
   const g=c.getContext('2d');g.scale(d,d);
   const rect=()=>({x:-cam.x*cam.z,y:-cam.y*cam.z,w:P.W*cam.z,h:P.H*cam.z});
-  const t0=performance.now(), life={coins:10000,snow:18000,fireworks:12000,party:17000,brew:14000,haunt:16000}[kind]; let parts=[], rockets=[], nextLaunch=t0+300, nextBolt=t0+900, lastBlub=0;
-  const cam0={x:cam.x,y:cam.y,z:cam.z}; const bats=kind==='haunt'||kind==='brew'?Array.from({length:kind==='haunt'?9:4},()=>({x:Math.random(),y:.05+Math.random()*.3,v:(.0025+Math.random()*.003)*(Math.random()<.5?1:-1),ph:Math.random()*6,s:8+Math.random()*8})):[];
+  const t0=performance.now(), life={coins:10000,snow:18000,fireworks:12000,party:17000,brew:14000,haunt:20000}[kind]; let parts=[], rockets=[], sparks=[], nextLaunch=t0+300, nextBolt=t0+900, lastBlub=0;
+  const cam0={x:cam.x,y:cam.y,z:cam.z}; const bats=kind==='haunt'||kind==='brew'?Array.from({length:kind==='haunt'?14:4},()=>({x:Math.random(),y:.05+Math.random()*.3,v:(.0025+Math.random()*.003)*(Math.random()<.5?1:-1),ph:Math.random()*6,s:8+Math.random()*8})):[];
   if(kind==='party') eggTune();
   if(kind==='coins') parts=Array.from({length:110},()=>({x:Math.random()*w,y:-40-Math.random()*h*1.2,vy:2.4+Math.random()*3.2,vx:(Math.random()-.5),ph:Math.random()*6.28,sp:.1+Math.random()*.12,s:6+Math.random()*7}));
   if(kind==='snow') parts=Array.from({length:240},()=>({x:Math.random()*w,y:Math.random()*h,vy:.5+Math.random()*1.1,ph:Math.random()*6.28,s:1.4+Math.random()*2.6,a:.5+Math.random()*.5}));
@@ -1151,15 +1152,38 @@ function eggFinish(kind,e){
       g.restore(); g.globalAlpha=1;
       drawBats(g,R,bats);
     } else if(kind==='haunt'){
-      // lightning now and then, ghosts drifting up out of the village, bats across the moon, pumpkins flickering
-      if(now>nextBolt&&t<life-2500){ nextBolt=now+2200+Math.random()*3000; parts.push({bolt:true,l:1}); eggSfx('thunder'); if(Math.random()<.5) eggSfx('spook'); }
-      if(Math.random()<.03&&t<life-4000) parts.push({ghost:true,x:R.x+R.w*(.1+Math.random()*.8),y:R.y+R.h*(.5+Math.random()*.4),vy:-(.3+Math.random()*.35),ph:Math.random()*6,s:12+Math.random()*12,l:1});
-      if(Math.random()<.4) parts.push({x:R.x+Math.random()*R.w,y:R.y+R.h*(.45+Math.random()*.55),l:1,tw:true});
+      const F=e.fx, px=f=>R.x+f*R.w, py=f=>R.y+f*R.h, S=Math.max(R.w,R.h), flick=(k,sp)=>.75+.25*Math.sin(t/sp+k*7)*Math.sin(t/(sp*.37)+k*3);
+      // 1. moon breathes, pumpkins and lanterns glow and flicker, cottage windows warm up
+      g.save(); g.globalCompositeOperation='lighter';
+      const mr=F.moon.r*S*(1.1+.08*Math.sin(t/900)), mg=g.createRadialGradient(px(F.moon.x),py(F.moon.y),mr*.5,px(F.moon.x),py(F.moon.y),mr*1.6); mg.addColorStop(0,'rgba(255,200,90,.22)'); mg.addColorStop(1,'rgba(255,200,90,0)'); g.fillStyle=mg; g.beginPath(); g.arc(px(F.moon.x),py(F.moon.y),mr*1.6,0,6.2832); g.fill();
+      F.pumpkins.forEach(([x,y,r],k)=>{ const rr=r*S*(1.3+.35*flick(k,170)), gr=g.createRadialGradient(px(x),py(y),0,px(x),py(y),rr); gr.addColorStop(0,`rgba(255,150,30,${.55*flick(k,170)})`); gr.addColorStop(.5,'rgba(255,110,20,.18)'); gr.addColorStop(1,'rgba(255,110,20,0)'); g.fillStyle=gr; g.beginPath(); g.arc(px(x),py(y),rr,0,6.2832); g.fill(); });
+      F.lamps.forEach(([x,y],k)=>{ const rr=S*.035*(1+.2*flick(k,260)), gr=g.createRadialGradient(px(x),py(y),0,px(x),py(y),rr); gr.addColorStop(0,'rgba(255,220,140,.5)'); gr.addColorStop(1,'rgba(255,220,140,0)'); g.fillStyle=gr; g.beginPath(); g.arc(px(x),py(y),rr,0,6.2832); g.fill(); });
+      F.windows.forEach(([x,y],k)=>{ const rr=S*.03, gr=g.createRadialGradient(px(x),py(y),0,px(x),py(y),rr); gr.addColorStop(0,`rgba(255,200,100,${.35*flick(k,400)})`); gr.addColorStop(1,'rgba(255,200,100,0)'); g.fillStyle=gr; g.beginPath(); g.arc(px(x),py(y),rr,0,6.2832); g.fill(); });
+      // 2. the haunted house: windows strobe between orange and sickly green, and the whole house pulses when it is "awake"
+      const H=F.house, awake=Math.sin(t/1400)>.3, hb=Math.max(0,Math.sin(t/180));
+      H.win.forEach(([x,y],k)=>{ const on=awake?(Math.sin(t/90+k*2)>0):true, col=awake&&on?'120,255,120':'255,170,60', rr=S*.028*(awake?1.3:1), gr=g.createRadialGradient(px(x),py(y),0,px(x),py(y),rr); gr.addColorStop(0,`rgba(${col},${awake?.8:.45})`); gr.addColorStop(1,`rgba(${col},0)`); g.fillStyle=gr; g.beginPath(); g.arc(px(x),py(y),rr,0,6.2832); g.fill(); });
+      if(awake){ const gr=g.createRadialGradient(px(H.x+H.w/2),py(H.y+H.h/2),0,px(H.x+H.w/2),py(H.y+H.h/2),S*.2); gr.addColorStop(0,`rgba(120,255,120,${.18*hb})`); gr.addColorStop(1,'rgba(120,255,120,0)'); g.fillStyle=gr; g.fillRect(R.x,R.y,R.w,R.h); }
+      // 3. the cauldron bubbles and belches green smoke
+      const cx=px(F.cauldron.x), cy=py(F.cauldron.y), cg=g.createRadialGradient(cx,cy,0,cx,cy,S*.09*(1+.15*Math.sin(t/220))); cg.addColorStop(0,'rgba(140,255,120,.5)'); cg.addColorStop(1,'rgba(140,255,120,0)'); g.fillStyle=cg; g.beginPath(); g.arc(cx,cy,S*.14,0,6.2832); g.fill();
+      g.restore();
+      if(now-lastBlub>110&&t<life-2500){ lastBlub=now; parts.push({bub:true,x:cx+(Math.random()-.5)*R.w*.07,y:cy-R.h*.02,vy:-(.5+Math.random()*1),vx:(Math.random()-.5)*.5,s:2+Math.random()*5,l:1}); if(Math.random()<.2) eggSfx('blub'); }
+      // 4. ghosts come out in sets, swaying like pendulums, from the graveyard and the house
+      const waves=[1200,5200,9200,13000]; for(const wt of waves) if(t>=wt&&t<wt+40&&!parts.some(q=>q.wave===wt)){ const n=3+Math.floor(Math.random()*2); for(let k=0;k<n;k++){ const fromHouse=Math.random()<.4; parts.push({ghost:true,wave:wt,x:fromHouse?px(H.x+H.w*(.3+Math.random()*.4)):px(.55+Math.random()*.4),y:fromHouse?py(H.y+H.h*.6):py(.45+Math.random()*.35),vy:-(.22+Math.random()*.25),ph:Math.random()*6,sw:.9+Math.random()*.8,amp:18+Math.random()*22,s:12+Math.random()*12,l:1,born:now+k*350}); } if(Math.random()<.7) eggSfx('spook'); }
+      // 5. lightning: a jagged bolt strikes behind the house, the sky flashes, thunder rolls
+      if(now>nextBolt&&t<life-2500){ nextBolt=now+2600+Math.random()*3200; const bx=px(H.x+H.w*(.2+Math.random()*.6)), pts=[[bx+(Math.random()-.5)*R.w*.3,R.y]]; let y=R.y; while(y<py(H.y+.05)){ y+=R.h*.05; pts.push([bx+(Math.random()-.5)*R.w*.08,y]); } parts.push({bolt:true,pts,l:1}); eggSfx('thunder'); }
+      g.save();
       for(let i=parts.length-1;i>=0;i--){ const b=parts[i];
-        if(b.bolt){ b.l-=.18; if(b.l<=0){parts.splice(i,1);continue} g.fillStyle=`rgba(255,255,255,${.75*b.l})`; g.fillRect(R.x,R.y,R.w,R.h); g.fillStyle=`rgba(255,255,255,${.25*b.l})`; g.fillRect(0,0,w,h); continue; }
-        if(b.ghost){ b.y+=b.vy; b.ph+=.045; b.x+=Math.sin(b.ph)*.6; b.l-=.0035; if(b.l<=0||b.y<R.y){parts.splice(i,1);continue}
-          drawGhost(g,b.x,b.y,b.s*1.6,Math.min(1,b.l*1.5)*.8,b.ph); continue; }
-        b.l-=.07; if(b.l<=0){parts.splice(i,1);continue} g.save(); g.globalCompositeOperation='lighter'; g.globalAlpha=b.l; g.fillStyle='rgba(255,160,40,.9)'; g.beginPath(); g.arc(b.x,b.y,3.5,0,6.2832); g.fill(); g.restore(); }
+        if(b.bolt){ b.l-=.09; if(b.l<=0){parts.splice(i,1);continue} g.fillStyle=`rgba(255,255,255,${.55*b.l})`; g.fillRect(R.x,R.y,R.w,R.h*.6); g.fillStyle=`rgba(230,235,255,${.18*b.l})`; g.fillRect(0,0,w,h);
+          if(b.l>.5){ g.lineJoin='round'; g.lineCap='round'; g.shadowColor='rgba(200,220,255,1)'; g.shadowBlur=18; g.strokeStyle=`rgba(255,255,255,${b.l})`; g.lineWidth=3.5; g.beginPath(); b.pts.forEach(([x,y],k)=>k?g.lineTo(x,y):g.moveTo(x,y)); g.stroke(); g.lineWidth=1.2; g.strokeStyle='rgba(180,210,255,1)'; g.stroke(); g.shadowBlur=0; } continue; }
+        if(b.ghost){ if(now<b.born) continue; b.y+=b.vy; b.ph+=.035*b.sw; b.l-=.0032; if(b.l<=0||b.y<R.y-b.s*2){parts.splice(i,1);continue}
+          const sway=Math.sin(b.ph); drawGhost(g,b.x+sway*b.amp,b.y,b.s*1.6,Math.min(1,b.l*1.5)*.85,b.ph,sway*.22); continue; }
+        if(b.bub){ b.y+=b.vy; b.x+=b.vx+Math.sin(b.y/12)*.4; b.s+=.04; b.l-=.012; if(b.l<=0){parts.splice(i,1);continue} g.globalAlpha=b.l*.85; g.fillStyle='rgba(170,255,140,.7)'; g.beginPath(); g.arc(b.x,b.y,b.s,0,6.2832); g.fill(); g.strokeStyle='rgba(230,255,200,.9)'; g.lineWidth=1; g.stroke(); g.globalAlpha=1; continue; }
+        parts.splice(i,1); }
+      g.restore();
+      // 6. sparks drift up from the pumpkins and the cauldron
+      if(Math.random()<.5){ const [x,y]=F.pumpkins[Math.random()*F.pumpkins.length|0]; sparks.push({x:px(x),y:py(y),vy:-(.3+Math.random()*.5),vx:(Math.random()-.5)*.4,l:1,c:'255,170,60'}); }
+      if(Math.random()<.4) sparks.push({x:cx+(Math.random()-.5)*20,y:cy,vy:-(.6+Math.random()*.6),vx:(Math.random()-.5)*.6,l:1,c:'160,255,140'});
+      g.save(); g.globalCompositeOperation='lighter'; for(let i=sparks.length-1;i>=0;i--){ const k=sparks[i]; k.x+=k.vx; k.y+=k.vy; k.l-=.012; if(k.l<=0){sparks.splice(i,1);continue} g.fillStyle=`rgba(${k.c},${k.l})`; g.beginPath(); g.arc(k.x,k.y,1.6,0,6.2832); g.fill(); } g.restore();
       drawBats(g,R,bats);
     } else {
       if(now>nextLaunch&&t<life-3000){ rockets.push({x:R.x+R.w*(.1+Math.random()*.8),y:R.y+R.h,ty:R.y+R.h*(.08+Math.random()*.45),v:-(7+Math.random()*3)}); nextLaunch=now+450+Math.random()*650; }
