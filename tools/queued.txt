@@ -18,3 +18,4 @@ christmas	gingerbread-village
 christmas	castle-village
 fantasy	treasure-cove
 fantasy	pirate-deck
+fairytales	wandering-bookshop
