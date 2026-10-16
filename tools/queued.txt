@@ -39,3 +39,4 @@ fantasy	dino-valley
 landscapes	lost-temple
 fantasy	temple-chamber
 fantasy	castle-siege
+fantasy	broadside
