@@ -36,3 +36,4 @@ sports	speedway-sunset
 fantasy	wreck-divers
 vibes	poker-dogs
 fantasy	dino-valley
+landscapes	lost-temple
