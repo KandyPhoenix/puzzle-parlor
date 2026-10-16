@@ -26,3 +26,6 @@ fantasy	sunken-treasure
 vibes	crooked-town
 vibes	carnival-lights
 vibes	candy-factory
+sports	elk-hunt
+sports	alpine-trail
+sports	hunter-and-dog
