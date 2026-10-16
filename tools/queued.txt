@@ -25,3 +25,4 @@ fantasy	smugglers-cove
 fantasy	sunken-treasure
 vibes	crooked-town
 vibes	carnival-lights
+vibes	candy-factory
