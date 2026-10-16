@@ -34,3 +34,4 @@ fantasy	firehouse-heroes
 fantasy	mountain-rescue
 sports	speedway-sunset
 fantasy	wreck-divers
+vibes	poker-dogs
