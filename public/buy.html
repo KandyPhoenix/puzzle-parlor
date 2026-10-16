@@ -74,6 +74,17 @@ h2{font-family:var(--display);font-weight:400;font-size:clamp(28px,4.2vw,40px);l
 .caps span{color:rgba(255,255,255,.75);font-size:15px}
 /* themes */
 .themes{padding:70px 0 20px}
+.mood2{display:grid;grid-template-columns:1.1fr .9fr;gap:34px;align-items:start}
+.mood2 .strip{grid-template-columns:repeat(4,1fr)}
+.brain{position:relative;border-radius:22px;padding:30px 28px 26px;background:linear-gradient(160deg,#fff7e6 0%,#fff 55%,#f3ecff 100%);border:2px solid rgba(242,177,52,.55);box-shadow:0 2px 4px rgba(28,30,38,.05),0 30px 60px -28px rgba(255,140,66,.55);overflow:hidden}
+.brain::before{content:"";position:absolute;inset:-2px;border-radius:24px;background:linear-gradient(135deg,var(--gold),var(--gold2),var(--lav));z-index:-1;filter:blur(18px);opacity:.35}
+.brain::after{content:"🧠";position:absolute;right:18px;top:14px;font-size:44px;opacity:.9}
+.brain h2{font-size:28px;margin:0 0 14px;padding-right:50px}
+.brain p{color:var(--ink);font-size:16px;line-height:1.55;margin:0 0 14px}
+.brain p:last-child{margin-bottom:0}
+.brain a{color:var(--gold2);font-weight:700}
+@media(max-width:900px){.mood2{grid-template-columns:1fr}}
+
 .strip{display:grid;grid-template-columns:repeat(7,1fr);gap:12px;margin-top:24px}
 .strip a{position:relative;display:block;aspect-ratio:3/4;border-radius:14px;overflow:hidden;text-decoration:none;box-shadow:0 18px 40px -22px rgba(0,0,0,.6);transition:transform .2s ease}
 .strip a:hover{transform:translateY(-4px)}
@@ -194,10 +205,11 @@ dialog#contact::backdrop{background:rgba(18,21,43,.72);backdrop-filter:blur(4px)
 </section>
 
 <section class="themes">
-  <div class="wrap">
-    <span class="kicker">Seven themes, dozens of pictures</span>
-    <h2>Pick A Mood</h2>
-    <div class="strip">
+  <div class="wrap mood2">
+    <div>
+      <span class="kicker">Seven themes, dozens of pictures</span>
+      <h2>Pick A Mood</h2>
+      <div class="strip">
       <a href="./"><img src="thumbs/witch-kitchen.jpg" alt=""><span>Halloween</span></a>
       <a href="./"><img src="thumbs/gingerbread-village.jpg" alt=""><span>Christmas</span></a>
       <a href="./"><img src="thumbs/bethlehem.jpg" alt=""><span>Holidays</span></a>
@@ -207,6 +219,13 @@ dialog#contact::backdrop{background:rgba(18,21,43,.72);backdrop-filter:blur(4px)
       <a href="./"><img src="thumbs/yellowstone.jpg" alt=""><span>Landscapes</span></a>
       <a href="./"><img src="thumbs/forest-picnic.jpg" alt=""><span>Animals</span></a>
     </div>
+    </div>
+    <aside class="brain" id="brain">
+      <span class="kicker">Good For A Busy Mind</span>
+      <h2>A Hobby That Keeps Your Mind Working</h2>
+      <p>Jigsaws ask a lot of you in a quiet way: matching colours and shapes, holding the whole picture in your head, and spotting the small differences between pieces that look the same. Researchers are increasingly interested in mentally stimulating hobbies as part of healthy ageing. A 2026 University of Southampton trial of more than 11,000 adults aged 60 to 85, published in The Lancet Primary Care, found that pointing people towards brain-stimulating activities, puzzles among them, made a measurable difference to cognitive impairment after a year. <a href="https://www.southampton.ac.uk/news/2026/09/proof-that-puzzles-can-reverse-cognitive-impairment.page" target="_blank" rel="noopener">Read the university&rsquo;s summary</a>.</p>
+      <p>We make no medical claims, and Puzzle Parlor is not a treatment for anything. It is a jigsaw table that is easy on the eyes and kind to your time: pieces you can make large, a magnifier for the fiddly bits, no clock unless you want one, no ads, and nothing lost if you walk away for a week. Many people play a little most days, and that is the whole idea.</p>
+    </aside>
   </div>
 </section>
 
@@ -305,15 +324,6 @@ dialog#contact::backdrop{background:rgba(18,21,43,.72);backdrop-filter:blur(4px)
     <h2>Online Jigsaw Puzzles That Feel Like The Real Thing</h2>
     <p class="sub" style="max-width:760px">Most free jigsaw puzzle apps are built for a phone screen: tiny pieces, ads between every puzzle, and pictures that blur the moment you zoom. Puzzle Parlor is built for the way people actually do jigsaws, on an iPad or a computer with a cup of tea, over a few evenings. Every picture is stored at full resolution, so a 1,000-piece puzzle stays sharp when you lean in to match a brushstroke. The piece tray keeps loose pieces sorted along the bottom, the table locks so nothing slides while you work, and your progress is saved the moment you place a piece.</p>
     <p class="sub" style="max-width:760px">There are seasonal jigsaw puzzles for Halloween and Christmas, classic paintings by Van Gogh, Monet, Hokusai and Klimt, fantasy and fairy-tale scenes, and sweeping landscapes, each playable at 100, 150, 200, 300, 400, 500, 750 or 1,000 pieces. It works in any browser with nothing to install, can be added to your home screen like an app, and plays offline. The free version has no time limit, and the full version is a single $2.99 purchase with no subscription and no ads.</p>
-  </div>
-</section>
-
-<section class="feat" id="brain">
-  <div class="wrap">
-    <span class="kicker">Good for a busy mind</span>
-    <h2>A Hobby That Keeps Your Mind Working</h2>
-    <p class="sub" style="max-width:760px">Jigsaws ask a lot of you in a quiet way: matching colours and shapes, holding the whole picture in your head, and spotting the small differences between pieces that look the same. Researchers are increasingly interested in mentally stimulating hobbies as part of healthy ageing. A 2026 University of Southampton trial of more than 11,000 adults aged 60 to 85, published in The Lancet Primary Care, found that pointing people towards brain-stimulating activities, puzzles among them, made a measurable difference to cognitive impairment after a year. <a href="https://www.southampton.ac.uk/news/2026/09/proof-that-puzzles-can-reverse-cognitive-impairment.page" target="_blank" rel="noopener">Read the university&rsquo;s summary</a>.</p>
-    <p class="sub" style="max-width:760px">We make no medical claims, and Puzzle Parlor is not a treatment for anything. It is a jigsaw table that is easy on the eyes and kind to your time: pieces you can make large, a magnifier for the fiddly bits, no clock unless you want one, no ads, and nothing lost if you walk away for a week. Many people play a little most days, and that is the whole idea.</p>
   </div>
 </section>
 
