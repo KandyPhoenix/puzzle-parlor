@@ -30,3 +30,4 @@ sports	alpine-trail
 animals	safari-waterhole
 fantasy	rooftop-heroes
 fantasy	heroes-at-night
+fantasy	firehouse-heroes
