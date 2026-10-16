@@ -75,12 +75,6 @@ h2{font-family:var(--display);font-weight:400;font-size:clamp(28px,4.2vw,40px);l
 /* themes */
 .themes{padding:70px 0}
 #about .body{color:var(--ink);font-size:16px;line-height:1.55;margin:0 0 14px}
-.eggs2{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
-.eggs2 .sub{margin-bottom:0}
-.teaser{position:relative;border-radius:18px;overflow:hidden;box-shadow:0 30px 60px -28px rgba(0,0,0,.6);background:#0d0b16}
-.teaser canvas{display:block;width:100%;height:auto;cursor:pointer}
-.teaser span{position:absolute;left:0;right:0;bottom:0;padding:10px 14px;font-size:13px;color:rgba(255,255,255,.85);background:linear-gradient(transparent,rgba(0,0,0,.65))}
-@media(max-width:900px){.eggs2{grid-template-columns:1fr}}
 .mindcols{margin:8px 0 28px}
 .mindcols p{color:var(--ink);font-size:16px;line-height:1.55;margin:0 0 14px}
 .themes .strip{grid-template-columns:repeat(8,1fr)}
@@ -144,6 +138,13 @@ summary{cursor:pointer;font-weight:700;list-style:none;display:flex;justify-cont
 summary::after{content:"+";font-size:22px;color:var(--gold2);font-weight:400}
 details[open] summary::after{content:"–"}
 details p{margin:10px 0 4px;color:var(--muted)}
+#eggPiece{position:absolute;right:22px;bottom:10px;width:22px;height:22px;padding:0;border:0;background:none;color:rgba(255,255,255,.18);cursor:pointer;transition:color .3s,transform .3s}
+#eggPiece:hover,#eggPiece:focus-visible{color:var(--gold);transform:rotate(-12deg) scale(1.25);outline:0}
+#eggPiece.found{color:var(--gold)}
+footer .wrap{position:relative}
+#eggRain{position:fixed;inset:0;pointer-events:none;z-index:50}
+#eggNote{position:fixed;left:50%;top:18px;transform:translateX(-50%);z-index:51;background:rgba(28,30,38,.94);color:#fff;padding:12px 20px;border-radius:10px;font-weight:700;max-width:min(92%,560px);text-align:center;box-shadow:0 20px 50px -20px rgba(0,0,0,.6);opacity:0;transition:opacity .4s;pointer-events:none}
+#eggNote.show{opacity:1}
 footer{background:var(--night);color:rgba(255,255,255,.65);padding:34px 0;font-size:14px}
 footer a{color:#fff}
 #paid{display:none;background:var(--mint);color:#0b3b2b;font-weight:700;padding:14px 22px;text-align:center}
@@ -183,7 +184,7 @@ dialog#contact::backdrop{background:rgba(18,21,43,.72);backdrop-filter:blur(4px)
         <a class="btn hot" id="buyBtn" href="#" aria-disabled="true">Unlock everything <span class="tag" id="priceTag">$2.99</span></a>
         <a class="btn glass" href="./">Try the free version</a>
       </div>
-      <div class="trust"><span>One-time price</span><span>No account, no tracking</span><span>No internet needed to play</span><span>Up to 3 devices</span><span>New puzzles added regularly</span></div>
+      <div class="trust"><span>One-time price</span><span>No account, no tracking</span><span>No internet needed to play</span><span>Up to 3 devices</span><span>New puzzles added regularly</span><span>Hidden easter eggs &amp; surprise endings</span></div>
     </div>
     <div class="collage" aria-hidden="true">
       <img src="thumbs/haunted-village.jpg" alt="">
@@ -256,17 +257,6 @@ dialog#contact::backdrop{background:rgba(18,21,43,.72);backdrop-filter:blur(4px)
         <div class="note"><b>Where your photos live:</b> on the device you added them to, in the app's own storage. They are never uploaded to us or anyone else. Progress on a photo puzzle is saved on that same device, and you can remove a photo at any time.</div>
       </div>
     </div>
-  </div>
-</section>
-
-<section class="feat" id="surprises">
-  <div class="wrap eggs2">
-    <div>
-      <span class="kicker">Something extra</span>
-      <h2>Hidden Easter Eggs And Surprise Endings</h2>
-      <p class="sub" style="max-width:720px">Reveal the hidden treasure, does X really mark the spot? Some pictures are hiding something, and placing the right pieces reveals it. Finish others and watch your creation come to life to celebrate. What happens, and where, is for you to find out. New surprises are added over time. Full version only.</p>
-    </div>
-    <div class="teaser"><canvas id="eggDemo" width="840" height="640" aria-label="A small jigsaw that puts itself together and then does something unexpected"></canvas><span id="eggDemoCap">Watch this one finish</span></div>
   </div>
 </section>
 
@@ -348,7 +338,7 @@ dialog#contact::backdrop{background:rgba(18,21,43,.72);backdrop-filter:blur(4px)
   </div>
 </section>
 
-<footer><div class="wrap"><a href="privacy">Privacy policy</a> · <button class="linkbtn" type="button" data-contact="">Contact us</button><br>Puzzle Parlor &copy; KandyPhoenix.com 2026 &nbsp;·&nbsp; Site by <a href="https://www.phoenixmethodseo.com" rel="noopener">Phoenix Method SEO</a></div></footer>
+<footer><div class="wrap"><button id="eggPiece" type="button" aria-label="A hidden puzzle piece" title="…"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 3a2 2 0 00-2 2v1H5a2 2 0 00-2 2v3h1a2 2 0 010 4H3v3a2 2 0 002 2h3v-1a2 2 0 014 0v1h3a2 2 0 002-2v-3h1a2 2 0 000-4h-1V8a2 2 0 00-2-2h-3V5a2 2 0 00-2-2z"/></svg></button><a href="privacy">Privacy policy</a> · <button class="linkbtn" type="button" data-contact="">Contact us</button><br>Puzzle Parlor &copy; KandyPhoenix.com 2026 &nbsp;·&nbsp; Site by <a href="https://www.phoenixmethodseo.com" rel="noopener">Phoenix Method SEO</a></div></footer>
 
 <dialog id="contact" aria-labelledby="contactTitle">
   <form id="contactForm" method="dialog" novalidate>
@@ -395,55 +385,25 @@ f.addEventListener('submit',async e=>{ e.preventDefault();
 });})();
 </script>
 
+
+
 <script>
 (function(){
-  const c=document.getElementById('eggDemo'); if(!c) return; const g=c.getContext('2d'), W=c.width, H=c.height, cap=document.getElementById('eggDemoCap');
-  const cols=4, rows=3, bx=120, by=90, bw=600, bh=450, pw=bw/cols, ph=bh/rows, t=pw*.22;
-  const cols4=['#f2b134','#ff8c42','#b79cf2','#5cc3ff','#5fe0b7','#ffd36b','#ff6f91','#7ec8ff','#a7f0d1','#ffc27a','#c9b6ff','#9fe3ff'];
-  const rnd=(a,b)=>a+Math.random()*(b-a), reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  // tab layout: h[r][c] is the edge below row r; v[r][c] is the edge right of col c. +1 tab out, -1 in
-  const hE=[],vE=[]; for(let r=0;r<rows;r++){hE[r]=[];vE[r]=[];for(let k=0;k<cols;k++){hE[r][k]=r<rows-1?(Math.random()<.5?1:-1):0; vE[r][k]=k<cols-1?(Math.random()<.5?1:-1):0}}
-  function piecePath(r,k){ const P=new Path2D(), top=r?-hE[r-1][k]:0, right=vE[r][k], bottom=hE[r][k], left=k?-vE[r][k-1]:0;
-    const edge=(x0,y0,x1,y1,dir,nx,ny)=>{ const mx=(x0+x1)/2,my=(y0+y1)/2; if(!dir){P.lineTo(x1,y1);return} const ax=x0+(x1-x0)*.38,ay=y0+(y1-y0)*.38,bx2=x0+(x1-x0)*.62,by2=y0+(y1-y0)*.62, ox=nx*t*dir,oy=ny*t*dir;
-      P.lineTo(ax,ay); P.bezierCurveTo(ax-nx*t*.1*dir+ (x1-x0)*.02,ay-ny*t*.1*dir,mx-(x1-x0)*.16+ox,my-(y1-y0)*.16+oy,mx+ox,my+oy); P.bezierCurveTo(mx+(x1-x0)*.16+ox,my+(y1-y0)*.16+oy,bx2,by2,bx2,by2); P.lineTo(x1,y1); };
-    P.moveTo(0,0); edge(0,0,pw,0,top,0,-1); edge(pw,0,pw,ph,right,1,0); edge(pw,ph,0,ph,bottom,0,1); edge(0,ph,0,0,left,-1,0); P.closePath(); return P; }
-  const pieces=[]; for(let r=0;r<rows;r++)for(let k=0;k<cols;k++) pieces.push({r,k,path:piecePath(r,k),hx:bx+k*pw,hy:by+r*ph,x:0,y:0,rot:0,done:false,col:cols4[(r*cols+k)%cols4.length]});
-  const xPiece=pieces[6]; // the one with the X on it
-  let order=[], phase='idle', t0=0, coins=[], ghosts=[], sparks=[], raf=null, found=false;
-  function reset(){ phase='build'; t0=performance.now(); found=false; coins=[]; ghosts=[]; sparks=[]; order=pieces.slice().sort(()=>Math.random()-.5);
-    pieces.forEach((p,i)=>{ p.done=false; const side=Math.random()<.5; p.sx=side?rnd(-200,-60):rnd(W+60,W+200); p.sy=rnd(-80,H+80); p.srot=rnd(-1.2,1.2); p.x=p.sx; p.y=p.sy; p.rot=p.srot; }); cap.textContent='Watch this one finish'; }
-  function drawPiece(p,alpha){ g.save(); g.globalAlpha=alpha; g.translate(p.x+pw/2,p.y+ph/2); g.rotate(p.rot); g.translate(-pw/2,-ph/2);
-    const gr=g.createLinearGradient(0,0,pw,ph); gr.addColorStop(0,p.col); gr.addColorStop(1,'#1d1b3a'); g.fillStyle=gr; g.fill(p.path); g.lineWidth=2; g.strokeStyle='rgba(0,0,0,.45)'; g.stroke(p.path);
-    if(p===xPiece){ g.save(); g.clip(p.path); g.strokeStyle=found?'#ffe27a':'#d8443c'; g.lineWidth=found?9:7; g.lineCap='round'; g.shadowColor=found?'#ffd36b':'transparent'; g.shadowBlur=found?22:0; g.beginPath(); g.moveTo(pw*.33,ph*.33); g.lineTo(pw*.67,ph*.67); g.moveTo(pw*.67,ph*.33); g.lineTo(pw*.33,ph*.67); g.stroke(); g.restore(); }
-    g.restore(); }
-  function ghost(x,y,s,a,tilt){ g.save(); g.translate(x,y); g.rotate(tilt); g.globalAlpha=a; g.shadowColor='rgba(200,230,255,.7)'; g.shadowBlur=s*.5; const w=s*.34,hm=s*1.55; g.beginPath(); g.moveTo(-w,0); g.bezierCurveTo(-w,-s*.8,-w*.5,-s,0,-s); g.bezierCurveTo(w*.5,-s,w,-s*.8,w,0); g.bezierCurveTo(w*1.05,s*.5,w*.7,s*.9,w*.75,hm*.7); g.bezierCurveTo(w*.8,hm*.9,w*.3,hm*.85,w*.1,hm); g.bezierCurveTo(-w*.2,hm*1.08,-w*.5,hm*.8,-w*.6,hm*.65); g.bezierCurveTo(-w*.75,hm*.5,-w*1.05,s*.5,-w,0); g.closePath();
-    const gr=g.createLinearGradient(0,-s,0,hm); gr.addColorStop(0,'rgba(255,255,255,.95)'); gr.addColorStop(.45,'rgba(225,238,255,.7)'); gr.addColorStop(1,'rgba(200,225,255,0)'); g.fillStyle=gr; g.fill(); g.shadowBlur=0; g.fillStyle='rgba(40,50,80,.55)'; g.beginPath(); g.ellipse(-w*.4,-s*.4,s*.08,s*.14,0,0,6.2832); g.ellipse(w*.4,-s*.4,s*.08,s*.14,0,0,6.2832); g.fill(); g.restore(); }
-  function frame(now){
-    g.clearRect(0,0,W,H); g.fillStyle='#0d0b16'; g.fillRect(0,0,W,H);
-    g.setLineDash([8,6]); g.strokeStyle='rgba(255,255,255,.25)'; g.lineWidth=1.5; g.strokeRect(bx,by,bw,bh); g.setLineDash([]);
-    const el=now-t0;
-    if(phase==='build'){ const per=reduced?60:420, k=Math.floor(el/per);
-      order.forEach((p,i)=>{ if(i<k){ p.x=p.hx; p.y=p.hy; p.rot=0; if(!p.done){ p.done=true; if(p===xPiece){ found=true; cap.textContent='X marks the spot…'; for(let j=0;j<40;j++) sparks.push({x:p.hx+pw/2,y:p.hy+ph/2,vx:rnd(-3,3),vy:rnd(-4,1),l:1,c:'255,215,90'}); } } }
-        else if(i===k){ const u=Math.min(1,(el-i*per)/per), e=1-Math.pow(1-u,3); p.x=p.sx+(p.hx-p.sx)*e; p.y=p.sy+(p.hy-p.sy)*e; p.rot=p.srot*(1-e); } });
-      if(k>=pieces.length){ phase='alive'; t0=now; cap.textContent='…and then it comes alive'; for(let j=0;j<90;j++) coins.push({x:rnd(0,W),y:rnd(-H,-20),vy:rnd(2.2,5),ph:rnd(0,6),sp:rnd(.1,.22),s:rnd(6,13)}); for(let j=0;j<4;j++) ghosts.push({x:rnd(bx+60,bx+bw-60),y:by+bh*rnd(.5,.9),ph:rnd(0,6),amp:rnd(14,30),s:rnd(16,26),born:now+j*500,l:1}); }
-    }
-    for(const p of pieces) if(p.done||phase==='alive') drawPiece(p,1);
-    if(phase==='build') for(const p of order) if(!p.done) drawPiece(p,.95);
-    g.save(); g.globalCompositeOperation='lighter'; for(let i=sparks.length-1;i>=0;i--){ const k=sparks[i]; k.x+=k.vx; k.y+=k.vy; k.vy+=.12; k.l-=.02; if(k.l<=0){sparks.splice(i,1);continue} g.fillStyle=`rgba(${k.c},${k.l})`; g.beginPath(); g.arc(k.x,k.y,3,0,6.2832); g.fill(); } g.restore();
-    if(phase==='alive'){ const a=el/1000;
-      if(a<1.2){ g.save(); g.globalCompositeOperation='lighter'; const R=Math.min(bw,bh)*(.15+a*.5); const gr=g.createRadialGradient(xPiece.hx+pw/2,xPiece.hy+ph/2,0,xPiece.hx+pw/2,xPiece.hy+ph/2,R); gr.addColorStop(0,`rgba(255,215,90,${.6*(1-a/1.2)})`); gr.addColorStop(1,'rgba(255,215,90,0)'); g.fillStyle=gr; g.fillRect(0,0,W,H); g.restore(); }
-      for(const b of coins){ b.y+=b.vy; b.ph+=b.sp; if(b.y>H+20&&a<6){b.y=-30;b.x=rnd(0,W)} const rx=Math.max(.6,Math.abs(Math.cos(b.ph)))*b.s; if(b.y<H+20){ g.save(); g.translate(b.x,b.y); g.fillStyle='#e6b31e'; g.beginPath(); g.ellipse(0,0,rx,b.s,0,0,6.2832); g.fill(); g.lineWidth=1.2; g.strokeStyle='#9a6d05'; g.stroke(); g.fillStyle='rgba(255,245,200,.75)'; g.beginPath(); g.ellipse(-rx*.3,-b.s*.35,rx*.3,b.s*.25,0,0,6.2832); g.fill(); g.restore(); } }
-      for(const h of ghosts){ if(now<h.born) continue; h.y-=.45; h.ph+=.035; h.l-=.003; if(h.l<=0) continue; const sw=Math.sin(h.ph); ghost(h.x+sw*h.amp,h.y,h.s,Math.min(1,h.l*1.5)*.85,sw*.22); }
-      if(a>9){ phase='idle'; cap.textContent='Tap to watch it again'; }
-    }
-    if(phase!=='idle'||sparks.length) raf=requestAnimationFrame(frame); else raf=null;
-  }
-  function start(){ reset(); if(!raf) raf=requestAnimationFrame(frame); }
-  c.addEventListener('click',start);
-  // first run when the section scrolls into view
-  if('IntersectionObserver' in window){ const io=new IntersectionObserver(es=>{ if(es.some(e=>e.isIntersecting)){ start(); io.disconnect(); } },{threshold:.4}); io.observe(c); } else start();
-  // idle frame so the box is not empty before it starts
-  g.fillStyle='#0d0b16'; g.fillRect(0,0,W,H);
+  const btn=document.getElementById('eggPiece'); if(!btn) return;
+  btn.addEventListener('click',()=>{
+    btn.classList.add('found');
+    let note=document.getElementById('eggNote'); if(!note){ note=document.createElement('div'); note.id='eggNote'; document.body.appendChild(note); }
+    note.textContent='You found one! Some puzzles hide surprises just like this. Full version only.'; void note.offsetWidth; note.classList.add('show'); setTimeout(()=>note.classList.remove('show'),4500);
+    if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    let c=document.getElementById('eggRain'); if(!c){ c=document.createElement('canvas'); c.id='eggRain'; document.body.appendChild(c); }
+    const d=window.devicePixelRatio||1, w=innerWidth, h=innerHeight; c.width=w*d; c.height=h*d; const g=c.getContext('2d'); g.setTransform(d,0,0,d,0,0);
+    const coins=Array.from({length:120},()=>({x:Math.random()*w,y:-40-Math.random()*h,vy:2.4+Math.random()*3.4,vx:(Math.random()-.5),ph:Math.random()*6.28,sp:.1+Math.random()*.12,s:6+Math.random()*7}));
+    const t0=performance.now();
+    (function f(){ const t=performance.now()-t0; g.clearRect(0,0,w,h); let alive=0;
+      for(const b of coins){ b.y+=b.vy; b.x+=b.vx; b.ph+=b.sp; if(b.y>h+20){ if(t<4500){b.y=-30;b.x=Math.random()*w} else continue; } alive++;
+        const rx=Math.max(.6,Math.abs(Math.cos(b.ph)))*b.s; g.save(); g.translate(b.x,b.y); g.fillStyle='#e6b31e'; g.beginPath(); g.ellipse(0,0,rx,b.s,0,0,6.2832); g.fill(); g.lineWidth=1.2; g.strokeStyle='#9a6d05'; g.stroke(); g.fillStyle='rgba(255,245,200,.75)'; g.beginPath(); g.ellipse(-rx*.3,-b.s*.35,rx*.3,b.s*.25,0,0,6.2832); g.fill(); g.restore(); }
+      if(alive) requestAnimationFrame(f); else { g.clearRect(0,0,w,h); c.remove(); } })();
+  });
 })();
 </script>
 </body>
