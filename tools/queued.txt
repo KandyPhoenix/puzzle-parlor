@@ -32,3 +32,4 @@ fantasy	rooftop-heroes
 fantasy	heroes-at-night
 fantasy	firehouse-heroes
 fantasy	mountain-rescue
+sports	speedway-sunset
