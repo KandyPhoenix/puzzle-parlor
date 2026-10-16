@@ -14,7 +14,7 @@ vibes	forest-shrine
 vibes	zen-morning
 vibes	zen-sunset
 vibes	curious-crow
-christmas	gingerbread-village
+christmas	gingerbread-emporium
 christmas	castle-village
 fantasy	treasure-cove
 fantasy	pirate-deck
