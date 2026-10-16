@@ -20,7 +20,7 @@ Features
 • A movable magnifier in every puzzle, plus a per-puzzle hard mode with rotated pieces
 • Turn your own photos into puzzles (full version); photos stay on your device
 • New puzzles are added regularly, included in the full version at no extra cost
-• Hidden surprises in selected puzzles: some pictures react when the right pieces go in, and come alive when you finish (full version)
+• Hidden easter eggs and surprise endings: some pictures react when the right pieces go in, and come alive when you finish (full version)
 • Pause button and one-tap offline mode
 • Time and move counter for every puzzle
 • Pin up to four puzzles in progress to the top of the gallery

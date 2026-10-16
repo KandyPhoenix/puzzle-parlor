@@ -3,7 +3,7 @@ const {chromium}=require('/opt/node-tools/node_modules/playwright');
 const pg=await (await b.newContext({viewport:{width:1100,height:760}})).newPage();pg.on('pageerror',e=>errs.push(e.message));
 await pg.goto('http://127.0.0.1:8768/');await pg.waitForTimeout(400);
 await pg.evaluate(()=>{ window.__slug=IMAGES[0].slug; EGGS[window.__slug]={hot:{x:.2,y:.2,w:.1,h:.1,msg:'X marks the spot! You found the treasure.'},fin:'coins',glow:{x:.8,y:.7}}; renderGrid(); });
-out.badge=await pg.$eval('.box:first-of-type .egg',e=>e.textContent).catch(()=>null);
+out.badge=await pg.$('.box:first-of-type .egg');
 await pg.click('.box:first-of-type .size');await pg.waitForTimeout(2500);
 const lockCells=(sel)=>pg.evaluate((sel)=>{ const {pw,ph,pieces}=P; let n=0; for(const p of pieces){ const inHot=(p.c*pw<.3*P.W&&p.c*pw+pw>.2*P.W&&p.r*ph<.3*P.H&&p.r*ph+ph>.2*P.H); if(sel==='hot'?!inHot:inHot) continue; if(P.groups.get(p.g).locked) continue; if(p.inTray){p.inTray=false;P.tray=P.tray.filter(k=>k!==pieces.indexOf(p));} p.x=p.c*pw; p.y=p.r*ph; snap(p.g); n++; } updateProgress(); draw(); return n; },sel);
 out.lockedOthers=await lockCells('others');
