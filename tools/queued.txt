@@ -40,3 +40,4 @@ landscapes	lost-temple
 fantasy	temple-chamber
 fantasy	castle-siege
 fantasy	broadside
+fantasy	wizard-rune
