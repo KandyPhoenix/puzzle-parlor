@@ -197,7 +197,7 @@ label.hard input{accent-color:var(--brass-text);width:16px;height:16px;margin:0}
 #win .row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
 .btn{padding:10px 18px;border-radius:5px;border:0;cursor:pointer;font-weight:700;background:var(--brass);color:var(--brass-ink)}
 .btn.ghost{background:var(--chip);color:var(--ink)}
-#confetti{position:absolute;inset:0;pointer-events:none;z-index:4}
+#confetti{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:4}
 .box .egg{align-self:flex-start;margin-top:4px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#fff;background:#7c5cbf;padding:2px 7px;border-radius:3px}
 #eggToast{position:absolute;left:50%;top:14px;transform:translateX(-50%);z-index:5;max-width:min(92%,520px);text-align:center;background:rgba(35,38,43,.92);color:#fff;padding:10px 18px;border-radius:8px;font-weight:700;pointer-events:none;opacity:0;transition:opacity .45s}#eggToast.show{opacity:1}
 #restart.armed,#hardBtn.armed{background:#b7412f;color:#fff}
@@ -1054,6 +1054,22 @@ function drawEggFx(z){
   ctx.lineWidth=3/z; ctx.strokeStyle=`rgba(${col},${1-a})`; ctx.beginPath(); ctx.arc(x,y,r*(.5+a*1.6),0,6.2832); ctx.stroke();
   ctx.restore(); draw();
 }
+// a soft, translucent ghost: smooth bezier body, wavy hem that ripples, glow, gentle eyes
+function drawGhost(g,x,y,s,a,ph){
+  g.save(); g.translate(x,y); g.globalAlpha=a; g.shadowColor='rgba(200,230,255,.9)'; g.shadowBlur=s*.6;
+  const w=s*.55, hm=s*1.05, k=Math.sin(ph*2)*s*.06;
+  g.beginPath(); g.moveTo(-w,0);
+  g.bezierCurveTo(-w,-s*.75,-w*.55,-s,0,-s); g.bezierCurveTo(w*.55,-s,w,-s*.75,w,0);
+  g.lineTo(w,hm-s*.25);
+  g.bezierCurveTo(w*.8,hm+k,w*.55,hm-s*.2+k,w*.35,hm-k); g.bezierCurveTo(w*.15,hm-s*.25-k,-w*.1,hm+k,-w*.3,hm-k); g.bezierCurveTo(-w*.55,hm-s*.25+k,-w*.8,hm+k,-w,hm-s*.25);
+  g.closePath();
+  const gr=g.createRadialGradient(-w*.2,-s*.3,s*.1,0,0,s*1.3); gr.addColorStop(0,'rgba(255,255,255,.98)'); gr.addColorStop(.6,'rgba(235,245,255,.85)'); gr.addColorStop(1,'rgba(200,225,255,.35)');
+  g.fillStyle=gr; g.fill();
+  g.shadowBlur=0; g.fillStyle='rgba(40,50,80,.7)';
+  g.beginPath(); g.ellipse(-w*.38,-s*.35,s*.11,s*.17,0,0,6.2832); g.ellipse(w*.38,-s*.35,s*.11,s*.17,0,0,6.2832); g.fill();
+  g.fillStyle='rgba(40,50,80,.35)'; g.beginPath(); g.ellipse(0,s*.05,s*.09,s*.13,0,0,6.2832); g.fill();
+  g.restore();
+}
 function drawBats(g,R,bats){ g.fillStyle='rgba(10,8,16,.92)'; for(const b of bats){ b.x+=b.v; b.ph+=.3; if(b.x<-.1) b.x=1.1; if(b.x>1.1) b.x=-.1; const x=R.x+b.x*R.w, y=R.y+b.y*R.h+Math.sin(b.ph/3)*6, f=Math.sin(b.ph)*b.s*.5, s=b.s, d=b.v>0?1:-1;
   g.beginPath(); g.moveTo(x,y); g.quadraticCurveTo(x-s*.5*d,y-f-s*.3,x-s*d,y-f); g.quadraticCurveTo(x-s*.5*d,y+2,x,y+s*.35); g.quadraticCurveTo(x+s*.5*d,y+2,x+s*d,y-f); g.quadraticCurveTo(x+s*.5*d,y-f-s*.3,x,y); g.fill(); } }
 // finish effects draw on the confetti layer in screen space, over the finished picture
@@ -1106,13 +1122,12 @@ function eggFinish(kind,e){
     } else if(kind==='haunt'){
       // lightning now and then, ghosts drifting up out of the village, bats across the moon, pumpkins flickering
       if(now>nextBolt&&t<life-2500){ nextBolt=now+2200+Math.random()*3000; parts.push({bolt:true,l:1}); eggSfx('thunder'); if(Math.random()<.5) eggSfx('spook'); }
-      if(Math.random()<.04&&t<life-4000) parts.push({ghost:true,x:R.x+R.w*(.1+Math.random()*.8),y:R.y+R.h*(.5+Math.random()*.4),vy:-(.35+Math.random()*.4),ph:Math.random()*6,s:10+Math.random()*12,l:1});
+      if(Math.random()<.03&&t<life-4000) parts.push({ghost:true,x:R.x+R.w*(.1+Math.random()*.8),y:R.y+R.h*(.5+Math.random()*.4),vy:-(.3+Math.random()*.35),ph:Math.random()*6,s:12+Math.random()*12,l:1});
       if(Math.random()<.4) parts.push({x:R.x+Math.random()*R.w,y:R.y+R.h*(.45+Math.random()*.55),l:1,tw:true});
       for(let i=parts.length-1;i>=0;i--){ const b=parts[i];
         if(b.bolt){ b.l-=.18; if(b.l<=0){parts.splice(i,1);continue} g.fillStyle=`rgba(255,255,255,${.75*b.l})`; g.fillRect(R.x,R.y,R.w,R.h); g.fillStyle=`rgba(255,255,255,${.25*b.l})`; g.fillRect(0,0,w,h); continue; }
-        if(b.ghost){ b.y+=b.vy; b.ph+=.05; b.x+=Math.sin(b.ph)*.7; b.l-=.004; if(b.l<=0||b.y<R.y){parts.splice(i,1);continue}
-          g.save(); g.globalAlpha=Math.min(1,b.l*1.4)*.85; g.fillStyle='#fff'; g.beginPath(); g.arc(b.x,b.y,b.s,Math.PI,0); g.lineTo(b.x+b.s,b.y+b.s*1.3); for(let k=3;k>=-3;k-=2) g.lineTo(b.x+k*b.s/3,b.y+b.s*(k%4===0?1.1:1.5)); g.lineTo(b.x-b.s,b.y+b.s*1.3); g.closePath(); g.fill();
-          g.fillStyle='#223'; g.beginPath(); g.arc(b.x-b.s*.35,b.y-b.s*.1,b.s*.16,0,6.2832); g.arc(b.x+b.s*.35,b.y-b.s*.1,b.s*.16,0,6.2832); g.fill(); g.restore(); continue; }
+        if(b.ghost){ b.y+=b.vy; b.ph+=.045; b.x+=Math.sin(b.ph)*.6; b.l-=.0035; if(b.l<=0||b.y<R.y){parts.splice(i,1);continue}
+          drawGhost(g,b.x,b.y,b.s*1.6,Math.min(1,b.l*1.5)*.8,b.ph); continue; }
         b.l-=.07; if(b.l<=0){parts.splice(i,1);continue} g.save(); g.globalCompositeOperation='lighter'; g.globalAlpha=b.l; g.fillStyle='rgba(255,160,40,.9)'; g.beginPath(); g.arc(b.x,b.y,3.5,0,6.2832); g.fill(); g.restore(); }
       drawBats(g,R,bats);
     } else {
