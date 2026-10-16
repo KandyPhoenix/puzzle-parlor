@@ -105,7 +105,12 @@ h2{font-family:var(--display);font-weight:400;font-size:clamp(28px,4.2vw,40px);l
 .fcard p{margin:0;color:var(--muted);font-size:15px}
 /* pricing */
 .price{padding:70px 0}
-.pcard{position:relative;max-width:760px;margin:0 auto;background:linear-gradient(160deg,#1a1d3a,#2b2152);color:#fff;border-radius:24px;padding:40px;display:grid;grid-template-columns:1fr 1fr;gap:30px;box-shadow:0 50px 100px -40px rgba(43,33,82,.9)}
+.pricehow{display:grid;grid-template-columns:2fr 1fr;gap:36px;align-items:start}
+.howcol .steps{grid-template-columns:1fr;margin-top:18px;gap:14px}
+.howcol h2{font-size:30px}
+@media(max-width:960px){.pricehow{grid-template-columns:1fr}.howcol .steps{grid-template-columns:1fr}}
+
+.pcard{position:relative;margin:0;background:linear-gradient(160deg,#1a1d3a,#2b2152);color:#fff;border-radius:24px;padding:40px;display:grid;grid-template-columns:1fr 1fr;gap:30px;box-shadow:0 50px 100px -40px rgba(43,33,82,.9)}
 .pcard::before{content:"";position:absolute;inset:-2px;border-radius:26px;background:linear-gradient(135deg,var(--gold),var(--gold2),var(--lav),var(--sky));z-index:-1;filter:blur(14px);opacity:.55}
 .pcard .amt{font-family:var(--display);font-size:72px;line-height:1;color:var(--gold)}
 .pcard .amt small{display:block;font-family:var(--sans);font-size:15px;font-weight:700;color:rgba(255,255,255,.75);margin-top:8px}
@@ -274,7 +279,7 @@ dialog#contact::backdrop{background:rgba(18,21,43,.72);backdrop-filter:blur(4px)
 </section>
 
 <section class="price" id="price">
-  <div class="wrap">
+  <div class="wrap pricehow">
     <div class="pcard">
       <div>
         <h3>Full version</h3>
@@ -302,18 +307,15 @@ dialog#contact::backdrop{background:rgba(18,21,43,.72);backdrop-filter:blur(4px)
         <p class="note">All sales are final. Try the free version on your device first to be sure it suits you.</p>
       </div>
     </div>
-  </div>
-</section>
-
-<section class="how">
-  <div class="wrap">
-    <span class="kicker">Ready in two minutes</span>
-    <h2>How It Works</h2>
-    <div class="steps">
+    <aside class="howcol" id="how">
+      <span class="kicker">Ready in two minutes</span>
+      <h2>How It Works</h2>
+      <div class="steps">
       <div><b>Pay securely with Square</b><p>Card, Apple Pay or Google Pay. Your unlock code arrives by email within a few minutes.</p></div>
       <div><b>Open the app</b><p>On iPad or iPhone, open it in Safari and choose Share, then Add to Home Screen. On Android, Chrome offers Install app. On a computer, just bookmark it.</p></div>
       <div><b>Enter your code</b><p>Tap Unlock all puzzles at the top of the gallery, type the code, and every picture opens.</p></div>
     </div>
+    </aside>
   </div>
 </section>
 
