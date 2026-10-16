@@ -223,6 +223,8 @@ label.hard input{accent-color:var(--brass-text);width:16px;height:16px;margin:0}
 .btn{padding:10px 18px;border-radius:5px;border:0;cursor:pointer;font-weight:700;background:var(--brass);color:var(--brass-ink)}
 .btn.ghost{background:var(--chip);color:var(--ink)}
 #confetti{position:absolute;inset:0;pointer-events:none;z-index:4}
+.box .egg{align-self:flex-start;margin-top:4px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#fff;background:#7c5cbf;padding:2px 7px;border-radius:3px}
+#eggToast{position:absolute;left:50%;top:14px;transform:translateX(-50%);z-index:5;max-width:min(92%,520px);text-align:center;background:rgba(35,38,43,.92);color:#fff;padding:10px 18px;border-radius:8px;font-weight:700;pointer-events:none;opacity:0;transition:opacity .45s}#eggToast.show{opacity:1}
 #restart.armed,#hardBtn.armed{background:#b7412f;color:#fff}
 #tray{display:flex;align-items:stretch;gap:6px;padding:6px 8px;background:var(--tray);border-top:1px solid var(--faint);box-shadow:0 -6px 16px -10px rgba(35,38,43,.25)}
 .tray-nav{flex:none;width:34px;border:0;border-radius:6px;background:var(--chip);cursor:pointer;display:grid;place-items:center}
@@ -339,6 +341,7 @@ label.hard input{accent-color:var(--brass-text);width:16px;height:16px;margin:0}
     <div id="big" hidden><img id="bigImg" alt="Finished picture, full screen"><span>Tap anywhere to close</span></div>
     <div id="veil"><p id="veilMsg">Cutting pieces…</p></div>
     <canvas id="confetti" hidden></canvas>
+    <div id="eggToast" role="status" hidden></div>
     <div id="paused" hidden><div class="card"><h2>Paused</h2><p>The timer is stopped and the pieces are hidden until you resume.</p><div class="row"><button class="btn" id="resumeBtn">Resume</button><button class="btn ghost" id="pausedBack">Back to puzzles</button></div></div></div>
     <div id="win" hidden><div class="card">
       <h2>Finished!</h2>
@@ -412,6 +415,11 @@ async function refreshLockConfig(){
   if(!WEB_SALES||FORCE_LOCK) return;
   try{ const r=await fetch(`${API_ROOT}api/license/status`,{cache:'no-store'}); const j=await r.json(); if(typeof j.locking==='boolean'&&j.locking!==!!store.get('jig-lockcfg')){ store.set('jig-lockcfg',j.locking); LOCKING=j.locking; renderGrid(); lockUI(); } }catch(e){}
 }
+const EGGS={
+  'treasure-cove':{hot:{x:.215,y:.675,w:.10,h:.11,msg:'X marks the spot! You found the treasure.'},fin:'coins',glow:{x:.865,y:.73}},
+  'castle-village':{fin:'snow'},
+  'carnival-lights':{fin:'fireworks'}
+};
 const FREE_PER_CAT=2, FREE=new Set();
 {const seen={}; for(const i of IMAGES){seen[i.cat]=(seen[i.cat]||0)+1; if(seen[i.cat]<=FREE_PER_CAT) FREE.add(i.slug);}}
 const lic={get(){return store.get('jig-lic')},set(v){v?store.set('jig-lic',v):store.del('jig-lic')}};
@@ -525,7 +533,7 @@ function renderGrid(){
       return `<button class="${cls}" data-slug="${img.slug}" data-n="${n}" aria-label="${esc(img.title)}, ${count} pieces${s&&s.done?', completed':s&&s.pct!=null?', '+s.pct+'% done':''}"><span class="n">${fmtN(count)}</span><span class="s">${sub}</span>${bar}</button>`}).join('');
     return `<article class="box" data-slug="${img.slug}" style="--cat:var(--c-${img.cat})">
       <div class="art"><img src="${thumbOf(img)}" alt="${esc(img.title)} by ${esc(img.artist)}" loading="lazy" width="520" height="390"></div>
-      <div class="meta"><h3>${esc(img.title)}</h3>${img.page?`<a class="by" href="${esc(img.page)}" target="_blank" rel="noopener">${esc(img.artist)}, ${esc(img.year)}</a>`:`<span class="by">${esc(img.artist)}</span>`}<span class="chips">${img.isNew?'<span class="new">New scene</span>':''}${LOCKING?(FREE.has(img.slug)?'<span class="free">Free</span>':unlocked()?'':'<span class="lock">Full version</span>'):''}</span></div>
+      <div class="meta"><h3>${esc(img.title)}</h3>${img.page?`<a class="by" href="${esc(img.page)}" target="_blank" rel="noopener">${esc(img.artist)}, ${esc(img.year)}</a>`:`<span class="by">${esc(img.artist)}</span>`}<span class="chips">${EGGS[img.slug]?'<span class="egg" title="Something happens in this one">Hidden surprise</span>':''}${img.isNew?'<span class="new">New scene</span>':''}${LOCKING?(FREE.has(img.slug)?'<span class="free">Free</span>':unlocked()?'':'<span class="lock">Full version</span>'):''}</span></div>
       <div class="sizes">${sizes}</div>${img.photo?`<button class="rmphoto" data-rm="${img.slug}" title="Remove this photo and its progress">Remove photo</button>`:''}</article>`}).join('');
   if(cat==='photos'){ const a=$('addPhoto'); if(a) a.onclick=()=>openPhotoDlg(); const u=$('photoUnlock'); if(u) u.onclick=()=>openUnlock({title:'Your own photos'}); }
 }
@@ -694,7 +702,7 @@ async function openPuzzle(img,n){
   setHardUI(hard); loupeOn=store.get('jig-loupe')!==false; $('loupeBtn').setAttribute('aria-pressed',String(loupeOn)); requestAnimationFrame(()=>{ const sv=store.get('jig-loupe-pos'); if(sv&&window.__placeLoupe) window.__placeLoupe(sv.x,sv.y); });
   $('pinBtn').setAttribute('aria-pressed',String(!!(idx()[key]||{}).pin));
   if(okSave){
-    P.elapsed=saved.t||0; P.moves=saved.mv||0;
+    P.elapsed=saved.t||0; P.moves=saved.mv||0; P.eh=!!saved.eh;
     pieces.forEach((p,i)=>{p.x=saved.p[i*2];p.y=saved.p[i*2+1];p.g=saved.g[i];p.rot=(saved.ro&&saved.ro[i])||0});
     const lockedSet=new Set(saved.L||[]);
     pieces.forEach((p,i)=>{let g=P.groups.get(p.g);if(!g){g={id:p.g,members:[],locked:lockedSet.has(p.g)};P.groups.set(p.g,g)}g.members.push(i)});
@@ -868,6 +876,7 @@ function render(){
   // zoomed in past the overview cache: use native-resolution pieces (unless so many are on screen that the cache would thrash)
   const hi=z*d>P.B*1.15&&vis.length<=HI_MAX;
   for(const p of vis) drawPiece(ctx,p,hi?hiCanvas(p):p.cv);
+  drawEggFx(z);
   drawLoupe();
 }
 /* ---------- magnifier: the piece (or joined group) you last touched, large, with rotate buttons ---------- */
@@ -1018,6 +1027,72 @@ function updateProgress(){
   $('pMoves').textContent=fmtN(P.moves)+(P.moves===1?' move':' moves');
   const v=isWon()?100:Math.min(99,pct());
   $('pProg').innerHTML=`<em>${v}%</em>`; $('pProg').title=`${fmtN(P.count-P.groups.size)} of ${fmtN(P.count-1)} joins made`;
+  eggCheck();
+}
+
+/* ---------- hidden surprises (full version only) ---------- */
+// Coordinates are fractions of the picture. hot: a spot that reacts once every piece whose home covers it is locked in place.
+// fin: what plays when the puzzle is finished. glow: where the finish effect's warm glow sits. Adding a surprise to a new puzzle is one line here.
+const eggOf=img=>EGGS[img.slug]||null;
+const eggActive=()=>!!(P&&eggOf(P.img)&&unlocked());
+const REDUCED=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
+function eggChime(kind){ if(!flags.sound||!ac) return; try{ const t=ac.currentTime, notes=kind==='pop'?[160+Math.random()*120]:[523,659,784,1047];
+  notes.forEach((f,i)=>{ const o=ac.createOscillator(), g=ac.createGain(); o.type=kind==='pop'?'triangle':'sine'; o.frequency.value=f; const t0=t+i*.09;
+    g.gain.setValueAtTime(0,t0); g.gain.linearRampToValueAtTime(kind==='pop'?.22:.16,t0+.02); g.gain.exponentialRampToValueAtTime(.001,t0+(kind==='pop'?.28:.7));
+    o.connect(g).connect(ac.destination); o.start(t0); o.stop(t0+.8); }); }catch(e){} }
+function eggToast(msg){ const t=$('eggToast'); t.textContent=msg; t.hidden=false; t.classList.remove('show'); void t.offsetWidth; t.classList.add('show'); clearTimeout(eggToast.h); eggToast.h=setTimeout(()=>{t.classList.remove('show'); setTimeout(()=>{t.hidden=true},500)},4200); }
+function eggCheck(){
+  if(!eggActive()||P.eh||P.won) return; const e=eggOf(P.img); if(!e.hot) return;
+  const {pw,ph,pieces}=P, h=e.hot, x0=h.x*P.W,y0=h.y*P.H,x1=x0+h.w*P.W,y1=y0+h.h*P.H;
+  for(const p of pieces){ const px=p.c*pw,py=p.r*ph; if(px<x1&&px+pw>x0&&py<y1&&py+ph>y0&&!P.groups.get(p.g).locked) return; }
+  P.eh=true; P.eggFx={t0:performance.now(),x:(h.x+h.w/2)*P.W,y:(h.y+h.h/2)*P.H,r:Math.max(h.w*P.W,h.h*P.H)*.7};
+  ensureAudio(); eggChime(); eggToast(h.msg); save(); if(!REDUCED()) draw();
+}
+function drawEggFx(z){
+  if(!P.eggFx) return; const a=(performance.now()-P.eggFx.t0)/3200; if(a>=1){ P.eggFx=null; return; }
+  const {x,y,r}=P.eggFx, pulse=.5+.5*Math.sin(a*Math.PI*7), R=r*(1.2+.6*pulse);
+  ctx.save(); ctx.globalCompositeOperation='lighter';
+  const gr=ctx.createRadialGradient(x,y,0,x,y,R); gr.addColorStop(0,`rgba(255,215,90,${.6*(1-a)})`); gr.addColorStop(1,'rgba(255,215,90,0)');
+  ctx.fillStyle=gr; ctx.beginPath(); ctx.arc(x,y,R,0,6.2832); ctx.fill();
+  ctx.lineWidth=3/z; ctx.strokeStyle=`rgba(255,240,170,${1-a})`; ctx.beginPath(); ctx.arc(x,y,r*(.5+a*1.6),0,6.2832); ctx.stroke();
+  ctx.restore(); draw();
+}
+// finish effects draw on the confetti layer in screen space, over the finished picture
+function eggFinish(kind,e){
+  const c=$('confetti'),d=window.devicePixelRatio||1,w=c.parentElement.clientWidth,h=c.parentElement.clientHeight;c.hidden=false;c.width=w*d;c.height=h*d;
+  const g=c.getContext('2d');g.scale(d,d);
+  const rect=()=>({x:-cam.x*cam.z,y:-cam.y*cam.z,w:P.W*cam.z,h:P.H*cam.z});
+  const t0=performance.now(), life={coins:10000,snow:18000,fireworks:12000}[kind]; let parts=[], rockets=[], nextLaunch=t0+300;
+  if(kind==='coins') parts=Array.from({length:110},()=>({x:Math.random()*w,y:-40-Math.random()*h*1.2,vy:2.4+Math.random()*3.2,vx:(Math.random()-.5),ph:Math.random()*6.28,sp:.1+Math.random()*.12,s:6+Math.random()*7}));
+  if(kind==='snow') parts=Array.from({length:240},()=>({x:Math.random()*w,y:Math.random()*h,vy:.5+Math.random()*1.1,ph:Math.random()*6.28,s:1.4+Math.random()*2.6,a:.5+Math.random()*.5}));
+  const twinkles=[]; const burst=(x,y)=>{ const hue=Math.random()*360; for(let i=0;i<95;i++){ const an=Math.random()*6.2832, sp=1.5+Math.random()*4.8; parts.push({x,y,px:x,py:y,vx:Math.cos(an)*sp,vy:Math.sin(an)*sp,l:1,dl:.007+Math.random()*.007,c:`hsl(${hue+(Math.random()*40-20)},100%,${60+Math.random()*25}%)`}); } eggChime('pop'); };
+  function frame(){
+    if(!P||c.hidden){ g.clearRect(0,0,w,h); c.hidden=true; return; }
+    const now=performance.now(), t=now-t0, R=rect(); g.clearRect(0,0,w,h);
+    if(kind==='coins'){
+      for(const b of parts){ b.y+=b.vy; b.x+=b.vx; b.ph+=b.sp; if(b.y>h+20){b.y=-30;b.x=Math.random()*w}
+        const rx=Math.max(.6,Math.abs(Math.cos(b.ph)))*b.s; g.save(); g.translate(b.x,b.y); g.fillStyle='#e6b31e'; g.beginPath(); g.ellipse(0,0,rx,b.s,0,0,6.2832); g.fill();
+        g.lineWidth=1.2; g.strokeStyle='#9a6d05'; g.stroke(); g.fillStyle='rgba(255,245,200,.75)'; g.beginPath(); g.ellipse(-rx*.3,-b.s*.35,rx*.3,b.s*.25,0,0,6.2832); g.fill(); g.restore(); }
+      if(e.glow){ const gx=R.x+e.glow.x*R.w, gy=R.y+e.glow.y*R.h, rad=Math.max(R.w,R.h)*.18*(1+.25*Math.sin(t/260)); g.save(); g.globalCompositeOperation='lighter';
+        const gr=g.createRadialGradient(gx,gy,0,gx,gy,rad); gr.addColorStop(0,'rgba(255,220,110,.55)'); gr.addColorStop(1,'rgba(255,220,110,0)'); g.fillStyle=gr; g.beginPath(); g.arc(gx,gy,rad,0,6.2832); g.fill(); g.restore(); }
+    } else if(kind==='snow'){
+      for(const b of parts){ b.y+=b.vy; b.ph+=.02; b.x+=Math.sin(b.ph)*.4; if(b.y>h+6){b.y=-6;b.x=Math.random()*w} g.fillStyle=`rgba(255,255,255,${b.a})`; g.beginPath(); g.arc(b.x,b.y,b.s,0,6.2832); g.fill(); }
+      if(Math.random()<.35) twinkles.push({x:R.x+Math.random()*R.w,y:R.y+Math.random()*R.h,l:0,up:true,s:4+Math.random()*8});
+      g.save(); g.globalCompositeOperation='lighter';
+      for(let i=twinkles.length-1;i>=0;i--){ const k=twinkles[i]; k.l+=k.up?.08:-.04; if(k.l>=1)k.up=false; if(k.l<=0){twinkles.splice(i,1);continue}
+        g.strokeStyle=`rgba(255,235,170,${k.l})`; g.lineWidth=1.5; g.beginPath(); g.moveTo(k.x-k.s,k.y); g.lineTo(k.x+k.s,k.y); g.moveTo(k.x,k.y-k.s); g.lineTo(k.x,k.y+k.s); g.stroke(); }
+      g.restore();
+    } else {
+      if(now>nextLaunch&&t<life-3000){ rockets.push({x:R.x+R.w*(.1+Math.random()*.8),y:R.y+R.h,ty:R.y+R.h*(.08+Math.random()*.45),v:-(7+Math.random()*3)}); nextLaunch=now+450+Math.random()*650; }
+      for(let i=rockets.length-1;i>=0;i--){ const r=rockets[i]; r.y+=r.v; g.fillStyle='rgba(255,240,200,.95)'; g.beginPath(); g.arc(r.x,r.y,2.5,0,6.2832); g.fill(); g.fillStyle='rgba(255,200,120,.5)'; g.beginPath(); g.arc(r.x,r.y-r.v*1.5,2,0,6.2832); g.fill(); if(r.y<=r.ty){ burst(r.x,r.y); rockets.splice(i,1); } }
+      g.lineCap='round'; g.lineWidth=3;
+      for(let i=parts.length-1;i>=0;i--){ const b=parts[i]; b.px=b.x; b.py=b.y; b.x+=b.vx; b.y+=b.vy; b.vy+=.045; b.vx*=.985; b.vy*=.985; b.l-=b.dl; if(b.l<=0){parts.splice(i,1);continue}
+        g.globalAlpha=Math.max(0,b.l); g.strokeStyle=b.c; g.beginPath(); g.moveTo(b.px,b.py); g.lineTo(b.x,b.y); g.stroke(); }
+      g.globalAlpha=1;
+    }
+    if(t<life&&!c.hidden&&P) requestAnimationFrame(frame); else { g.clearRect(0,0,w,h); c.hidden=true; }
+  }
+  requestAnimationFrame(frame);
 }
 
 /* ---------- sound ---------- */
@@ -1110,8 +1185,8 @@ $('restart').onclick=()=>{
   clearTimeout(armTimer); const{img,n,key}=P; store.del(key); setIdx(key,{done:false,pct:null}); P=null; syncPush(); openPuzzle(img,n);
 };
 $('back').onclick=leave; $('winBack').onclick=leave;
-$('winStay').onclick=()=>{$('win').hidden=true;$('confetti').hidden=true};
-function leave(){ openGen++; if(P){tick();save()} syncPush(); P=null; ptrs.clear(); drag=pan=pinch=trayDrag=null; strip.querySelectorAll('.tp').forEach(n=>n.remove()); $('play').hidden=true; $('gallery').hidden=false; renderGrid(); }
+$('winStay').onclick=()=>{$('win').hidden=true; if(!eggActive()) $('confetti').hidden=true};
+function leave(){ openGen++; if(P){tick();save()} syncPush(); $('confetti').hidden=true; $('eggToast').hidden=true; P=null; ptrs.clear(); drag=pan=pinch=trayDrag=null; strip.querySelectorAll('.tp').forEach(n=>n.remove()); $('play').hidden=true; $('gallery').hidden=false; renderGrid(); }
 document.addEventListener('keydown',e=>{
   if($('play').hidden||!P||e.target.closest('input,textarea')) return;
   if(P.paused&&e.key!=='Escape'){ if(e.key===' '||e.key==='Enter'){ e.preventDefault(); setPaused(false); } return; }
@@ -1135,7 +1210,7 @@ function save(){
   const p=new Array(P.count*2);P.pieces.forEach((q,i)=>{p[i*2]=Math.round(q.x*10)/10;p[i*2+1]=Math.round(q.y*10)/10});
   const L=[];for(const g of P.groups.values())if(g.locked)L.push(g.id);
   const ts=Date.now();
-  store.set(P.key,{v:1,u:ts,seed:P.seed,hard:P.hard,cols:P.cols,rows:P.rows,t:Math.round(P.elapsed),mv:P.moves,p,g:P.pieces.map(q=>q.g),L,z:P.z,tr:P.tray,ro:P.hard?P.pieces.map(q=>q.rot):undefined});
+  store.set(P.key,{v:1,u:ts,seed:P.seed,hard:P.hard,cols:P.cols,rows:P.rows,t:Math.round(P.elapsed),mv:P.moves,p,g:P.pieces.map(q=>q.g),L,z:P.z,tr:P.tray,ro:P.hard?P.pieces.map(q=>q.rot):undefined,eh:P.eh?1:undefined});
   setIdx(P.key,{pct:pct(),hard:P.hard},ts);
 }
 
@@ -1147,8 +1222,12 @@ function celebrate(){
   store.del(P.key); setIdx(P.key,{done:true,best:Math.round(best),moves:bestMv,pct:null,hard:P.hard}); syncPush();
   $('pProg').innerHTML='<em>100%</em>';
   $('winMsg').textContent=`${P.img.title}, ${fmtN(P.count)} pieces${P.hard?' (hard mode)':''}: ${fmtTime(P.elapsed)} and ${fmtN(P.moves)} moves.`;
-  $('win').hidden=false; fit();
-  if(!matchMedia('(prefers-reduced-motion: reduce)').matches) confetti();
+  fit();
+  const e=eggActive()?eggOf(P.img):null;
+  if(e&&e.fin){ // the picture comes alive for a few seconds before the card appears
+    const gen=openGen; ensureAudio(); eggChime(); if(!REDUCED()) eggFinish(e.fin,e);
+    setTimeout(()=>{ if(gen===openGen&&P&&P.won) $('win').hidden=false; },REDUCED()?0:3800);
+  } else { $('win').hidden=false; if(!REDUCED()) confetti(); }
 }
 function confetti(){
   const c=$('confetti'),d=window.devicePixelRatio||1,w=c.parentElement.clientWidth,h=c.parentElement.clientHeight;c.hidden=false;c.width=w*d;c.height=h*d;
