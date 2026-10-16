@@ -74,10 +74,9 @@ h2{font-family:var(--display);font-weight:400;font-size:clamp(28px,4.2vw,40px);l
 .caps span{color:rgba(255,255,255,.75);font-size:15px}
 /* themes */
 .themes{padding:70px 0 20px}
-.mood2{display:grid;grid-template-columns:1.1fr .9fr;gap:34px;align-items:start}
-.mood2 .strip{grid-template-columns:repeat(4,1fr)}
-.brain{position:relative;border-radius:22px;padding:30px 28px 26px;background:linear-gradient(160deg,#fff7e6 0%,#fff 55%,#f3ecff 100%);border:2px solid rgba(242,177,52,.55);box-shadow:0 2px 4px rgba(28,30,38,.05),0 30px 60px -28px rgba(255,140,66,.55);overflow:hidden}
-.brain::before{content:"";position:absolute;inset:-2px;border-radius:24px;background:linear-gradient(135deg,var(--gold),var(--gold2),var(--lav));z-index:-1;filter:blur(18px);opacity:.35}
+.mood2{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start}
+.mood2 .strip{grid-template-columns:repeat(3,1fr)}
+.brain{position:relative;border-radius:22px;padding:30px 28px 26px;background:linear-gradient(160deg,#fff7e6 0%,#fff 55%,#f3ecff 100%);border:2px solid rgba(242,177,52,.55);box-shadow:0 2px 4px rgba(28,30,38,.05),0 24px 44px -30px rgba(28,30,38,.4);overflow:hidden}
 .brain::after{content:"🧠";position:absolute;right:18px;top:14px;font-size:44px;opacity:.9}
 .brain h2{font-size:28px;margin:0 0 14px;padding-right:50px}
 .brain p{color:var(--ink);font-size:16px;line-height:1.55;margin:0 0 14px}
