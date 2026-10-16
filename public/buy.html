@@ -74,6 +74,12 @@ h2{font-family:var(--display);font-weight:400;font-size:clamp(28px,4.2vw,40px);l
 .caps span{color:rgba(255,255,255,.75);font-size:15px}
 /* themes */
 .themes{padding:70px 0 20px}
+.eggs2{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+.eggs2 .sub{margin-bottom:0}
+.teaser{position:relative;border-radius:18px;overflow:hidden;box-shadow:0 30px 60px -28px rgba(0,0,0,.6);background:#0d0b16}
+.teaser video{display:block;width:100%;height:auto}
+.teaser span{position:absolute;left:0;right:0;bottom:0;padding:10px 14px;font-size:13px;color:rgba(255,255,255,.85);background:linear-gradient(transparent,rgba(0,0,0,.65))}
+@media(max-width:900px){.eggs2{grid-template-columns:1fr}}
 .mood2{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start}
 .mood2 .strip{grid-template-columns:repeat(3,1fr)}
 .brain{padding:0}
@@ -255,10 +261,13 @@ dialog#contact::backdrop{background:rgba(18,21,43,.72);backdrop-filter:blur(4px)
 </section>
 
 <section class="feat" id="surprises">
-  <div class="wrap">
-    <span class="kicker">Something extra</span>
-    <h2>Hidden Easter Eggs And Surprise Endings</h2>
-    <p class="sub" style="max-width:720px">Reveal the hidden treasure, does X really mark the spot? Some pictures are hiding something, and placing the right pieces reveals it. Finish others and watch your creation come to life to celebrate. What happens, and where, is for you to find out. New surprises are added over time. Full version only.</p>
+  <div class="wrap eggs2">
+    <div>
+      <span class="kicker">Something extra</span>
+      <h2>Hidden Easter Eggs And Surprise Endings</h2>
+      <p class="sub" style="max-width:720px">Reveal the hidden treasure, does X really mark the spot? Some pictures are hiding something, and placing the right pieces reveals it. Finish others and watch your creation come to life to celebrate. What happens, and where, is for you to find out. New surprises are added over time. Full version only.</p>
+    </div>
+    <div class="teaser"><video src="shots/surprise-teaser.mp4" poster="shots/surprise-teaser.jpg" autoplay muted loop playsinline aria-label="A finished puzzle coming alive, blurred so the picture stays a secret"></video><span>One of the endings, blurred so the picture stays a secret</span></div>
   </div>
 </section>
 
