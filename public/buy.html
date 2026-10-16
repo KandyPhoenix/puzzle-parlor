@@ -73,11 +73,12 @@ h2{font-family:var(--display);font-weight:400;font-size:clamp(28px,4.2vw,40px);l
 .caps b{display:block;font-size:17px;margin-bottom:4px;color:var(--gold)}
 .caps span{color:rgba(255,255,255,.75);font-size:15px}
 /* themes */
+.wrap.narrow{max-width:800px}
 .themes{padding:70px 0 20px}
 .eggs2{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
 .eggs2 .sub{margin-bottom:0}
 .teaser{position:relative;border-radius:18px;overflow:hidden;box-shadow:0 30px 60px -28px rgba(0,0,0,.6);background:#0d0b16}
-.teaser video{display:block;width:100%;height:auto}
+.teaser canvas{display:block;width:100%;height:auto;cursor:pointer}
 .teaser span{position:absolute;left:0;right:0;bottom:0;padding:10px 14px;font-size:13px;color:rgba(255,255,255,.85);background:linear-gradient(transparent,rgba(0,0,0,.65))}
 @media(max-width:900px){.eggs2{grid-template-columns:1fr}}
 .mood2{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start}
@@ -113,7 +114,6 @@ h2{font-family:var(--display);font-weight:400;font-size:clamp(28px,4.2vw,40px);l
 .price{padding:70px 0}
 .pricehow{display:grid;grid-template-columns:2fr 1fr;gap:36px;align-items:start}
 .howcol .steps{grid-template-columns:1fr;margin-top:18px;gap:14px}
-.howcol h2{font-size:30px}
 @media(max-width:960px){.pricehow{grid-template-columns:1fr}.howcol .steps{grid-template-columns:1fr}}
 
 .pcard{position:relative;margin:0;background:linear-gradient(160deg,#1a1d3a,#2b2152);color:#fff;border-radius:24px;padding:40px;display:grid;grid-template-columns:1fr 1fr;gap:30px;box-shadow:0 50px 100px -40px rgba(43,33,82,.9)}
@@ -267,7 +267,7 @@ dialog#contact::backdrop{background:rgba(18,21,43,.72);backdrop-filter:blur(4px)
       <h2>Hidden Easter Eggs And Surprise Endings</h2>
       <p class="sub" style="max-width:720px">Reveal the hidden treasure, does X really mark the spot? Some pictures are hiding something, and placing the right pieces reveals it. Finish others and watch your creation come to life to celebrate. What happens, and where, is for you to find out. New surprises are added over time. Full version only.</p>
     </div>
-    <div class="teaser"><video poster="shots/surprise-teaser.jpg" autoplay muted loop playsinline aria-label="A finished puzzle coming alive, blurred so the picture stays a secret"><source src="shots/surprise-teaser.webm" type="video/webm"><source src="shots/surprise-teaser.mp4" type="video/mp4"></video><span>One of the endings, blurred so the picture stays a secret</span></div>
+    <div class="teaser"><canvas id="eggDemo" width="840" height="640" aria-label="A small jigsaw that puts itself together and then does something unexpected"></canvas><span id="eggDemoCap">Watch this one finish</span></div>
   </div>
 </section>
 
@@ -331,7 +331,7 @@ dialog#contact::backdrop{background:rgba(18,21,43,.72);backdrop-filter:blur(4px)
 </section>
 
 <section class="feat" id="about">
-  <div class="wrap">
+  <div class="wrap narrow">
     <span class="kicker">Why people pick Puzzle Parlor</span>
     <h2>Online Jigsaw Puzzles That Feel Like The Real Thing</h2>
     <p class="sub" style="max-width:760px">Most free jigsaw puzzle apps are built for a phone screen: tiny pieces, ads between every puzzle, and pictures that blur the moment you zoom. Puzzle Parlor is built for the way people actually do jigsaws, on an iPad or a computer with a cup of tea, over a few evenings. Every picture is stored at full resolution, so a 1,000-piece puzzle stays sharp when you lean in to match a brushstroke. The piece tray keeps loose pieces sorted along the bottom, the table locks so nothing slides while you work, and your progress is saved the moment you place a piece.</p>
@@ -396,6 +396,58 @@ f.addEventListener('submit',async e=>{ e.preventDefault();
   }catch{ m.textContent='No connection. Please try again, or email puzzles@kandyphoenix.com.'; m.className='msg err'; }
   send.disabled=false;
 });})();
+</script>
+
+<script>
+(function(){
+  const c=document.getElementById('eggDemo'); if(!c) return; const g=c.getContext('2d'), W=c.width, H=c.height, cap=document.getElementById('eggDemoCap');
+  const cols=4, rows=3, bx=120, by=90, bw=600, bh=450, pw=bw/cols, ph=bh/rows, t=pw*.22;
+  const cols4=['#f2b134','#ff8c42','#b79cf2','#5cc3ff','#5fe0b7','#ffd36b','#ff6f91','#7ec8ff','#a7f0d1','#ffc27a','#c9b6ff','#9fe3ff'];
+  const rnd=(a,b)=>a+Math.random()*(b-a), reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // tab layout: h[r][c] is the edge below row r; v[r][c] is the edge right of col c. +1 tab out, -1 in
+  const hE=[],vE=[]; for(let r=0;r<rows;r++){hE[r]=[];vE[r]=[];for(let k=0;k<cols;k++){hE[r][k]=r<rows-1?(Math.random()<.5?1:-1):0; vE[r][k]=k<cols-1?(Math.random()<.5?1:-1):0}}
+  function piecePath(r,k){ const P=new Path2D(), top=r?-hE[r-1][k]:0, right=vE[r][k], bottom=hE[r][k], left=k?-vE[r][k-1]:0;
+    const edge=(x0,y0,x1,y1,dir,nx,ny)=>{ const mx=(x0+x1)/2,my=(y0+y1)/2; if(!dir){P.lineTo(x1,y1);return} const ax=x0+(x1-x0)*.38,ay=y0+(y1-y0)*.38,bx2=x0+(x1-x0)*.62,by2=y0+(y1-y0)*.62, ox=nx*t*dir,oy=ny*t*dir;
+      P.lineTo(ax,ay); P.bezierCurveTo(ax-nx*t*.1*dir+ (x1-x0)*.02,ay-ny*t*.1*dir,mx-(x1-x0)*.16+ox,my-(y1-y0)*.16+oy,mx+ox,my+oy); P.bezierCurveTo(mx+(x1-x0)*.16+ox,my+(y1-y0)*.16+oy,bx2,by2,bx2,by2); P.lineTo(x1,y1); };
+    P.moveTo(0,0); edge(0,0,pw,0,top,0,-1); edge(pw,0,pw,ph,right,1,0); edge(pw,ph,0,ph,bottom,0,1); edge(0,ph,0,0,left,-1,0); P.closePath(); return P; }
+  const pieces=[]; for(let r=0;r<rows;r++)for(let k=0;k<cols;k++) pieces.push({r,k,path:piecePath(r,k),hx:bx+k*pw,hy:by+r*ph,x:0,y:0,rot:0,done:false,col:cols4[(r*cols+k)%cols4.length]});
+  const xPiece=pieces[6]; // the one with the X on it
+  let order=[], phase='idle', t0=0, coins=[], ghosts=[], sparks=[], raf=null, found=false;
+  function reset(){ phase='build'; t0=performance.now(); found=false; coins=[]; ghosts=[]; sparks=[]; order=pieces.slice().sort(()=>Math.random()-.5);
+    pieces.forEach((p,i)=>{ p.done=false; const side=Math.random()<.5; p.sx=side?rnd(-200,-60):rnd(W+60,W+200); p.sy=rnd(-80,H+80); p.srot=rnd(-1.2,1.2); p.x=p.sx; p.y=p.sy; p.rot=p.srot; }); cap.textContent='Watch this one finish'; }
+  function drawPiece(p,alpha){ g.save(); g.globalAlpha=alpha; g.translate(p.x+pw/2,p.y+ph/2); g.rotate(p.rot); g.translate(-pw/2,-ph/2);
+    const gr=g.createLinearGradient(0,0,pw,ph); gr.addColorStop(0,p.col); gr.addColorStop(1,'#1d1b3a'); g.fillStyle=gr; g.fill(p.path); g.lineWidth=2; g.strokeStyle='rgba(0,0,0,.45)'; g.stroke(p.path);
+    if(p===xPiece){ g.save(); g.clip(p.path); g.strokeStyle=found?'#ffe27a':'#d8443c'; g.lineWidth=found?9:7; g.lineCap='round'; g.shadowColor=found?'#ffd36b':'transparent'; g.shadowBlur=found?22:0; g.beginPath(); g.moveTo(pw*.33,ph*.33); g.lineTo(pw*.67,ph*.67); g.moveTo(pw*.67,ph*.33); g.lineTo(pw*.33,ph*.67); g.stroke(); g.restore(); }
+    g.restore(); }
+  function ghost(x,y,s,a,tilt){ g.save(); g.translate(x,y); g.rotate(tilt); g.globalAlpha=a; g.shadowColor='rgba(200,230,255,.7)'; g.shadowBlur=s*.5; const w=s*.34,hm=s*1.55; g.beginPath(); g.moveTo(-w,0); g.bezierCurveTo(-w,-s*.8,-w*.5,-s,0,-s); g.bezierCurveTo(w*.5,-s,w,-s*.8,w,0); g.bezierCurveTo(w*1.05,s*.5,w*.7,s*.9,w*.75,hm*.7); g.bezierCurveTo(w*.8,hm*.9,w*.3,hm*.85,w*.1,hm); g.bezierCurveTo(-w*.2,hm*1.08,-w*.5,hm*.8,-w*.6,hm*.65); g.bezierCurveTo(-w*.75,hm*.5,-w*1.05,s*.5,-w,0); g.closePath();
+    const gr=g.createLinearGradient(0,-s,0,hm); gr.addColorStop(0,'rgba(255,255,255,.95)'); gr.addColorStop(.45,'rgba(225,238,255,.7)'); gr.addColorStop(1,'rgba(200,225,255,0)'); g.fillStyle=gr; g.fill(); g.shadowBlur=0; g.fillStyle='rgba(40,50,80,.55)'; g.beginPath(); g.ellipse(-w*.4,-s*.4,s*.08,s*.14,0,0,6.2832); g.ellipse(w*.4,-s*.4,s*.08,s*.14,0,0,6.2832); g.fill(); g.restore(); }
+  function frame(now){
+    g.clearRect(0,0,W,H); g.fillStyle='#0d0b16'; g.fillRect(0,0,W,H);
+    g.setLineDash([8,6]); g.strokeStyle='rgba(255,255,255,.25)'; g.lineWidth=1.5; g.strokeRect(bx,by,bw,bh); g.setLineDash([]);
+    const el=now-t0;
+    if(phase==='build'){ const per=reduced?60:420, k=Math.floor(el/per);
+      order.forEach((p,i)=>{ if(i<k){ p.x=p.hx; p.y=p.hy; p.rot=0; if(!p.done){ p.done=true; if(p===xPiece){ found=true; cap.textContent='X marks the spot…'; for(let j=0;j<40;j++) sparks.push({x:p.hx+pw/2,y:p.hy+ph/2,vx:rnd(-3,3),vy:rnd(-4,1),l:1,c:'255,215,90'}); } } }
+        else if(i===k){ const u=Math.min(1,(el-i*per)/per), e=1-Math.pow(1-u,3); p.x=p.sx+(p.hx-p.sx)*e; p.y=p.sy+(p.hy-p.sy)*e; p.rot=p.srot*(1-e); } });
+      if(k>=pieces.length){ phase='alive'; t0=now; cap.textContent='…and then it comes alive'; for(let j=0;j<90;j++) coins.push({x:rnd(0,W),y:rnd(-H,-20),vy:rnd(2.2,5),ph:rnd(0,6),sp:rnd(.1,.22),s:rnd(6,13)}); for(let j=0;j<4;j++) ghosts.push({x:rnd(bx+60,bx+bw-60),y:by+bh*rnd(.5,.9),ph:rnd(0,6),amp:rnd(14,30),s:rnd(16,26),born:now+j*500,l:1}); }
+    }
+    for(const p of pieces) if(p.done||phase==='alive') drawPiece(p,1);
+    if(phase==='build') for(const p of order) if(!p.done) drawPiece(p,.95);
+    g.save(); g.globalCompositeOperation='lighter'; for(let i=sparks.length-1;i>=0;i--){ const k=sparks[i]; k.x+=k.vx; k.y+=k.vy; k.vy+=.12; k.l-=.02; if(k.l<=0){sparks.splice(i,1);continue} g.fillStyle=`rgba(${k.c},${k.l})`; g.beginPath(); g.arc(k.x,k.y,3,0,6.2832); g.fill(); } g.restore();
+    if(phase==='alive'){ const a=el/1000;
+      if(a<1.2){ g.save(); g.globalCompositeOperation='lighter'; const R=Math.min(bw,bh)*(.15+a*.5); const gr=g.createRadialGradient(xPiece.hx+pw/2,xPiece.hy+ph/2,0,xPiece.hx+pw/2,xPiece.hy+ph/2,R); gr.addColorStop(0,`rgba(255,215,90,${.6*(1-a/1.2)})`); gr.addColorStop(1,'rgba(255,215,90,0)'); g.fillStyle=gr; g.fillRect(0,0,W,H); g.restore(); }
+      for(const b of coins){ b.y+=b.vy; b.ph+=b.sp; if(b.y>H+20&&a<6){b.y=-30;b.x=rnd(0,W)} const rx=Math.max(.6,Math.abs(Math.cos(b.ph)))*b.s; if(b.y<H+20){ g.save(); g.translate(b.x,b.y); g.fillStyle='#e6b31e'; g.beginPath(); g.ellipse(0,0,rx,b.s,0,0,6.2832); g.fill(); g.lineWidth=1.2; g.strokeStyle='#9a6d05'; g.stroke(); g.fillStyle='rgba(255,245,200,.75)'; g.beginPath(); g.ellipse(-rx*.3,-b.s*.35,rx*.3,b.s*.25,0,0,6.2832); g.fill(); g.restore(); } }
+      for(const h of ghosts){ if(now<h.born) continue; h.y-=.45; h.ph+=.035; h.l-=.003; if(h.l<=0) continue; const sw=Math.sin(h.ph); ghost(h.x+sw*h.amp,h.y,h.s,Math.min(1,h.l*1.5)*.85,sw*.22); }
+      if(a>9){ phase='idle'; cap.textContent='Tap to watch it again'; }
+    }
+    if(phase!=='idle'||sparks.length) raf=requestAnimationFrame(frame); else raf=null;
+  }
+  function start(){ reset(); if(!raf) raf=requestAnimationFrame(frame); }
+  c.addEventListener('click',start);
+  // first run when the section scrolls into view
+  if('IntersectionObserver' in window){ const io=new IntersectionObserver(es=>{ if(es.some(e=>e.isIntersecting)){ start(); io.disconnect(); } },{threshold:.4}); io.observe(c); } else start();
+  // idle frame so the box is not empty before it starts
+  g.fillStyle='#0d0b16'; g.fillRect(0,0,W,H);
+})();
 </script>
 </body>
 </html>
