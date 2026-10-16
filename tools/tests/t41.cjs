@@ -1,0 +1,21 @@
+const {chromium}=require('/opt/node-tools/node_modules/playwright');
+(async()=>{const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});const out={};const errs=[];
+const pg=await (await b.newContext({viewport:{width:1100,height:760}})).newPage();pg.on('pageerror',e=>errs.push(e.message));
+await pg.goto('http://127.0.0.1:8768/');await pg.waitForTimeout(400);
+await pg.evaluate(()=>openPuzzle(IMAGES.find(i=>i.slug==='haunted-village'),100)); await pg.waitForTimeout(3000);
+const lock=(sel)=>pg.evaluate((sel)=>{ const e=EGGS[P.img.slug].hot, {pw,ph,pieces}=P, x0=e.x*P.W,y0=e.y*P.H,x1=x0+e.w*P.W,y1=y0+e.h*P.H; let n=0;
+  for(const p of pieces){ const px=p.c*pw,py=p.r*ph, inHot=px<x1&&px+pw>x0&&py<y1&&py+ph>y0; if(sel==='hot'?!inHot:inHot) continue; if(P.groups.get(p.g).locked) continue; if(p.inTray){p.inTray=false;P.tray=P.tray.filter(k=>k!==pieces.indexOf(p));} p.x=p.c*pw; p.y=p.r*ph; snap(p.g); n++; } updateProgress(); draw(); return n; },sel);
+await lock('others'); await lock('hot'); await pg.waitForTimeout(300);
+out.shown=await pg.evaluate(()=>({toast:!document.getElementById('eggToast').hidden,btns:[...document.querySelectorAll('#eggToast button')].map(b=>b.textContent),hold:P.eggFx&&P.eggFx.hold}));
+await pg.screenshot({path:'hot_note.png'});
+await pg.click('#eggToast button:first-child'); await pg.waitForTimeout(400);
+out.admire=await pg.evaluate(()=>({hold:P.eggFx&&P.eggFx.hold,fx:!!P.eggFx,btns:[...document.querySelectorAll('#eggToast button')].map(b=>b.textContent)}));
+await pg.waitForTimeout(5000); out.stillGlowing=await pg.evaluate(()=>!!P.eggFx);
+await pg.screenshot({path:'hot_admire.png'});
+await pg.click('#eggToast button'); await pg.waitForTimeout(700);
+out.stopped=await pg.evaluate(()=>({fx:!!P.eggFx,toastShown:document.getElementById('eggToast').classList.contains('show')}));
+// second path: keep building straight away
+await pg.evaluate(()=>{ P.eh=false; eggCheck(); }); await pg.waitForTimeout(300);
+await pg.click('#eggToast button:nth-child(2)'); await pg.waitForTimeout(700);
+out.keep=await pg.evaluate(()=>({fx:!!P.eggFx,toastShown:document.getElementById('eggToast').classList.contains('show')}));
+out.errs=errs;console.log(JSON.stringify(out,null,1));await b.close()})();

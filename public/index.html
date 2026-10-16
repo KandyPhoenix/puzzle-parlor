@@ -224,7 +224,8 @@ label.hard input{accent-color:var(--brass-text);width:16px;height:16px;margin:0}
 .btn.ghost{background:var(--chip);color:var(--ink)}
 #confetti{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:4}
 .box .egg{align-self:flex-start;margin-top:4px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#fff;background:#7c5cbf;padding:2px 7px;border-radius:3px}
-#eggToast{position:absolute;left:50%;top:14px;transform:translateX(-50%);z-index:5;max-width:min(92%,520px);text-align:center;background:rgba(35,38,43,.92);color:#fff;padding:10px 18px;border-radius:8px;font-weight:700;pointer-events:none;opacity:0;transition:opacity .45s}#eggToast.show{opacity:1}
+#eggToast{position:absolute;left:50%;top:14px;transform:translateX(-50%);z-index:5;max-width:min(92%,520px);text-align:center;background:rgba(35,38,43,.94);color:#fff;padding:12px 18px 10px;border-radius:10px;font-weight:700;pointer-events:none;opacity:0;transition:opacity .45s;box-shadow:0 18px 40px -16px rgba(0,0,0,.6)}#eggToast.show{opacity:1;pointer-events:auto}
+#eggToast .row{display:flex;gap:8px;justify-content:center;margin-top:10px}#eggToast .btn{padding:7px 14px;font-size:14px}
 #restart.armed,#hardBtn.armed{background:#b7412f;color:#fff}
 #tray{display:flex;align-items:stretch;gap:6px;padding:6px 8px;background:var(--tray);border-top:1px solid var(--faint);box-shadow:0 -6px 16px -10px rgba(35,38,43,.25)}
 .tray-nav{flex:none;width:34px;border:0;border-radius:6px;background:var(--chip);cursor:pointer;display:grid;place-items:center}
@@ -1067,16 +1068,24 @@ function eggTune(){ if(!flags.sound||!ac) return; eggTuneStop(); try{
   for(let i=0;i<32;i++){ const at=t0+i*q, o=ac.createOscillator(), g=ac.createGain(); o.type='sine'; o.frequency.setValueAtTime(150,at); o.frequency.exponentialRampToValueAtTime(45,at+.12); g.gain.setValueAtTime(.5,at); g.gain.exponentialRampToValueAtTime(.001,at+.14); o.connect(g).connect(master); o.start(at); o.stop(at+.15); }
 }catch(e){} }
 function eggTuneStop(){ if(!eggBand) return; try{ const m=eggBand.master; m.gain.setTargetAtTime(0,ac.currentTime,.15); setTimeout(()=>{try{m.disconnect()}catch(e){}},600); }catch(e){} eggBand=null; }
-function eggToast(msg){ const t=$('eggToast'); t.textContent=msg; t.hidden=false; t.classList.remove('show'); void t.offsetWidth; t.classList.add('show'); clearTimeout(eggToast.h); eggToast.h=setTimeout(()=>{t.classList.remove('show'); setTimeout(()=>{t.hidden=true},500)},4200); }
+function eggToast(msg,opts){ const t=$('eggToast'); t.textContent=''; const m=document.createElement('div'); m.textContent=msg; t.appendChild(m);
+  if(opts&&opts.admire){ const row=document.createElement('div'); row.className='row';
+    const a=document.createElement('button'); a.className='btn'; a.textContent='Admire it'; a.onclick=()=>{ clearTimeout(eggToast.h); if(P&&P.eggFx){ P.eggFx.t0=performance.now(); P.eggFx.hold=60000; } m.textContent=msg; row.remove(); const k=document.createElement('div'); k.className='row'; const b2=document.createElement('button'); b2.className='btn ghost'; b2.textContent='Keep building'; b2.onclick=()=>{ if(P) P.eggFx=null; eggToastHide(); draw(); }; k.appendChild(b2); t.appendChild(k); eggToast.h=setTimeout(eggToastHide,60000); draw(); };
+    const b=document.createElement('button'); b.className='btn ghost'; b.textContent='Keep building'; b.onclick=()=>{ if(P) P.eggFx=null; eggToastHide(); draw(); };
+    row.appendChild(a); row.appendChild(b); t.appendChild(row); }
+  t.hidden=false; t.classList.remove('show'); void t.offsetWidth; t.classList.add('show'); clearTimeout(eggToast.h); eggToast.h=setTimeout(eggToastHide,(opts&&opts.admire)?12000:4200); }
+function eggToastHide(){ const t=$('eggToast'); t.classList.remove('show'); setTimeout(()=>{t.hidden=true},500); }
 function eggCheck(){
   if(!eggActive()||P.eh||P.won) return; const e=eggOf(P.img); if(!e.hot) return;
   const {pw,ph,pieces}=P, h=e.hot, x0=h.x*P.W,y0=h.y*P.H,x1=x0+h.w*P.W,y1=y0+h.h*P.H;
   for(const p of pieces){ const px=p.c*pw,py=p.r*ph; if(px<x1&&px+pw>x0&&py<y1&&py+ph>y0&&!P.groups.get(p.g).locked) return; }
   P.eh=true; P.eggFx={t0:performance.now(),x:(h.x+h.w/2)*P.W,y:(h.y+h.h/2)*P.H,r:Math.max(h.w*P.W,h.h*P.H)*.7,col:h.color||'255,215,90'};
-  ensureAudio(); eggChime(); eggToast(h.msg); save(); if(!REDUCED()) draw();
+  ensureAudio(); eggChime(); eggToast(h.msg,{admire:true}); P.eggFx.hold=12000; save(); if(!REDUCED()) draw();
 }
 function drawEggFx(z){
-  if(!P.eggFx) return; const a=(performance.now()-P.eggFx.t0)/3200; if(a>=1){ P.eggFx=null; return; }
+  if(!P.eggFx) return; const el=performance.now()-P.eggFx.t0, hold=P.eggFx.hold||3200; if(el>=hold){ P.eggFx=null; return; }
+  // a: 0 at the start of each pulse cycle, 1 at the end; the glow fades out over the last 1.2 s of the hold
+  const fade=Math.max(0,Math.min(1,(hold-el)/1200)), a=1-fade*(1-(el%3200)/3200);
   const {x,y,r,col}=P.eggFx, pulse=.5+.5*Math.sin(a*Math.PI*7), R=r*(1.2+.6*pulse);
   ctx.save(); ctx.globalCompositeOperation='lighter';
   const gr=ctx.createRadialGradient(x,y,0,x,y,R); gr.addColorStop(0,`rgba(${col},${.6*(1-a)})`); gr.addColorStop(1,`rgba(${col},0)`);
