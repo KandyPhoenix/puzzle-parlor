@@ -1208,8 +1208,8 @@ cv.addEventListener('pointerdown',e=>{
   const touch=e.pointerType==='touch';
   const panGesture=e.button===1||e.button===2||e.shiftKey; // middle/right button or Shift: always pans
   if(panGesture){pan={x:sx,y:sy,cx:cam.x,cy:cam.y,pid:e.pointerId};return}
-  const[wx,wy]=world(sx,sy), id=hitTest(wx,wy,(touch?36:10)/cam.z); // a near miss still grabs the piece, so the table does not pan instead
-  const lift=touch?P.ph*.6+36/cam.z:0; // on touch, the piece rides above the fingertip
+  const[wx,wy]=world(sx,sy), id=hitTest(wx,wy,(touch?4:6)/cam.z); // the finger has to be on the piece to grab it
+  const lift=0; // the piece stays right under the finger
   const now=performance.now(), dbl=id!=null&&id===lastTap.id&&now-lastTap.t<400&&Math.hypot(sx-lastTap.x,sy-lastTap.y)<24;
   lastTap={t:now,x:sx,y:sy,id};
   if(dbl){lastTap.id=null;if(P.hard)rotateGroup(id);else centreGroup(id);return}
