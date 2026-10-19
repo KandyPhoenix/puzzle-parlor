@@ -43,3 +43,8 @@ fantasy	broadside
 fantasy	wizard-rune
 vibes	lakeside-breathe
 vibes	greenhouse-growth
+vibes	cafe-forecast
+vibes	sloth-snacks
+animals	reef-paradise
+vibes	window-seat-rest
+vibes	forest-one-step
