@@ -41,3 +41,5 @@ fantasy	temple-chamber
 fantasy	castle-siege
 fantasy	broadside
 fantasy	wizard-rune
+vibes	lakeside-breathe
+vibes	greenhouse-growth
