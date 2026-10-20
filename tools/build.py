@@ -90,6 +90,8 @@ NEW=[n for n in NEW if n not in QUEUED]
 missing=[n for n in NEW if not os.path.exists(f'img/{n}.jpg')]
 if missing: print('NOT YET SHARPENED, skipped:',missing)
 rows=rows+[(NEWC[n],n,'') for n in NEW if n not in missing]
+# ADDED: release dates (YYYY-MM-DD) for the 'New scene' chip; the release script fills this in for new puzzles
+ADDED={}
 # PIN: these go to the top of their category (the first two per category are the free ones)
 PIN=['monster-ball','haunted-village']
 for slug in reversed(PIN):
@@ -104,7 +106,7 @@ for cat,slug,_ in rows:
     im=Image.open(f'img/{slug}.jpg'); shutil.copy(f'img/{slug}.jpg',f'out/img/{slug}.jpg')
     ImageOps.fit(im,(520,390),Image.LANCZOS).save(f'out/thumbs/{slug}.jpg','JPEG',quality=78,optimize=True,progressive=True)
     t,a,y=D[slug]
-    imgs.append(dict(cat=cat,slug=slug,title=t,artist=a,year=y,w=im.width,h=im.height,page=m['page'],isNew=slug in NEW))
+    imgs.append(dict(cat=cat,slug=slug,title=t,artist=a,year=y,w=im.width,h=im.height,page=m['page'],isNew=slug in NEW,added=ADDED.get(slug,'')))
 h=open('index.html').read().replace('/*IMAGES*/[]',json.dumps(imgs,ensure_ascii=False))
 open('out/index.html','w').write(h)
 print(len(imgs),'images');os.system('du -sh out/img out/thumbs')

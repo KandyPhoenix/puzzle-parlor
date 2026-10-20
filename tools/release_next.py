@@ -28,7 +28,7 @@ head,rest=s.split('const IMAGES=',1); arr,tail=rest.split(';\nconst SIZES',1)
 imgs=json.loads(arr)
 if any(i['slug']==slug for i in imgs): print(slug,'already live'); sys.exit(1)
 if f"id:'{cat}'" not in s: print('theme',cat,'is not in CATS; add it to public/index.html and tools/index.src.html first'); sys.exit(1)
-imgs.append({'cat':cat,'slug':slug,'title':title,'artist':artist,'year':year,'w':w,'h':h,'page':page,'isNew':False})
+imgs.append({'cat':cat,'slug':slug,'title':title,'artist':artist,'year':year,'w':w,'h':h,'page':page,'isNew':True,'added':__import__('datetime').date.today().isoformat()})
 s=head+'const IMAGES='+json.dumps(imgs,ensure_ascii=False)+';\nconst SIZES'+tail
 open(H,'w',encoding='utf-8').write(s)
 # 3. new service-worker cache name so every device drops the old copy
