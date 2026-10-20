@@ -1,8 +1,6 @@
-vibes	choose-happiness
 vibes	todays-forecast
 vibes	on-fire
 vibes	choose-peace
-vibes	silly-cow
 animals	tide-pool
 animals	penguin-beach
 sports	stadium-lights
@@ -10,7 +8,6 @@ christmas	bookshop-cafe
 landscapes	blossom-village
 animals	koi-pond
 vibes	forest-shrine
-vibes	zen-morning
 vibes	zen-sunset
 vibes	curious-crow
 christmas	gingerbread-emporium
@@ -23,7 +20,6 @@ fantasy	captains-cabin
 fantasy	smugglers-cove
 fantasy	sunken-treasure
 vibes	crooked-town
-vibes	carnival-lights
 vibes	candy-factory
 sports	elk-hunt
 sports	alpine-trail
