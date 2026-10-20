@@ -90,6 +90,12 @@ NEW=[n for n in NEW if n not in QUEUED]
 missing=[n for n in NEW if not os.path.exists(f'img/{n}.jpg')]
 if missing: print('NOT YET SHARPENED, skipped:',missing)
 rows=rows+[(NEWC[n],n,'') for n in NEW if n not in missing]
+# PIN: these go to the top of their category (the first two per category are the free ones)
+PIN=['monster-ball','haunted-village']
+for slug in reversed(PIN):
+    r=next((x for x in rows if x[1]==slug),None)
+    if r:
+        rows.remove(r); first=next(i for i,x in enumerate(rows) if x[0]==r[0]); rows.insert(first,r)
 rows.sort(key=lambda r:[c['id'] for c in __import__('json').loads(open('cats.json').read())].index(r[0]) if False else 0)  # stable: keep file order
 os.makedirs('out/img',exist_ok=True); os.makedirs('out/thumbs',exist_ok=True)
 imgs=[]

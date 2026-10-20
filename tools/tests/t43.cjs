@@ -1,0 +1,12 @@
+const {chromium}=require('/opt/node-tools/node_modules/playwright');
+(async()=>{const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});const pg=await b.newPage({viewport:{width:1100,height:800}});const errs=[];pg.on('pageerror',e=>errs.push(e.message));
+await pg.goto('http://127.0.0.1:8768/');await pg.waitForTimeout(600);
+await pg.click('.tab[data-cat="halloween"]').catch(()=>{});await pg.waitForTimeout(300);
+const order=await pg.$$eval('#grid .box',a=>a.map(x=>x.dataset.slug).slice(0,3));
+await pg.click('#grid .box:first-of-type .art');await pg.waitForTimeout(1500);
+const open=await pg.evaluate(()=>({hidden:document.getElementById('look').hidden,src:document.getElementById('lookImg').src.split('/').slice(-2).join('/'),cap:document.getElementById('lookCap').textContent}));
+await pg.screenshot({path:'look.png'});
+await pg.click('#look');await pg.waitForTimeout(200);
+const closed=await pg.evaluate(()=>document.getElementById('look').hidden);
+const free=await pg.$$eval('#grid .box',a=>a.slice(0,3).map(x=>x.querySelector('.free')?'free':x.querySelector('.lock')?'lock':'-'));
+console.log(JSON.stringify({order,open,closed,free,errs}));await b.close()})();

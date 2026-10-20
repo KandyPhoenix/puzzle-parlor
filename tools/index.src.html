@@ -64,6 +64,20 @@ button{font:inherit;color:inherit}
 .box .art{position:relative;aspect-ratio:4/3;max-width:100%;background:var(--wood-2);overflow:hidden;border-bottom:3px solid var(--cat)}
 .box .art img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s ease}
 .box:hover .art img{transform:scale(1.04)}
+.box .art{cursor:zoom-in}
+#promo{display:flex;align-items:center;gap:16px;margin:0 0 18px;padding:12px 14px;border-radius:8px;background:var(--card);border:1px solid var(--brass);box-shadow:0 6px 24px rgba(0,0,0,.18)}
+#promo img{width:150px;height:auto;aspect-ratio:4/3;align-self:center;object-fit:cover;border-radius:5px;flex:none;cursor:zoom-in}
+#promo .ptext{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+#promo .kick{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--brass-ink);background:var(--brass);padding:2px 7px;border-radius:3px;align-self:flex-start}
+#promo h2{margin:0;font-size:19px;line-height:1.25;text-wrap:balance}
+#promo p{margin:0;color:var(--muted);font-size:14px}
+#promo .ends{font-size:12px;color:var(--brass-text);font-weight:700}
+#promo .btn{flex:none}
+@media (max-width:640px){#promo{flex-wrap:wrap}#promo img{width:100%;max-height:160px}#promo .btn{width:100%}}
+#look{position:fixed;inset:0;z-index:50;background:rgba(20,22,26,.94);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:14px;cursor:zoom-out}
+#look img{max-width:100%;max-height:calc(100% - 56px);object-fit:contain;border:3px solid #fff;box-shadow:0 20px 50px rgba(0,0,0,.5);background:#222}
+#look .cap{color:#f1f2f4;font-size:14px;text-align:center;text-wrap:balance}
+#look .cap small{display:block;color:#b9bcc3;font-size:12px;margin-top:2px}
 .box .meta{padding:14px 16px 4px;display:flex;flex-direction:column;gap:2px;min-width:0}
 .box h3{margin:0;font-size:16px;font-weight:700;line-height:1.3;text-wrap:balance}
 .box .by{color:var(--muted);font-size:13px}
@@ -235,6 +249,11 @@ label.hard input{accent-color:var(--brass-text);width:16px;height:16px;margin:0}
       <h1>Puzzle <span>Parlor</span></h1>
       <p id="lede">Jigsaw puzzles of spooky Halloween scenes, cozy Christmas and holiday pictures, famous paintings, fantasy worlds, fairy tales and landscapes. Pick any picture and choose from 100 to 1,000 pieces.</p>
     </header>
+    <section id="promo" hidden aria-label="Special offer">
+      <img id="promoImg" alt="" width="520" height="390">
+      <div class="ptext"><span class="kick" id="promoKick"></span><h2 id="promoTitle"></h2><p id="promoText"></p><span class="ends" id="promoEnds"></span></div>
+      <button class="btn" id="promoBtn">Play it</button>
+    </section>
     <section id="pinned" hidden aria-label="Pinned puzzles">
       <h2>Pinned</h2>
       <div class="pinrow" id="pinrow"></div>
@@ -350,6 +369,7 @@ label.hard input{accent-color:var(--brass-text);width:16px;height:16px;margin:0}
   </div>
 </section>
 
+<div id="look" hidden><img id="lookImg" alt=""><div class="cap" id="lookCap"></div></div>
 <script>
 const CATS=[
   {id:'halloween',label:'Halloween'},
@@ -398,8 +418,17 @@ const EGGS={
   'haunted-village':{hot:{x:.52,y:.03,w:.22,h:.28,msg:'The lights are on in the haunted house. Somebody is home…',color:'255,170,60'},fin:'haunt',glow:{x:.62,y:.2},
     fx:{pumpkins:[[.05,.83,.07],[.07,.9,.07],[.04,.96,.06],[.28,.67,.05],[.63,.7,.06],[.67,.77,.05],[.71,.71,.05],[.94,.51,.05],[.6,.52,.03]],lamps:[[.16,.84],[.33,.55],[.84,.55],[.97,.4],[.93,.62]],windows:[[.2,.49],[.18,.58],[.35,.5],[.42,.47],[.49,.52]],house:{x:.52,y:.05,w:.22,h:.25,win:[[.575,.22],[.62,.17],[.665,.22],[.6,.27],[.64,.27]]},cauldron:{x:.78,y:.83},moon:{x:.37,y:.16,r:.11}}}
 };
+// Promotions shown on the main page. A promo with free:true makes that puzzle free while it runs
+// (it does not count toward the two always-free puzzles per theme, so it locks again when the promo ends).
+// Dates are local time; 'until' is the first moment the promo is over.
+const PROMOS=[
+  {slug:'monster-ball',kick:'Free for Halloween',title:'The Monster Ball is free until November 1',text:'Join the dance: ghouls, goblins and a very suspicious punch bowl. Play it free in any size, then see if you can find what is hiding in the ballroom.',until:'2026-11-01T00:00:00',free:true,btn:'Play it free'}
+];
+const promoActive=p=>{const now=Date.now(); return (!p.from||now>=new Date(p.from).getTime()) && now<new Date(p.until).getTime();};
+const PROMO_FREE=new Set(PROMOS.filter(p=>p.free).map(p=>p.slug));
 const FREE_PER_CAT=2, FREE=new Set();
-{const seen={}; for(const i of IMAGES){seen[i.cat]=(seen[i.cat]||0)+1; if(seen[i.cat]<=FREE_PER_CAT) FREE.add(i.slug);}}
+{const seen={}; for(const i of IMAGES){ if(PROMO_FREE.has(i.slug)) continue; seen[i.cat]=(seen[i.cat]||0)+1; if(seen[i.cat]<=FREE_PER_CAT) FREE.add(i.slug);}
+ for(const p of PROMOS) if(p.free&&promoActive(p)) FREE.add(p.slug);}
 const lic={get(){return store.get('jig-lic')},set(v){v?store.set('jig-lic',v):store.del('jig-lic')}};
 function deviceId(){let d=store.get('jig-dev');if(!d){d=crypto.randomUUID?crypto.randomUUID():Math.random().toString(36).slice(2)+Date.now().toString(36);store.set('jig-dev',d)}return d}
 const unlocked=()=>!LOCKING||!!(lic.get()&&lic.get().ok);
@@ -522,9 +551,27 @@ $('tabs').addEventListener('keydown',e=>{
   const i=CATS.findIndex(c=>c.id===cat), j=(i+(e.key==='ArrowRight'?1:-1)+CATS.length)%CATS.length;
   cat=CATS[j].id;store.set('jig-cat',cat);renderTabs();renderGrid();
 });
-$('grid').addEventListener('click',e=>{const b=e.target.closest('.size');if(!b)return;openPuzzle(findImg(b.dataset.slug),+b.dataset.n)});
+$('grid').addEventListener('click',e=>{
+  const a=e.target.closest('.art'); if(a){const box=a.closest('.box'); if(box&&box.dataset.slug) openLook(findImg(box.dataset.slug)); return}
+  const b=e.target.closest('.size');if(!b)return;openPuzzle(findImg(b.dataset.slug),+b.dataset.n)});
+// Tap the picture on a card to see it big before choosing a size
+function openLook(img){ if(!img) return; const im=$('lookImg'); im.src=thumbOf(img); im.alt=img.title;
+  const full=new Image(); full.onload=()=>{ if(!$('look').hidden) im.src=full.src }; full.src=srcOf(img);
+  $('lookCap').innerHTML=esc(img.title)+(img.artist&&!img.photo?' · '+esc(img.artist):'')+'<small>Tap anywhere to close, then pick a size</small>';
+  $('look').hidden=false; }
+$('look').onclick=()=>{$('look').hidden=true;$('lookImg').src=''};
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!$('look').hidden){$('look').hidden=true;$('lookImg').src=''} });
 $('lede').textContent='Jigsaw puzzles of spooky Halloween scenes, cozy Christmas and holiday pictures, famous paintings, fantasy worlds, fairy tales, landscapes, animals, sports and racing, happy sayings, or your own photos. Pick any picture and choose from 100 to 1,000 pieces.';
 renderTabs();renderGrid();
+function renderPromo(){ const p=PROMOS.find(promoActive); const el=$('promo'); if(!p){el.hidden=true;return}
+  const img=findImg(p.slug); if(!img){el.hidden=true;return}
+  $('promoImg').src=thumbOf(img); $('promoImg').alt=img.title; $('promoKick').textContent=p.kick||''; $('promoTitle').textContent=p.title; $('promoText').textContent=p.text||'';
+  const d=new Date(p.until); $('promoEnds').textContent='Ends '+d.toLocaleDateString(undefined,{month:'long',day:'numeric'});
+  $('promoBtn').textContent=p.btn||'Play it';
+  $('promoBtn').onclick=()=>{ cat=img.cat; store.set('jig-cat',cat); renderTabs(); renderGrid(); const box=document.querySelector(`#grid .box[data-slug="${p.slug}"]`); if(box) box.scrollIntoView({behavior:'smooth',block:'center'}); };
+  $('promoImg').onclick=()=>openLook(img);
+  el.hidden=false; }
+renderPromo();
 
 /* ---------- cross-device sync (Cloudflare KV behind /api) ---------- */
 const SYNC_WORDS=['apple','brook','candle','dragon','ember','forest','garden','harbor','island','jasper','kettle','lantern','meadow','nectar','orchid','pepper','quartz','river','saddle','timber','velvet','willow','maple','copper','silver','marble','pebble','sunny','frost','clover'];
