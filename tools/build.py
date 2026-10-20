@@ -72,6 +72,8 @@ D={
 'zen-garden':("Evening in the Zen Garden","Original art",""),
 'zen-morning':("Morning in the Zen Garden","Original art",""),
 'carnival-lights':("A Night at the Fair","Original art",""),
+'zen-bamboo':("The Bamboo Zen Garden","Original art",""),
+'zen-waterfall':("Buddha by the Waterfall","Original art",""),
 'rocky-storm':("A Storm in the Rocky Mountains, Mt. Rosalie","Albert Bierstadt","1866"),
 'poppy-field':("Poppy Field","Claude Monet","1873"),
 'paris-rainy-day':("Paris Street; Rainy Day","Gustave Caillebotte","1877"),
@@ -84,7 +86,7 @@ D={
 }
 meta={m['slug']:m for m in json.load(open('meta.json'))}
 rows=[l.rstrip('\n').split('\t') for l in open('list.tsv') if l.strip()]
-NEWC={'haunted-village':'halloween','monster-ball':'halloween','witch-kitchen':'halloween','midnight-graveyard':'halloween','fairytale-kingdom':'fairytales','gingerbread-house':'fairytales','santa-workshop':'christmas','gingerbread-village':'christmas','sleigh-over-town':'christmas','forest-picnic':'animals','cat-cafe':'animals','dog-park':'animals','grand-prix-street':'sports','tide-pool':'animals','penguin-beach':'animals','stadium-lights':'sports','drag-race':'sports','bookshop-cafe':'christmas','blossom-village':'landscapes','koi-pond':'animals','autumn-village':'holiday','savanna-sunset':'animals','aurora-lake':'landscapes','choose-happiness':'vibes','todays-forecast':'vibes','on-fire':'vibes','choose-peace':'vibes','silly-cow':'vibes','zen-garden':'vibes','hunter-and-dog':'sports','regatta':'sports','zen-morning':'vibes','carnival-lights':'vibes'}
+NEWC={'haunted-village':'halloween','monster-ball':'halloween','witch-kitchen':'halloween','midnight-graveyard':'halloween','fairytale-kingdom':'fairytales','gingerbread-house':'fairytales','santa-workshop':'christmas','gingerbread-village':'christmas','sleigh-over-town':'christmas','forest-picnic':'animals','cat-cafe':'animals','dog-park':'animals','grand-prix-street':'sports','tide-pool':'animals','penguin-beach':'animals','stadium-lights':'sports','drag-race':'sports','bookshop-cafe':'christmas','blossom-village':'landscapes','koi-pond':'animals','autumn-village':'holiday','savanna-sunset':'animals','aurora-lake':'landscapes','choose-happiness':'vibes','todays-forecast':'vibes','on-fire':'vibes','choose-peace':'vibes','silly-cow':'vibes','zen-garden':'vibes','hunter-and-dog':'sports','regatta':'sports','zen-morning':'vibes','carnival-lights':'vibes','zen-bamboo':'vibes','zen-waterfall':'vibes'}
 NEW=list(NEWC)
 for n in NEW: meta[n]={'lic':'Original','page':''}
 QUEUED=set(l.strip().split('\t')[1] for l in open('queued.txt') if l.strip()) if os.path.exists('queued.txt') else set()
@@ -93,7 +95,7 @@ missing=[n for n in NEW if not os.path.exists(f'img/{n}.jpg')]
 if missing: print('NOT YET SHARPENED, skipped:',missing)
 rows=rows+[(NEWC[n],n,'') for n in NEW if n not in missing]
 # ADDED: release dates (YYYY-MM-DD) for the 'New scene' chip; the release script fills this in for new puzzles
-ADDED={'zen-morning':'2026-10-20','carnival-lights':'2026-10-20','choose-happiness':'2026-10-20','silly-cow':'2026-10-20'}
+ADDED={'zen-morning':'2026-10-20','carnival-lights':'2026-10-20','choose-happiness':'2026-10-20','silly-cow':'2026-10-20','zen-bamboo':'2026-10-20','zen-waterfall':'2026-10-20'}
 # PIN: these go to the top of their category (the first two per category are the free ones)
 PIN=['monster-ball','haunted-village','zen-garden']
 for slug in reversed(PIN):
