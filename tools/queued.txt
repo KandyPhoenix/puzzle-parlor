@@ -46,3 +46,4 @@ vibes	window-seat-rest
 vibes	forest-one-step
 christmas	christmas-market
 fantasy	mermaid-grotto
+animals	koi-lotus
