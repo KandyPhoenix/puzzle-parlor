@@ -53,3 +53,4 @@ fairytales	enchanted-cottage
 animals	owl-at-dusk
 holiday	harvest-kitchen
 fantasy	dragon-wisteria
+landscapes	lantern-festival
