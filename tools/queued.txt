@@ -48,3 +48,4 @@ christmas	christmas-market
 fantasy	mermaid-grotto
 animals	koi-lotus
 vibes	teacup-garden
+landscapes	lighthouse-storm
