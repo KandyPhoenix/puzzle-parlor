@@ -44,3 +44,4 @@ vibes	sloth-snacks
 animals	reef-paradise
 vibes	window-seat-rest
 vibes	forest-one-step
+christmas	christmas-market
