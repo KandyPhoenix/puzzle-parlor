@@ -54,3 +54,5 @@ animals	owl-at-dusk
 holiday	harvest-kitchen
 fantasy	dragon-wisteria
 landscapes	lantern-festival
+landscapes	winter-cabin
+animals	tide-pools-sunset
