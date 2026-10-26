@@ -58,3 +58,4 @@ landscapes	winter-cabin
 animals	tide-pools-sunset
 animals	jungle-waterfall
 halloween	haunted-library
+vibes	stay-wild
