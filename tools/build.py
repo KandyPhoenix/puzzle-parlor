@@ -102,7 +102,7 @@ rows=rows+[(NEWC[n],n,'') for n in NEW if n not in missing]
 # ADDED: release dates (YYYY-MM-DD) for the 'New scene' chip; the release script fills this in for new puzzles
 ADDED={'zen-morning':'2026-10-20','carnival-lights':'2026-10-20','choose-happiness':'2026-10-20','silly-cow':'2026-10-20','zen-bamboo':'2026-10-20','zen-waterfall':'2026-10-20','monster-ball-toon':'2026-10-20','trick-or-treat-lane':'2026-10-20','witch-kitchen-toon':'2026-10-20','koi-garden-sunset':'2026-10-20','zen-stones':'2026-10-23'}
 # PIN: these go to the top of their category (the first two per category are the free ones)
-PIN=['monster-ball','haunted-village','zen-garden']
+PIN=['monster-ball','haunted-village','haunted-library','zen-garden']
 for slug in reversed(PIN):
     r=next((x for x in rows if x[1]==slug),None)
     if r:
