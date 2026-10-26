@@ -57,3 +57,4 @@ landscapes	lantern-festival
 landscapes	winter-cabin
 animals	tide-pools-sunset
 animals	jungle-waterfall
+halloween	haunted-library
