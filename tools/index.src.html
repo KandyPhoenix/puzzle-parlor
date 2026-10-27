@@ -37,7 +37,11 @@ button{font:inherit;color:inherit}
 .mast h1{font-family:var(--display);font-weight:400;font-size:clamp(42px,8vw,76px);line-height:1;letter-spacing:-.01em;margin:0;color:var(--head-soft);text-wrap:balance}
 .mast h1 span{color:var(--head-ink)}
 .mast p{font-family:"Nunito",var(--body);font-size:clamp(16px,2vw,19px);line-height:1.55;margin:24px 0 0;max-width:36em;color:var(--head-ink);opacity:.95}
-.tabs{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-block:22px 26px}
+.shelfhead{margin:26px 0 14px}
+.shelfhead h2{font-family:var(--display);font-weight:400;font-size:clamp(24px,3.2vw,30px);line-height:1.1;margin:0;color:var(--ink)}
+.shelfhead p{margin:4px 0 0;font-size:14px;color:var(--muted)}
+.browse{font-size:14px;color:var(--muted);margin-right:2px}
+.tabs{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-block:0 26px}
 .picker{position:relative}
 .tab-cur{background:var(--ink);color:var(--wood);border-color:var(--ink);padding-right:12px}
 .tab-cur svg{width:16px;height:16px;opacity:.8}
@@ -266,7 +270,9 @@ label.hard input{accent-color:var(--brass-text);width:16px;height:16px;margin:0}
       <h2>Pinned</h2>
       <div class="pinrow" id="pinrow"></div>
     </section>
+    <div class="shelfhead"><h2 id="shelfTitle"></h2><p id="shelfSub"></p></div>
     <nav class="tabs" id="tabs" aria-label="Puzzle themes">
+      <span class="browse">Browse</span>
       <div class="picker">
         <button class="tab tab-cur" id="themeBtn" aria-haspopup="listbox" aria-expanded="false" aria-controls="themeMenu"><i></i><span id="themeName"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
         <ul class="menu" id="themeMenu" role="listbox" hidden></ul>
@@ -380,7 +386,7 @@ label.hard input{accent-color:var(--brass-text);width:16px;height:16px;margin:0}
 <div id="look" hidden><img id="lookImg" alt=""><div class="cap" id="lookCap"></div></div>
 <script>
 const CATS=[
-  {id:'home',label:'Featured today'},
+  {id:'home',label:'Home'},
   {id:'halloween',label:'Halloween'},
   {id:'holiday',label:'Holidays'},
   {id:'christmas',label:'Christmas'},
@@ -505,6 +511,8 @@ function renderTabs(){
   const c=CATS.find(x=>x.id===cat);
   $('themeBtn').style.setProperty('--dot',`var(--c-${c.id})`); $('themeBtn').querySelector('i').style.background=`var(--c-${c.id})`;
   $('themeName').textContent=c.label;
+  $('shelfTitle').textContent=c.id==='home'?"Today's Featured Puzzles":c.id==='photos'?'My photos':c.label;
+  $('shelfSub').textContent=c.id==='home'?`${HOME_N} picks, reshuffled every ${HOME_PERIOD_DAYS} days. Free ones are marked; an unlock code opens the rest and every theme.`:c.id==='photos'?'Puzzles made from your own pictures, on this device only.':`${countOf(c.id)} puzzles in this theme.`;
   $('themeMenu').innerHTML='<li class="hint" role="presentation">Choose a theme · star it to keep a shortcut</li>'+CATS.filter(x=>x.id==='photos'||countOf(x.id)>0).map(x=>`<li role="option" aria-selected="${x.id===cat}" class="${x.id===cat?'cur':''}"><button class="pick" data-cat="${x.id}" style="--dot:var(--c-${x.id})"><i></i>${x.label}</button><button class="pinb" data-pin="${x.id}" aria-pressed="${pins.includes(x.id)}" aria-label="${pins.includes(x.id)?'Unpin':'Pin'} ${x.label}" title="${pins.includes(x.id)?'Remove shortcut':'Keep as a shortcut'}">${PIN_SVG}</button></li>`).join('');
   $('pins').innerHTML=pins.map(id=>{const x=CATS.find(c=>c.id===id);return `<button class="tab" id="tab-${id}" aria-pressed="${id===cat}" aria-selected="${id===cat}" style="--dot:var(--c-${id})" data-cat="${id}"><i></i>${x.label}</button>`}).join('');
 }
@@ -548,7 +556,7 @@ function renderGrid(){
   renderPinned();
   const ix=idx();
   const list=cat==='photos'?PHOTOS:cat==='home'?featured():IMAGES.filter(i=>i.cat===cat);
-  const lead=cat==='home'?`<p class="shelfnote">Sixteen picks, reshuffled every three days. Free ones are marked; an unlock code opens the rest and every theme.</p>`:cat!=='photos'?'':unlocked()
+  const lead=cat!=='photos'?'':unlocked()
     ?`<article class="box addbox"><button class="addphoto" id="addPhoto"><b>+</b><span>Add a photo</span><small>Turn any picture on this device into a puzzle. It stays on this device only.</small></button></article>`
     :`<article class="box addbox locked"><div class="addphoto"><b>🔒</b><span>Your own photos</span><small>Make puzzles from your own pictures. Part of the full version.</small><button class="btn" id="photoUnlock">Unlock</button></div></article>`;
   $('grid').innerHTML=lead+list.map(img=>{
