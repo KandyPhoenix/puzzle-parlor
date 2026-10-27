@@ -33,6 +33,7 @@
 :root{
   --wood:#f1f2f4; --wood-2:#e3e5e9; --card:#ffffff; --card-hi:#f5f6f8;
   --ink:#23262b; --muted:#5f6670; --faint:rgba(35,38,43,.13);
+  --head:#3f5f8a; --head-ink:#ffffff; --head-soft:#cfe0f7; --head-muted:rgba(255,255,255,.82);
   --brass:#5b7fb8; --brass-ink:#ffffff; --brass-text:#3d5f96;
   --bar:rgba(255,255,255,.95); --chip:rgba(35,38,43,.06); --chip-hi:rgba(35,38,43,.11);
   --table:#e2e3e6; --tray:#f7f8fa;
@@ -54,10 +55,12 @@ button{font:inherit;color:inherit}
 #gallery{min-height:100%;padding-inline:clamp(16px,4vw,48px);padding-block:28px 56px;
   background:radial-gradient(1200px 500px at 15% -10%, rgba(91,127,184,.10), transparent 60%), var(--wood)}
 .wrap{max-width:1240px;margin-inline:auto}
-.mast{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 32px;padding-bottom:22px;border-bottom:1px solid var(--faint)}
-.mast h1{font-family:var(--display);font-weight:400;font-size:clamp(34px,6vw,58px);line-height:1;letter-spacing:.01em;margin:0;color:var(--ink);text-wrap:balance}
-.mast h1 span{color:var(--brass-text)}
-.mast p{margin:0;max-width:52ch;color:var(--muted)}
+.mast{background:var(--head);color:var(--head-ink);margin:-28px calc(-1*clamp(16px,4vw,48px)) 22px;padding:calc(26px + env(safe-area-inset-top)) clamp(16px,4vw,48px) 26px}
+.mast .wrap{display:flex;align-items:center;justify-content:space-between;gap:18px 36px;flex-wrap:wrap}
+.mast .intro{flex:1 1 360px;min-width:0}
+.mast h1{font-family:var(--display);font-weight:400;font-size:clamp(34px,6vw,58px);line-height:1;letter-spacing:.01em;margin:0 0 10px;color:var(--head-soft);text-wrap:balance}
+.mast h1 span{color:var(--head-ink)}
+.mast p{margin:0;max-width:52ch;color:var(--head-muted)}
 .tabs{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-block:22px 26px}
 .picker{position:relative}
 .tab-cur{background:var(--ink);color:var(--wood);border-color:var(--ink);padding-right:12px}
@@ -90,7 +93,7 @@ button{font:inherit;color:inherit}
 .box .art img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s ease}
 .box:hover .art img{transform:scale(1.04)}
 .box .art{cursor:zoom-in}
-#promo{display:flex;align-items:center;gap:16px;margin:0 0 18px;padding:12px 14px;border-radius:8px;background:var(--card);border:1px solid var(--brass);box-shadow:0 6px 24px rgba(0,0,0,.18)}
+#promo{flex:0 1 520px;display:flex;align-items:center;gap:16px;margin:0;padding:12px 14px;border-radius:8px;background:var(--card);color:var(--ink);border:1px solid var(--brass);box-shadow:0 6px 24px rgba(0,0,0,.18)}
 #promo img{width:150px;height:auto;aspect-ratio:4/3;align-self:center;object-fit:cover;border-radius:5px;flex:none;cursor:zoom-in}
 #promo .ptext{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
 #promo .kick{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--brass-ink);background:var(--brass);padding:2px 7px;border-radius:3px;align-self:flex-start}
@@ -98,7 +101,7 @@ button{font:inherit;color:inherit}
 #promo p{margin:0;color:var(--muted);font-size:14px}
 #promo .ends{font-size:12px;color:var(--brass-text);font-weight:700}
 #promo .btn{flex:none}
-@media (max-width:640px){#promo{flex-wrap:wrap}#promo img{width:100%;max-height:160px}#promo .btn{width:100%}}
+@media (max-width:640px){#promo{flex-basis:100%;flex-wrap:wrap}#promo img{width:100%;max-height:160px}#promo .btn{width:100%}}
 #look{position:fixed;inset:0;z-index:50;background:rgba(20,22,26,.94);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:14px;cursor:zoom-out}
 #look img{max-width:100%;max-height:calc(100% - 56px);object-fit:contain;border:3px solid #fff;box-shadow:0 20px 50px rgba(0,0,0,.5);background:#222}
 #look .cap{color:#f1f2f4;font-size:14px;text-align:center;text-wrap:balance}
@@ -273,16 +276,18 @@ label.hard input{accent-color:var(--brass-text);width:16px;height:16px;margin:0}
 </head>
 <body>
 <main id="gallery">
-  <div class="wrap">
-    <header class="mast">
+  <header class="mast"><div class="wrap">
+    <div class="intro">
       <h1>Puzzle <span>Parlor</span></h1>
       <p id="lede">Jigsaw puzzles of spooky Halloween scenes, cozy Christmas and holiday pictures, famous paintings, fantasy worlds, fairy tales and landscapes. Pick any picture and choose from 100 to 1,000 pieces.</p>
-    </header>
-    <section id="promo" hidden aria-label="Special offer">
+    </div>
+<section id="promo" hidden aria-label="Special offer">
       <img id="promoImg" alt="" width="520" height="390">
       <div class="ptext"><span class="kick" id="promoKick"></span><h2 id="promoTitle"></h2><p id="promoText"></p><span class="ends" id="promoEnds"></span></div>
       <button class="btn" id="promoBtn">Play it</button>
     </section>
+  </div></header>
+  <div class="wrap">
     <section id="pinned" hidden aria-label="Pinned puzzles">
       <h2>Pinned</h2>
       <div class="pinrow" id="pinrow"></div>
