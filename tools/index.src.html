@@ -2,7 +2,7 @@
 <title>Puzzle Parlor: Free Online Jigsaw Puzzles, 100-1,000 Pieces</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Figtree:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Figtree:wght@400;500;600;700&family=Nunito:wght@500;700;800&family=IBM+Plex+Mono:wght@500&display=swap">
 <style>
 /* Layout: a bright puzzle-parlor shelf of boxes (gallery) that opens onto a light table with a piece tray along the bottom. Single light look by design; the table colour is the player's choice. */
 :root{
@@ -30,12 +30,13 @@ button{font:inherit;color:inherit}
 #gallery{min-height:100%;padding-inline:clamp(16px,4vw,48px);padding-block:28px 56px;
   background:radial-gradient(1200px 500px at 15% -10%, rgba(91,127,184,.10), transparent 60%), var(--wood)}
 .wrap{max-width:1240px;margin-inline:auto}
-.mast{background:var(--head);color:var(--head-ink);margin:-28px calc(-1*clamp(16px,4vw,48px)) 22px;padding:calc(18px + env(safe-area-inset-top)) clamp(16px,4vw,48px) 18px}
-.mast .wrap{display:flex;align-items:center;justify-content:space-between;gap:18px 36px;flex-wrap:wrap}
-.mast .intro{flex:1 1 360px;min-width:0}
-.mast h1{font-family:var(--display);font-weight:400;font-size:clamp(26px,5vw,36px);line-height:1;letter-spacing:.01em;margin:0 0 6px;color:var(--head-soft);text-wrap:balance}
+.mast{background:radial-gradient(circle at 85% 20%,rgba(255,255,255,.12),transparent 45%),var(--head);color:var(--head-ink);margin:-28px calc(-1*clamp(16px,4vw,48px)) 22px;padding:calc(30px + env(safe-area-inset-top)) clamp(16px,4vw,48px) 34px}
+.mast .wrap{display:grid;grid-template-columns:1fr;gap:26px;align-items:center}
+@media (min-width:860px){.mast .wrap{grid-template-columns:1.1fr .9fr;gap:48px}.mast{padding-top:calc(44px + env(safe-area-inset-top));padding-bottom:48px}}
+.mast .intro{min-width:0}
+.mast h1{font-family:var(--display);font-weight:400;font-size:clamp(42px,8vw,76px);line-height:1;letter-spacing:-.01em;margin:0;color:var(--head-soft);text-wrap:balance}
 .mast h1 span{color:var(--head-ink)}
-.mast p{margin:0;max-width:60ch;font-size:14px;color:var(--head-muted)}
+.mast p{font-family:"Nunito",var(--body);font-size:clamp(16px,2vw,19px);line-height:1.55;margin:24px 0 0;max-width:36em;color:var(--head-ink);opacity:.95}
 .tabs{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-block:22px 26px}
 .picker{position:relative}
 .tab-cur{background:var(--ink);color:var(--wood);border-color:var(--ink);padding-right:12px}
@@ -68,15 +69,16 @@ button{font:inherit;color:inherit}
 .box .art img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s ease}
 .box:hover .art img{transform:scale(1.04)}
 .box .art{cursor:zoom-in}
-#promo{flex:0 1 480px;display:flex;align-items:center;gap:12px;margin:0;padding:8px 10px;border-radius:8px;background:var(--card);color:var(--ink);border:1px solid var(--brass);box-shadow:0 6px 24px rgba(0,0,0,.18)}
-#promo img{width:96px;height:auto;aspect-ratio:4/3;align-self:center;object-fit:cover;border-radius:5px;flex:none;cursor:zoom-in}
+#promo{display:flex;flex-direction:column;width:100%;max-width:380px;margin:0 auto;padding:0;border-radius:20px;overflow:hidden;background:var(--card);color:var(--ink);box-shadow:0 18px 40px rgba(0,0,0,.28);text-align:left}
+#promo .pic{position:relative;aspect-ratio:4/3;background:#fff}
+#promo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 30%;display:block;cursor:zoom-in;border-radius:0}
+#promo .kick{position:absolute;top:12px;left:12px;z-index:1;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#fff;background:var(--brass);padding:5px 11px;border-radius:999px}
+#promo .info{display:flex;align-items:center;gap:12px;padding:14px 16px}
 #promo .ptext{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
-#promo .kick{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--brass-ink);background:var(--brass);padding:2px 7px;border-radius:3px;align-self:flex-start}
-#promo h2{margin:0;font-size:15px;line-height:1.25;text-wrap:balance}
-#promo p{margin:0;color:var(--muted);font-size:12px;line-height:1.3}
-#promo .ends{font-size:11px;color:var(--brass-text);font-weight:700}
-#promo .btn{flex:none}
-@media (max-width:640px){#promo{flex-basis:100%;flex-wrap:wrap}#promo img{width:100%;max-height:160px}#promo .btn{width:100%}}
+#promo h2{margin:0;font-family:var(--display);font-weight:400;font-size:22px;line-height:1.15}
+#promo p{display:none}
+#promo .ends{font-size:13px;color:var(--muted);font-weight:500}
+#promo .btn{flex:none;border-radius:12px;padding:11px 16px;font-weight:800;font-size:15px}
 #look{position:fixed;inset:0;z-index:50;background:rgba(20,22,26,.94);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:14px;cursor:zoom-out}
 #look img{max-width:100%;max-height:calc(100% - 56px);object-fit:contain;border:3px solid #fff;box-shadow:0 20px 50px rgba(0,0,0,.5);background:#222}
 #look .cap{color:#f1f2f4;font-size:14px;text-align:center;text-wrap:balance}
@@ -254,9 +256,9 @@ label.hard input{accent-color:var(--brass-text);width:16px;height:16px;margin:0}
       <p id="lede">Jigsaw puzzles of spooky Halloween scenes, cozy Christmas and holiday pictures, famous paintings, fantasy worlds, fairy tales and landscapes. Pick any picture and choose from 100 to 1,000 pieces.</p>
     </div>
 <section id="promo" hidden aria-label="Special offer">
-      <img id="promoImg" alt="" width="520" height="390">
-      <div class="ptext"><span class="kick" id="promoKick"></span><h2 id="promoTitle"></h2><p id="promoText"></p><span class="ends" id="promoEnds"></span></div>
-      <button class="btn" id="promoBtn">Play it</button>
+      <div class="pic"><img id="promoImg" alt="" width="520" height="390"><span class="kick" id="promoKick"></span></div>
+      <div class="info"><div class="ptext"><h2 id="promoTitle"></h2><p id="promoText"></p><span class="ends" id="promoEnds"></span></div>
+      <button class="btn" id="promoBtn">Play it</button></div>
     </section>
   </div></header>
   <div class="wrap">
@@ -442,7 +444,7 @@ const EGGS={
 // (it does not count toward the two always-free puzzles per theme, so it locks again when the promo ends).
 // Dates are local time; 'until' is the first moment the promo is over.
 const PROMOS=[
-  {slug:'monster-ball',kick:'Free for Halloween',title:'The Monster Ball is free until November 1',text:'Join the dance: ghouls, goblins and a very suspicious punch bowl. Play it free in any size, then see if you can find what is hiding in the ballroom.',until:'2026-11-01T00:00:00',free:true,btn:'Play it free'}
+  {slug:'monster-ball',kick:'Free for Halloween',title:'The Monster Ball',text:'Join the dance: ghouls, goblins and a very suspicious punch bowl. Play it free in any size, then see if you can find what is hiding in the ballroom.',until:'2026-11-01T00:00:00',free:true,btn:'Play it free'}
 ];
 const promoActive=p=>{const now=Date.now(); return (!p.from||now>=new Date(p.from).getTime()) && now<new Date(p.until).getTime();};
 const PROMO_FREE=new Set(PROMOS.filter(p=>p.free).map(p=>p.slug));
@@ -585,7 +587,7 @@ renderTabs();renderGrid();
 function renderPromo(){ const p=PROMOS.find(promoActive); const el=$('promo'); if(!p){el.hidden=true;return}
   const img=findImg(p.slug); if(!img){el.hidden=true;return}
   $('promoImg').src=thumbOf(img); $('promoImg').alt=img.title; $('promoKick').textContent=p.kick||''; $('promoTitle').textContent=p.title; $('promoText').textContent=p.text||'';
-  const d=new Date(p.until); $('promoEnds').textContent='Ends '+d.toLocaleDateString(undefined,{month:'long',day:'numeric'});
+  const d=new Date(p.until); $('promoEnds').textContent='Free in every size · Ends '+d.toLocaleDateString(undefined,{month:'long',day:'numeric'});
   $('promoBtn').textContent=p.btn||'Play it';
   $('promoBtn').onclick=()=>{ cat=img.cat; store.set('jig-cat',cat); renderTabs(); renderGrid(); const box=document.querySelector(`#grid .box[data-slug="${p.slug}"]`); if(box) box.scrollIntoView({behavior:'smooth',block:'center'}); };
   $('promoImg').onclick=()=>openLook(img);
