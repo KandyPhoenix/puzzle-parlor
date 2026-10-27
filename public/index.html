@@ -421,7 +421,7 @@ const srcOf=img=>img.photo?img.url:'img/'+img.slug+'.jpg';
 // 'New scene' shows for three weeks after a picture is added (img.added = YYYY-MM-DD, set by the release script)
 // Featured shelf: 15 pictures reshuffled every day (seeded by the date, so a refresh shows the same shelf),
 // always including a few free ones so a new player can start at once.
-const HOME_N=15, HOME_FREE_MIN=3;
+const HOME_N=16, HOME_FREE_MIN=3;
 function seeded(seed){ let t=seed>>>0; return ()=>{ t+=0x6D2B79F5; let r=Math.imul(t^t>>>15,1|t); r^=r+Math.imul(r^r>>>7,61|r); return ((r^r>>>14)>>>0)/4294967296; }; }
 function shuffled(arr,rnd){ const a=arr.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(rnd()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
 function featured(){
@@ -569,7 +569,7 @@ function renderGrid(){
   renderPinned();
   const ix=idx();
   const list=cat==='photos'?PHOTOS:cat==='home'?featured():IMAGES.filter(i=>i.cat===cat);
-  const lead=cat==='home'?`<p class="shelfnote">Fifteen picks, reshuffled every day. Free ones are marked; an unlock code opens the rest and every theme.</p>`:cat!=='photos'?'':unlocked()
+  const lead=cat==='home'?`<p class="shelfnote">Sixteen picks, reshuffled every day. Free ones are marked; an unlock code opens the rest and every theme.</p>`:cat!=='photos'?'':unlocked()
     ?`<article class="box addbox"><button class="addphoto" id="addPhoto"><b>+</b><span>Add a photo</span><small>Turn any picture on this device into a puzzle. It stays on this device only.</small></button></article>`
     :`<article class="box addbox locked"><div class="addphoto"><b>🔒</b><span>Your own photos</span><small>Make puzzles from your own pictures. Part of the full version.</small><button class="btn" id="photoUnlock">Unlock</button></div></article>`;
   $('grid').innerHTML=lead+list.map(img=>{
