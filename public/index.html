@@ -37,7 +37,7 @@
   --brass:#5b7fb8; --brass-ink:#ffffff; --brass-text:#3d5f96;
   --bar:rgba(255,255,255,.95); --chip:rgba(35,38,43,.06); --chip-hi:rgba(35,38,43,.11);
   --table:#e2e3e6; --tray:#f7f8fa;
-  --c-home:#c99a3a; --c-halloween:#f07a2a; --c-holiday:#e9c35a; --c-christmas:#d8443c; --c-paintings:#5d9be0; --c-fantasy:#a983ec; --c-landscapes:#6fb880; --c-fairytales:#ec7fb4; --c-animals:#e8a33d; --c-sports:#d9342b; --c-vibes:#f06aa8; --c-photos:#3aa6a0;
+  --c-home:#c99a3a; --c-mine:#d9466b; --c-halloween:#f07a2a; --c-holiday:#e9c35a; --c-christmas:#d8443c; --c-paintings:#5d9be0; --c-fantasy:#a983ec; --c-landscapes:#6fb880; --c-fairytales:#ec7fb4; --c-animals:#e8a33d; --c-sports:#d9342b; --c-vibes:#f06aa8; --c-photos:#3aa6a0;
   --display:"Alfa Slab One", "Rockwell", "Roboto Slab", Georgia, serif;
   --body:"Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
@@ -122,6 +122,14 @@ button{font:inherit;color:inherit}
 .box .by{color:var(--muted);font-size:13px}
 .box .chips{display:flex;gap:6px;flex-wrap:wrap}
 .shelfnote{grid-column:1/-1;margin:0 0 4px;color:var(--muted);font-size:14px}
+.grouphead{grid-column:1/-1;margin:10px 0 -6px;font-family:var(--display);font-weight:400;font-size:22px;color:var(--ink)}
+.grouphead:first-child{margin-top:0}
+.fav{position:absolute;top:8px;right:8px;z-index:2;width:36px;height:36px;border-radius:50%;border:0;padding:0;display:grid;place-items:center;cursor:pointer;background:rgba(255,255,255,.9);box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.fav svg{width:19px;height:19px;fill:none;stroke:#5f6670;stroke-width:2;stroke-linejoin:round}
+.fav[aria-pressed="true"] svg{fill:#d9466b;stroke:#d9466b}
+.fav:hover svg{stroke:#d9466b}
+.fav:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
+#ppToast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:20;max-width:min(92vw,460px);background:rgba(35,38,43,.94);color:#fff;padding:11px 18px;border-radius:10px;font-size:14px;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.3)}
 .box .lock,.box .free{align-self:flex-start;margin-top:4px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:3px}
 .box .lock{color:var(--muted);background:var(--chip)}
 .box .free{color:var(--brass-ink);background:var(--brass)}
@@ -384,11 +392,12 @@ label.hard input{accent-color:var(--brass-text);width:16px;height:16px;margin:0}
     <div id="veil"><p id="veilMsg">Cutting pieces…</p></div>
     <canvas id="confetti" hidden></canvas>
     <div id="eggToast" role="status" hidden></div>
+    <div id="ppToast" role="status" hidden></div>
     <div id="paused" hidden><div class="card"><h2>Paused</h2><p>The timer is stopped and the pieces are hidden until you resume.</p><div class="row"><button class="btn" id="resumeBtn">Resume</button><button class="btn ghost" id="pausedBack">Back to puzzles</button></div></div></div>
     <div id="win" hidden><div class="card">
       <h2>Finished!</h2>
       <p id="winMsg"></p>
-      <div class="row"><button class="btn" id="winBack">More puzzles</button><button class="btn ghost" id="winStay">Admire it</button></div>
+      <div class="row"><button class="btn" id="winBack">More puzzles</button><button class="btn ghost" id="winShare">Share</button><button class="btn ghost" id="winStay">Admire it</button></div>
     </div></div>
   </div>
   <div id="tray" aria-label="Piece tray">
@@ -423,6 +432,7 @@ label.hard input{accent-color:var(--brass-text);width:16px;height:16px;margin:0}
 const THEME_SUB={"halloween": "Spooky jigsaw puzzles for the season: haunted villages, witches' kitchens, a monster ball and classic paintings by Goya, Fuseli and Bruegel.", "holiday": "Festive puzzles through the year: Thanksgiving, winter ice scenes, village autumns and the Feast of St. Nicholas.", "christmas": "Cozy Christmas jigsaw puzzles: Bruegel's snowy villages, Botticelli's nativity, Carl Larsson's Christmas Eve, Santa's workshop and a gingerbread village.", "paintings": "Famous paintings as jigsaw puzzles: Van Gogh, Monet, Seurat, Klimt, Renoir, Bosch and Hokusai's Great Wave.", "fantasy": "Titans, heroes, fairy fellers and the end of days. Adventure puzzles from Thomas Cole, Vasnetsov, John Martin and more.", "fairytales": "Storybook puzzles: Vasnetsov's Russian fairy tales, John Bauer's forest princess, a gingerbread house and a kingdom of your own.", "landscapes": "Mountains, canyons, forests and coastlines from Bierstadt, Church, Moran, Cole, Shishkin and Van Gogh.", "animals": "Animal puzzles with a smile: a woodland picnic, chaos at the cat cafe, dog park day and a waterhole at sunset.", "sports": "Street circuits, drag races, regattas and a day in the field. Sports puzzles full of action.", "vibes": "Zen gardens, koi ponds, uplifting sayings and a little silliness. Puzzles for a good mood."};
 const CATS=[
   {id:'home',label:'Home'},
+  {id:'mine',label:'My Puzzles'},
   {id:'vibes',label:'Good vibes'},
   {id:'halloween',label:'Halloween'},
   {id:'holiday',label:'Holidays'},
@@ -541,15 +551,16 @@ const fmtN=n=>n.toLocaleString('en-US');
 /* ---------- gallery ---------- */
 let cat='home'; // every launch opens on the Featured shelf; themes are a tap away
 let pins=store.get('jig-pins')||[]; pins=pins.filter(p=>CATS.some(c=>c.id===p));
+const HEART_SVG='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.6-9.3C.9 8.3 3 4.5 6.7 4.5c2.1 0 3.6 1.2 4.4 2.6.8-1.4 2.3-2.6 4.4-2.6 3.7 0 5.8 3.8 4.3 7.2C19.5 16.4 12 21 12 21z"/></svg>';
 const PIN_SVG='<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16 3l5 5-4 1-3 3 1 5-2 2-4-4-5 5-1-1 5-5-4-4 2-2 5 1 3-3z"/></svg>';
-const countOf=id=>id==='photos'?PHOTOS.length:id==='home'?Math.min(HOME_N,IMAGES.length):IMAGES.filter(i=>i.cat===id).length;
+const countOf=id=>id==='photos'?PHOTOS.length:id==='mine'?myCount():id==='home'?Math.min(HOME_N,IMAGES.length):IMAGES.filter(i=>i.cat===id).length;
 function renderTabs(){
   const c=CATS.find(x=>x.id===cat);
   $('themeBtn').style.setProperty('--dot',`var(--c-${c.id})`); $('themeBtn').querySelector('i').style.background=`var(--c-${c.id})`;
   $('themeName').textContent=c.label;
-  $('shelfTitle').textContent=c.id==='home'?"Today's Featured Puzzles":c.id==='photos'?'My photos':c.label;
-  $('shelfSub').textContent=c.id==='home'?'Enjoy our selection of free jigsaw puzzles, from famous paintings to original art, in sizes from 100 to 1,000 pieces. Upgrade to the unlocked version to play every puzzle in every theme.':c.id==='photos'?'Puzzles made from your own pictures, on this device only.':(THEME_SUB[c.id]||'');
-  $('themeMenu').innerHTML='<li class="hint" role="presentation">Choose a theme · star it to keep a shortcut</li>'+CATS.filter(x=>x.id==='photos'||countOf(x.id)>0).map(x=>`<li role="option" aria-selected="${x.id===cat}" class="${x.id===cat?'cur':''}"><button class="pick" data-cat="${x.id}" style="--dot:var(--c-${x.id})"><i></i>${x.label}</button><button class="pinb" data-pin="${x.id}" aria-pressed="${pins.includes(x.id)}" aria-label="${pins.includes(x.id)?'Unpin':'Pin'} ${x.label}" title="${pins.includes(x.id)?'Remove shortcut':'Keep as a shortcut'}">${PIN_SVG}</button></li>`).join('');
+  $('shelfTitle').textContent=c.id==='home'?"Today's Featured Puzzles":c.id==='mine'?'My Puzzles':c.id==='photos'?'My photos':c.label;
+  $('shelfSub').textContent=c.id==='mine'?'Your favorites, the puzzles you have started and the ones you have finished, all in one place. Tap the heart on any puzzle to save it here.':c.id==='home'?'Enjoy our selection of free jigsaw puzzles, from famous paintings to original art, in sizes from 100 to 1,000 pieces. Upgrade to the unlocked version to play every puzzle in every theme.':c.id==='photos'?'Puzzles made from your own pictures, on this device only.':(THEME_SUB[c.id]||'');
+  $('themeMenu').innerHTML='<li class="hint" role="presentation">Choose a theme · star it to keep a shortcut</li>'+CATS.filter(x=>x.id==='photos'||x.id==='mine'||countOf(x.id)>0).map(x=>`<li role="option" aria-selected="${x.id===cat}" class="${x.id===cat?'cur':''}"><button class="pick" data-cat="${x.id}" style="--dot:var(--c-${x.id})"><i></i>${x.label}</button><button class="pinb" data-pin="${x.id}" aria-pressed="${pins.includes(x.id)}" aria-label="${pins.includes(x.id)?'Unpin':'Pin'} ${x.label}" title="${pins.includes(x.id)?'Remove shortcut':'Keep as a shortcut'}">${PIN_SVG}</button></li>`).join('');
   $('pins').innerHTML=pins.map(id=>{const x=CATS.find(c=>c.id===id);return `<button class="tab" id="tab-${id}" aria-pressed="${id===cat}" aria-selected="${id===cat}" style="--dot:var(--c-${id})" data-cat="${id}"><i></i>${x.label}</button>`}).join('');
 }
 function openMenu(v){$('themeMenu').hidden=!v;$('themeBtn').setAttribute('aria-expanded',String(v))}
@@ -563,6 +574,21 @@ $('themeMenu').addEventListener('click',e=>{
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
 const PIN_MAX=4;
 function pinnedKeys(){const ix=idx();return Object.keys(ix).filter(k=>ix[k].pin).sort((a,b)=>(ix[b].pt||0)-(ix[a].pt||0))}
+// Favorites ride on the progress index as 'fav:<slug>' entries, so they sync across devices with it.
+const isFav=slug=>!!(idx()['fav:'+slug]||{}).fav;
+function toggleFav(slug){ const on=!isFav(slug); setIdx('fav:'+slug,{fav:on}); renderGrid(); ppToast(on?'Saved to My Puzzles':'Removed from favorites'); }
+function myPuzzles(){
+  const ix=idx(), fav=[], prog=[], fin=[], add=(arr,img)=>{ if(img&&!arr.includes(img)) arr.push(img); };
+  for(const k in ix){
+    if(k.startsWith('fav:')){ if(ix[k].fav) add(fav,findImg(k.slice(4))); continue; }
+    const q=parseKey(k); if(!q) continue; const img=findImg(q.slug);
+    if(ix[k].done) add(fin,img); else if(ix[k].pct!=null) add(prog,img);
+  }
+  return {fav,prog,fin};
+}
+function myCount(){ const m=myPuzzles(); return m.fav.length+m.prog.length+m.fin.length; }
+let ppToastT=null;
+function ppToast(msg){ const t=$('ppToast'); if(!t) return; t.textContent=msg; t.hidden=false; clearTimeout(ppToastT); ppToastT=setTimeout(()=>{t.hidden=true},2600); }
 function parseKey(k){const m=/^jig:(.+):(\d+)$/.exec(k);return m?{slug:m[1],n:+m[2]}:null}
 function renderPinned(){
   const ix=idx(), keys=pinnedKeys();
@@ -591,11 +617,16 @@ $('pinBtn').onclick=()=>{if(!P)return;const on=$('pinBtn').getAttribute('aria-pr
 function renderGrid(){
   renderPinned();
   const ix=idx();
-  const list=cat==='photos'?PHOTOS:cat==='home'?featured():IMAGES.filter(i=>i.cat===cat);
+  let list=cat==='photos'?PHOTOS:cat==='home'?featured():IMAGES.filter(i=>i.cat===cat);
+  if(cat==='mine'){ const m=myPuzzles(); list=[];
+    if(m.fav.length) list.push('<h3 class="grouphead">Favorites</h3>',...m.fav);
+    if(m.prog.length) list.push('<h3 class="grouphead">In progress</h3>',...m.prog);
+    if(m.fin.length) list.push('<h3 class="grouphead">Finished</h3>',...m.fin);
+    if(!list.length) list.push('<p class="shelfnote">Nothing here yet. Tap the heart on any puzzle to save it, and the puzzles you start or finish show up here on their own.</p>'); }
   const lead=cat!=='photos'?'':unlocked()
     ?`<article class="box addbox"><button class="addphoto" id="addPhoto"><b>+</b><span>Add a photo</span><small>Turn any picture on this device into a puzzle. It stays on this device only.</small></button></article>`
     :`<article class="box addbox locked"><div class="addphoto"><b>🔒</b><span>Your own photos</span><small>Make puzzles from your own pictures. Part of the full version.</small><button class="btn" id="photoUnlock">Unlock</button></div></article>`;
-  $('grid').innerHTML=lead+list.map(img=>{
+  $('grid').innerHTML=lead+list.map(img=>{ if(typeof img==='string') return img;
     const sizes=SIZES.map(n=>{
       const {count}=cut(n,img.w,img.h), k=`jig:${img.slug}:${n}`, s=ix[k];
       let sub='pieces',cls='size',bar='';
@@ -604,7 +635,7 @@ function renderGrid(){
       else if(!locked&&s&&s.pct!=null){sub='Resume '+s.pct+'%'+(s.hard?' ↻':'');bar=`<span class="bar" style="width:${s.pct}%"></span>`}
       return `<button class="${cls}" data-slug="${img.slug}" data-n="${n}" aria-label="${esc(img.title)}, ${count} pieces${s&&s.done?', completed':s&&s.pct!=null?', '+s.pct+'% done':''}"><span class="n">${fmtN(count)}</span><span class="s">${sub}</span>${bar}</button>`}).join('');
     return `<article class="box" data-slug="${img.slug}" style="--cat:var(--c-${img.cat})">
-      <div class="art"><img src="${thumbOf(img)}" alt="${esc(img.title)} by ${esc(img.artist)}" loading="lazy" width="520" height="390"></div>
+      <div class="art"><img src="${thumbOf(img)}" alt="${esc(img.title)} by ${esc(img.artist)}" loading="lazy" width="520" height="390">${img.photo?'':`<button class="fav" data-fav="${img.slug}" aria-pressed="${isFav(img.slug)}" aria-label="${isFav(img.slug)?'Remove '+esc(img.title)+' from favorites':'Save '+esc(img.title)+' to favorites'}">${HEART_SVG}</button>`}</div>
       <div class="meta"><h3>${esc(img.title)}</h3>${img.page?`<a class="by" href="${esc(img.page)}" target="_blank" rel="noopener">${esc(img.artist)}, ${esc(img.year)}</a>`:`<span class="by">${esc(img.artist)}</span>`}<span class="chips">${isRecent(img)?'<span class="new">New scene</span>':''}${LOCKING?(FREE.has(img.slug)?'<span class="free">Free</span>':unlocked()?'':'<span class="lock">Full version</span>'):''}</span></div>
       <div class="sizes">${sizes}</div>${img.photo?`<button class="rmphoto" data-rm="${img.slug}" title="Remove this photo and its progress">Remove photo</button>`:''}</article>`}).join('');
   if(cat==='photos'){ const a=$('addPhoto'); if(a) a.onclick=()=>openPhotoDlg(); const u=$('photoUnlock'); if(u) u.onclick=()=>openUnlock({title:'Your own photos'}); }
@@ -617,6 +648,7 @@ $('tabs').addEventListener('keydown',e=>{
   cat=CATS[j].id;store.set('jig-cat',cat);renderTabs();renderGrid();
 });
 $('grid').addEventListener('click',e=>{
+  const f=e.target.closest('.fav'); if(f){ e.stopPropagation(); toggleFav(f.dataset.fav); return; }
   const a=e.target.closest('.art'); if(a){const box=a.closest('.box'); if(box&&box.dataset.slug) openLook(findImg(box.dataset.slug)); return}
   const b=e.target.closest('.size');if(!b)return;openPuzzle(findImg(b.dataset.slug),+b.dataset.n)});
 // Tap the picture on a card to see it big before choosing a size
@@ -650,7 +682,7 @@ async function apiCall(p,opt){
   if(!r.ok) throw new Error('Sync server said '+r.status);
   return r.status===204?true:r.json();
 }
-function syncMark(key){ if(!syncOn()||key.startsWith('jig:photo-')) return; sync.dirty.add(key); clearTimeout(sync.timer); sync.timer=setTimeout(()=>syncPush(),20000); }
+function syncMark(key){ if(!syncOn()||key.startsWith('jig:photo-')) return; if(!key.startsWith('fav:')) sync.dirty.add(key); clearTimeout(sync.timer); sync.timer=setTimeout(()=>syncPush(),20000); }
 function mergeIndex(remote){
   const local=idx(), out=Object.assign({},local), newer=[];
   for(const k in (remote||{})){ const r=remote[k], l=local[k]; if(!l||(r.u||0)>(l.u||0)){out[k]=r;newer.push(k)} }
@@ -677,10 +709,11 @@ async function syncPullIndex(){
     const remote=await apiCall('index');
     const {merged,newer}=mergeIndex(remote);
     // local entries the server doesn't have yet, or has older: queue them
-    for(const k in merged){ if(k.startsWith('jig:photo-')) continue; const r=remote&&remote[k]; if(!r||(merged[k].u||0)>(r.u||0)) sync.dirty.add(k); }
+    let idxDirty=false;
+    for(const k in merged){ if(k.startsWith('jig:photo-')) continue; const r=remote&&remote[k]; if(!r||(merged[k].u||0)>(r.u||0)){ if(k.startsWith('fav:')) idxDirty=true; else sync.dirty.add(k); } }
     // anything newer on the server: our local save is stale
     for(const k of newer){ const e=merged[k]; if(e.pct==null) store.del(k); }
-    sync.err=''; renderGrid(); if(sync.dirty.size) await syncPush(); else syncStatus();
+    sync.err=''; renderGrid(); if(sync.dirty.size||idxDirty) await syncPush(); else syncStatus();
   }catch(e){ sync.err=e.message; syncStatus(); }
 }
 async function syncPullSave(key){
@@ -1382,6 +1415,30 @@ $('restart').onclick=()=>{
   clearTimeout(armTimer); const{img,n,key}=P; store.del(key); setIdx(key,{done:false,pct:null}); P=null; syncPush(); openPuzzle(img,n);
 };
 $('back').onclick=leave; $('winBack').onclick=leave;
+async function shareWin(){
+  if(!P) return; const img=P.img, btn=$('winShare'); btn.disabled=true;
+  const site='https://puzzles.kandyphoenix.com/';
+  const text=`I finished "${img.title}" (${fmtN(P.count)} pieces) in ${fmtTime(P.elapsed)} on Puzzle Parlor.`;
+  try{
+    const pic=await new Promise((res,rej)=>{const i=new Image(); i.onload=()=>res(i); i.onerror=()=>rej(new Error('image')); i.src=srcOf(img);});
+    const W=1200, H=Math.round(pic.naturalHeight*W/pic.naturalWidth), strip=150;
+    const c=document.createElement('canvas'); c.width=W; c.height=H+strip; const x=c.getContext('2d');
+    x.drawImage(pic,0,0,W,H); x.fillStyle='#3f5f8a'; x.fillRect(0,H,W,strip);
+    const fit=(t,max)=>{ if(x.measureText(t).width<=max) return t; while(t.length>1&&x.measureText(t+'…').width>max) t=t.slice(0,-1); return t+'…'; };
+    x.textBaseline='alphabetic'; x.fillStyle='#ffffff'; x.font='700 44px Figtree, system-ui, sans-serif'; x.fillText(fit(img.title,W-460),40,H+64);
+    x.fillStyle='#cfe0f7'; x.font='500 30px Figtree, system-ui, sans-serif'; x.fillText(`${fmtN(P.count)} pieces · ${fmtTime(P.elapsed)}${P.hard?' · hard mode':''}`,40,H+112);
+    x.textAlign='right'; x.fillStyle='#ffffff'; x.font='400 40px "Alfa Slab One", Georgia, serif'; x.fillText('Puzzle Parlor',W-40,H+68);
+    x.fillStyle='#cfe0f7'; x.font='500 26px Figtree, system-ui, sans-serif'; x.fillText('puzzles.kandyphoenix.com',W-40,H+110);
+    const blob=await new Promise(r=>c.toBlob(r,'image/jpeg',.9));
+    const file=new File([blob],(img.photo?'my-puzzle':img.slug)+'.jpg',{type:'image/jpeg'});
+    if(navigator.canShare&&navigator.canShare({files:[file]})) await navigator.share({files:[file],title:'Puzzle Parlor',text:text+' '+site});
+    else if(navigator.share) await navigator.share({title:'Puzzle Parlor',text,url:site});
+    else { const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=file.name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+      try{ await navigator.clipboard.writeText(text+' '+site); ppToast('Picture saved, and the link is copied so you can paste it.'); }catch(e){ ppToast('Picture saved to your downloads.'); } }
+  }catch(e){ if(!(e&&e.name==='AbortError')) ppToast('Sharing did not work this time. Try again in a moment.'); }
+  btn.disabled=false;
+}
+$('winShare').onclick=shareWin;
 $('winStay').onclick=()=>{$('win').hidden=true; if(!eggActive()) $('confetti').hidden=true};
 function leave(){ openGen++; if(P){tick();save()} syncPush(); $('confetti').hidden=true; $('eggToast').hidden=true; eggTuneStop(); P=null; ptrs.clear(); drag=pan=pinch=trayDrag=null; strip.querySelectorAll('.tp').forEach(n=>n.remove()); $('play').hidden=true; $('gallery').hidden=false; renderGrid(); }
 document.addEventListener('keydown',e=>{
